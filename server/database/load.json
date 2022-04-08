@@ -917,9 +917,9 @@
                                 "tcp-server-interface-1-0:tcp-server-interface-pac": {
                                     "tcp-server-interface-configuration": {
                                         "local-address": {
-                                            "ipv-4-address": "10.118.125.157"
+                                            "ipv-4-address": "192.168.178.22"
                                         },
-                                        "local-port": 1005
+                                        "local-port": 8080
                                     }
                                 }
                             }
@@ -1382,10 +1382,10 @@
                                     "tcp-client-interface-configuration": {
                                         "remote-address": {
                                             "ip-address": {
-                                                "ipv-4-address": "10.118.125.157"
+                                                "ipv-4-address": "192.168.178.22"
                                             }
                                         },
-                                        "remote-port": 1000
+                                        "remote-port": 3000
                                     }
                                 }
                             }
@@ -2094,10 +2094,10 @@
                                     "tcp-client-interface-configuration": {
                                         "remote-address": {
                                             "ip-address": {
-                                                "ipv-4-address": "10.118.125.157"
+                                                "ipv-4-address": "192.168.178.22"
                                             }
                                         },
-                                        "remote-port": 1005
+                                        "remote-port": 8080
                                     }
                                 }
                             }
