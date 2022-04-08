@@ -3,6 +3,12 @@
  * For list attributes the keys mentioned within flower brackets {} should be replaced with appropriate values
  * 
  **/
+/******************************************
+ ********network-domain****************
+ *****************************************/
+
+ const NETWORK_DOMAIN = "core-model-1-4:network-control-domain"
+ const NETWORK_DOMAIN_CONTROL_CONSTRUCT = NETWORK_DOMAIN + "/control-construct";
 
 /******************************************
  ********control-construct****************
@@ -59,6 +65,8 @@ const FC_PORT = FORWARDING_CONSTRUCT + "={fcUuid}/fc-port";
 const FC_PORT_LOGICAL_TERMINATION_POINT = FC_PORT + "={fcPortLocalId}/logical-termination-point";
 
 module.exports = {
+    NETWORK_DOMAIN,
+    NETWORK_DOMAIN_CONTROL_CONSTRUCT,
     CONTROL_CONSTRUCT,
     CONTROL_CONSTRUCT_UUID,
     PROFILE_COLLECTION,

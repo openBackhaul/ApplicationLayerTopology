@@ -11,27 +11,35 @@ const onfPaths = require('../../applicationPattern/onfModel/constants/OnfPaths')
 
 const fileOperation = require('../../applicationPattern/databaseDriver/JSONDriver');
 
-exports.embedYourself = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus) {
+exports.regardApplication = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus, clientApplicationName,
+    clientReleaseNumber) {
     return new Promise(async function (resolve, reject) {
         let forwardingConstructAutomationList = [];
         try {
             let forwardingAutomation;
 
             /***********************************************************************************
-             * PromptForEmbeddingCausesRequestForBequeathingData /v1/bequeath-your-data-and-die
+             * NewApplicationCausesRequestForTopologyChangeInformation /v1/redirect-topology-change-information
              ************************************************************************************/
-            let bequeathYourDataAndDieForwardingName = "PromptForEmbeddingCausesRequestForBequeathingData";
-            let bequeathYourDataAndDieContext;
-            let bequeathYourDataAndDieRequestBody = {};
-            bequeathYourDataAndDieRequestBody.newApplicationName = await httpServerInterface.getApplicationNameAsync();
-            bequeathYourDataAndDieRequestBody.newApplicationRelease = await httpServerInterface.getReleaseNumberAsync();
-            bequeathYourDataAndDieRequestBody.newApplicationAddress = await tcpServerInterface.getLocalAddress();
-            bequeathYourDataAndDieRequestBody.newApplicationPort = await tcpServerInterface.getLocalPort();
-            bequeathYourDataAndDieRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(bequeathYourDataAndDieRequestBody);
+            let topologyChangeInformationForwardingName = "NewApplicationCausesRequestForTopologyChangeInformation";
+            let topologyChangeInformationContext = clientApplicationName + clientReleaseNumber;
+            let topologyChangeInformationRequestBody = {};
+            topologyChangeInformationRequestBody.topologyApplication = await httpServerInterface.getApplicationNameAsync();
+            topologyChangeInformationRequestBody.topologyApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
+            topologyChangeInformationRequestBody.topologyApplicationAddress = await tcpServerInterface.getLocalAddress();
+            topologyChangeInformationRequestBody.topologyApplicationPort = await tcpServerInterface.getLocalPort();
+            topologyChangeInformationRequestBody.topologyOperationApplicationUpdate = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3004");
+            topologyChangeInformationRequestBody.topologyOperationLtpUpdate = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3005");
+            topologyChangeInformationRequestBody.topologyOperationLtpDeletion = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3006");
+            topologyChangeInformationRequestBody.topologyOperationFcUpdate = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3013");
+            topologyChangeInformationRequestBody.topologyOperationFcPortUpdate = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3014");
+            topologyChangeInformationRequestBody.topologyOperationFcPortDeletion = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3015");
+            
+            topologyChangeInformationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(topologyChangeInformationRequestBody);
             forwardingAutomation = new forwardingConstructAutomationInput(
-                bequeathYourDataAndDieForwardingName,
-                bequeathYourDataAndDieRequestBody,
-                bequeathYourDataAndDieContext
+                topologyChangeInformationForwardingName,
+                topologyChangeInformationRequestBody,
+                topologyChangeInformationContext
             );
             forwardingConstructAutomationList.push(forwardingAutomation);
 
@@ -57,32 +65,11 @@ exports.embedYourself = function (logicalTerminationPointconfigurationStatus, fo
     });
 }
 
-exports.registerYourself = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus) {
+exports.disregardApplication = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus) {
     return new Promise(async function (resolve, reject) {
         let forwardingConstructAutomationList = [];
         try {
-            let forwardingAutomation;
-
-            /***********************************************************************************
-             * PromptForRegisteringCausesRegistrationRequest /v1/register-application
-             ************************************************************************************/
-            let registrationApplicationForwardingName = "PromptForRegisteringCausesRegistrationRequest";
-            let registrationApplicationContext;
-            let registrationApplicationRequestBody = {};
-            registrationApplicationRequestBody.applicationName = await httpServerInterface.getApplicationNameAsync();
-            registrationApplicationRequestBody.applicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-            registrationApplicationRequestBody.applicationAddress = await tcpServerInterface.getLocalAddress();
-            registrationApplicationRequestBody.applicationPort = await tcpServerInterface.getLocalPort();
-            registrationApplicationRequestBody.embeddingOperation = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-0001");
-            registrationApplicationRequestBody.clientUpdateOperation = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-0007");
-            registrationApplicationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(registrationApplicationRequestBody);
-            forwardingAutomation = new forwardingConstructAutomationInput(
-                registrationApplicationForwardingName,
-                registrationApplicationRequestBody,
-                registrationApplicationContext
-            );
-            forwardingConstructAutomationList.push(forwardingAutomation);
-
+            
             /***********************************************************************************
              * forwardings for application layer topology
              ************************************************************************************/
