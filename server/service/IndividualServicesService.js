@@ -80,8 +80,37 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
  * no response value expected for this operation
  **/
 exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let forwardingConstructUuid = body["fc-uuid"];
+      let fcPortLocalId = body["fc-port-local-id"];
+      let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+
+      /****************************************************************************************
+       * Prepare input object to 
+       * configure control-construct list
+       ****************************************************************************************/
+      let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
+
+      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+      let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
+      let forwardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT + "=" + forwardingConstructUuid;
+      let fcPortPath = forwardingConstructPath + "/" + onfAttributes.FORWARDING_CONSTRUCT.FC_PORT + "=" + fcPortLocalId;
+      let isFcPortExists = await fileOperation.readFromDatabaseAsync(fcPortPath)
+      if (isFcPortExists) {
+        await fileOperation.deletefromDatabaseAsync(fcPortPath,
+          fcPortPath,
+          true);
+      }
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -128,23 +157,12 @@ exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, 
         let isdeleted = await fileOperation.deletefromDatabaseAsync(logicalTerminationPointPathForTheUuid,
           existingLogicalTerminationPoint,
           true);
-        if (isdeleted && (layerProtocolName== LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT || 
-          layerProtocolName== LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
+        if (isdeleted && (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT ||
+            layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
           await deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid);
           await deleteDependentLinkPorts(logicalTerminationPointUuid);
         }
       }
-
-      /****************************************************************************************
-       * delete links
-       ****************************************************************************************/
-
-      
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-
 
       resolve();
     } catch (error) {
@@ -726,8 +744,48 @@ exports.updateAllLtpsAndFcs = function (body, user, originator, xCorrelator, tra
  * no response value expected for this operation
  **/
 exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let forwardingConstruct = body;
+      let forwardingConstructUuid = forwardingConstruct["uuid"];
+      let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+
+      /****************************************************************************************
+       * Prepare input object to 
+       * configure control-construct list
+       ****************************************************************************************/
+      let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
+      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+      let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
+      let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
+      let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
+      
+      let existingForwardingConstruct = await fileOperation.readFromDatabaseAsync(forwardingConstructPathForTheUuid);
+
+      if (existingForwardingConstruct) {
+        let existingForwardingConstructAsAString = JSON.stringify(existingForwardingConstruct);
+        let newForwardingConstructAsAString = JSON.stringify(forwardingConstruct);
+        if (existingForwardingConstructAsAString != newForwardingConstructAsAString) {
+          await fileOperation.deletefromDatabaseAsync(forwardingConstructPathForTheUuid,
+            existingForwardingConstruct,
+            true);
+          await fileOperation.writeToDatabaseAsync(forardingConstructPath,
+            forwardingConstruct,
+            true);
+        }
+      } else {
+        await fileOperation.writeToDatabaseAsync(forardingConstructPath,
+          forwardingConstruct,
+          true);
+      }
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -744,8 +802,51 @@ exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator
  * no response value expected for this operation
  **/
 exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let forwardingConstructUuid = body["fc-uuid"];
+      let fcPort = body["fc-port"];
+      let fcPortLocalId = fcPort["local-id"];
+      let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+
+      /****************************************************************************************
+       * Prepare input object to 
+       * configure control-construct list
+       ****************************************************************************************/
+      let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
+      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+      let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
+      let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
+      let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
+      let fcPortPath = forwardingConstructPathForTheUuid + "/fc-port";
+      let fcPortPathForTheUuid = fcPortPath + "=" + fcPortLocalId
+      
+      let existingFcPort = await fileOperation.readFromDatabaseAsync(fcPortPathForTheUuid);
+
+      if (existingFcPort) {
+        let existingFcPortAsAString = JSON.stringify(existingFcPort);
+        let newFcPortAsAString = JSON.stringify(fcPort);
+        if (existingFcPortAsAString != newFcPortAsAString) {
+          await fileOperation.deletefromDatabaseAsync(fcPortPathForTheUuid,
+            existingFcPort,
+            true);
+          await fileOperation.writeToDatabaseAsync(fcPortPath,
+            fcPort,
+            true);
+        }
+      } else {
+        await fileOperation.writeToDatabaseAsync(fcPortPath,
+          fcPort,
+          true);
+      }
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -856,6 +957,38 @@ function getAllClientApplicationList() {
   });
 }
 
+async function getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid) {
+  return new Promise(async function (resolve, reject) {
+    let forwardingDomainUuid;
+    try {
+      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+      let forwardingConstructPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN;
+
+      let forwardingDomainList = await fileOperation.readFromDatabaseAsync(
+        forwardingConstructPath);
+      /*************************************************************************************
+       ****************delete dependents , if a fc-port exist for them***********************
+       *************************************************************************************/
+      for (let i = 0; i < forwardingDomainList.length; i++) {
+        let forwardingDomain = forwardingDomainList[i];
+        let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+
+        for (let j = 0; j < forwardingConstructList.length; j++) {
+          let forwardingConstruct = forwardingConstructList[j];
+          let _forwardingConstructUuid = forwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID];
+          if (_forwardingConstructUuid == forwardingConstructUuid) {
+            forwardingDomainUuid = forwardingDomain[onfAttributes.GLOBAL_CLASS.UUID];
+          }
+        }
+      }
+
+      resolve(forwardingDomainUuid);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 async function deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid) {
   return new Promise(async function (resolve, reject) {
     try {
@@ -942,11 +1075,11 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
           let link = linkList[i];
           let linkUuid = link["uuid"];
           let linkPortList = link["link-port"];
-          if(linkPortList){
-            for(let j=0;j<linkPortList.length;j++){
+          if (linkPortList) {
+            for (let j = 0; j < linkPortList.length; j++) {
               let linkPort = linkPortList[j];
               let linkPortLogicalTerminationPoint = linkPort["logical-termination-point"];
-              if(linkPortLogicalTerminationPoint == logicalTerminationPointUuid){
+              if (linkPortLogicalTerminationPoint == logicalTerminationPointUuid) {
                 await NetworkControlDomain.deleteLinkAsync(linkUuid);
               }
             }
