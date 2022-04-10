@@ -404,21 +404,84 @@ exports.listLinksToOperationClientsOfApplication = function (body, user, origina
  * returns inline_response_200_3
  **/
 exports.listOperationClientsAtApplication = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-      "operation-client-list": [{
-        "serving-application-name": "TypeApprovalRegister",
-        "serving-application-release-number": "0.0.1",
-        "operation-name": "/v1/embed-yourself"
-      }, {
-        "serving-application-name": "TypeApprovalRegister",
-        "serving-application-release-number": "0.0.1",
-        "operation-name": "/v1/update-client"
-      }]
-    };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
+  return new Promise(async function (resolve, reject) {
+    let response = {};
+    let operationClientList = [];
+    try {
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let applicationName = body["application-name"];
+      let applicationReleaseNumber = body["application-release-number"];
+
+      /****************************************************************************************
+       * Preparing response body
+       ****************************************************************************************/
+      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+        applicationName,
+        applicationReleaseNumber);
+
+      if (controlConstruct) {
+        let logicalTerminationPointList = controlConstruct["logical-termination-point"];
+
+        for (let i = 0; i < logicalTerminationPointList.length; i++) {
+          let logicalTerminationPoint = logicalTerminationPointList[i];
+          let layerProtocol = logicalTerminationPoint["layer-protocol"][0];
+          let layerProtocolName = layerProtocol["layer-protocol-name"];
+          if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+            let clientUuidList = logicalTerminationPoint["client-ltp"];
+            
+            let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+            let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
+            let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+            let clientApplicationName = httpClientCapability[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+            let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+
+            if (clientUuidList) {
+
+              for (let j = 0; j < clientUuidList.length; j++) {
+                let clientUuid = clientUuidList[j];
+
+                for (let k = 0; k < logicalTerminationPointList.length; k++) {
+                  let clientLogicalTerminationPoint = logicalTerminationPointList[k];
+                  let clientlogicalTerminationPointUuid = clientLogicalTerminationPoint["uuid"];
+
+                  if (clientlogicalTerminationPointUuid == clientUuid) {
+                    let clientLayerProtocol = clientLogicalTerminationPoint["layer-protocol"][0];
+                    let clientLayerProtocolName = clientLayerProtocol["layer-protocol-name"];
+
+                    if (clientLayerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
+                      let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+                      let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+                      let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+                      
+                      let operationClient = {};
+                      operationClient.servingApplicationName = clientApplicationName;
+                      operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
+                      operationClient.operationName = operationName;
+                      operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
+                      
+                      operationClientList.push(operationClient);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      /****************************************************************************************
+       * Setting 'application/json' response body
+       ****************************************************************************************/
+      response['application/json'] = {
+        "operation-client-list": operationClientList
+      };
+    } catch (error) {
+      console.log(error);
+    }
+    if (Object.keys(response).length > 0) {
+      resolve(response[Object.keys(response)[0]]);
     } else {
       resolve();
     }
@@ -473,13 +536,48 @@ exports.listOperationClientsReactingOnOperationServer = function (body, user, or
  * returns inline_response_200_2
  **/
 exports.listOperationServersAtApplication = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-      "operation-server-name-list": ["/v1/register-yourself", "/v1/embed-yourself"]
-    };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
+  return new Promise(async function (resolve, reject) {
+    let response = {};
+    let operationServerNameList = [];
+    try {
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let applicationName = body["application-name"];
+      let applicationReleaseNumber = body["application-release-number"];
+
+      /****************************************************************************************
+       * Preparing response body
+       ****************************************************************************************/
+      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+        applicationName,
+        applicationReleaseNumber);
+      if (controlConstruct) {
+        let logicalTerminationPointList = controlConstruct["logical-termination-point"];
+        for (let i = 0; i < logicalTerminationPointList.length; i++) {
+          let logicalTerminationPoint = logicalTerminationPointList[i];
+          let layerProtocol = logicalTerminationPoint["layer-protocol"][0];
+          let layerProtocolName = layerProtocol["layer-protocol-name"];
+          if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
+            let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+            let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+            let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
+            operationServerNameList.push(operationName);
+          }
+        }
+      }
+
+      /****************************************************************************************
+       * Setting 'application/json' response body
+       ****************************************************************************************/
+      response['application/json'] = {
+        "operation-server-name-list": operationServerNameList
+      };
+    } catch (error) {
+      console.log(error);
+    }
+    if (Object.keys(response).length > 0) {
+      resolve(response[Object.keys(response)[0]]);
     } else {
       resolve();
     }
@@ -763,7 +861,7 @@ exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator
       let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
       let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
       let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
-      
+
       let existingForwardingConstruct = await fileOperation.readFromDatabaseAsync(forwardingConstructPathForTheUuid);
 
       if (existingForwardingConstruct) {
@@ -824,7 +922,7 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
       let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
       let fcPortPath = forwardingConstructPathForTheUuid + "/fc-port";
       let fcPortPathForTheUuid = fcPortPath + "=" + fcPortLocalId
-      
+
       let existingFcPort = await fileOperation.readFromDatabaseAsync(fcPortPathForTheUuid);
 
       if (existingFcPort) {
