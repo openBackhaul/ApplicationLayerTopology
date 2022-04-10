@@ -627,9 +627,79 @@ exports.listOperationServersAtApplication = function (body, user, originator, xC
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let applicationName = body["subscriber-application"];
+      let releaseNumber = body["subscriber-release-number"];
+      let applicationAddress = body["subscriber-address"];
+      let applicationPort = body["subscriber-port"];
+      let subscriberOperation = body["subscriber-operation"];
+
+      /****************************************************************************************
+       * Prepare logicalTerminatinPointConfigurationInput object to 
+       * configure logical-termination-point
+       ****************************************************************************************/
+
+      let operationList = [
+        subscriberOperation
+      ];
+      let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
+        applicationName,
+        releaseNumber,
+        applicationAddress,
+        applicationPort,
+        operationList
+      );
+      let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationInformationAsync(
+        logicalTerminatinPointConfigurationInput
+      );
+
+
+      /****************************************************************************************
+       * Prepare attributes to configure forwarding-construct
+       ****************************************************************************************/
+
+      let forwardingConfigurationInputList = [];
+      let forwardingConstructConfigurationStatus;
+      let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
+
+      if (operationClientConfigurationStatusList) {
+        forwardingConfigurationInputList = await prepareForwardingConfiguration.notifyLinkUpdates(
+          operationClientConfigurationStatusList,
+          subscriberOperation
+        );
+        forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
+        configureForwardingConstructAsync(
+          operationServerName,
+          forwardingConfigurationInputList
+        );
+      }
+
+      /****************************************************************************************
+       * Prepare attributes to automate forwarding-construct
+       ****************************************************************************************/
+      let forwardingAutomationInputList = await prepareForwardingAutomation.notifyLinkUpdates(
+        logicalTerminationPointconfigurationStatus,
+        forwardingConstructConfigurationStatus
+      );
+      ForwardingAutomationService.automateForwardingConstructAsync(
+        operationServerName,
+        forwardingAutomationInputList,
+        user,
+        xCorrelator,
+        traceIndicator,
+        customerJourney
+      );
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -1232,7 +1302,7 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
  * @param {*} operationServerName operation name of the operation Server
  * @returns operationServeruuid
  */
- function getOperationServerUuid(controlConstruct, operationServerName) {
+function getOperationServerUuid(controlConstruct, operationServerName) {
   let operationServerUuid;
   try {
     let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
@@ -1262,7 +1332,7 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
  * @param {*} operationServerUuid 
  * @returns array
  */
- function getOperationClientsUuidsReactingOnOperationServerList(controlConstruct, operationServerUuid) {
+function getOperationClientsUuidsReactingOnOperationServerList(controlConstruct, operationServerUuid) {
   let operationClientsUuidsReactingOnOperationServerList = [];
   try {
     let forwardingDomainList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN];
@@ -1290,7 +1360,7 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
  * @param {*} operationServerUuid 
  * @returns array
  */
- function getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid) {
+function getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid) {
   let fcOutputUuidList = [];
   try {
     if (isOperationServerIsInInput(forwardingConstruct, operationServerUuid)) {
@@ -1317,7 +1387,7 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
  * @param {*} operationServerUuid 
  * @returns boolean
  */
- function isOperationServerIsInInput(forwardingConstruct, operationServerUuid) {
+function isOperationServerIsInInput(forwardingConstruct, operationServerUuid) {
   let isOperationServerUuidIsAInput = false;
   try {
     let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
@@ -1344,7 +1414,7 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
  * @returns object in the form of {addressedApplicationName:"name",
  * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
  */
- function getClientsReactingOnOperationServerList(controlConstruct,
+function getClientsReactingOnOperationServerList(controlConstruct,
   operationClientsUuidsReactingOnOperationServerList) {
   let clientsReactingOnOperationServerList = [];
   try {
@@ -1386,7 +1456,7 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
  * @param {*} uuid 
  * @returns operationName
  */
- function getOperationNameOfTheOperationClient(logicalTerminationPointList,
+function getOperationNameOfTheOperationClient(logicalTerminationPointList,
   operationClientsUuid) {
   let operationName;
   try {
