@@ -430,7 +430,7 @@ exports.listOperationClientsAtApplication = function (body, user, originator, xC
           let layerProtocolName = layerProtocol["layer-protocol-name"];
           if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
             let clientUuidList = logicalTerminationPoint["client-ltp"];
-            
+
             let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
             let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
             let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
@@ -454,13 +454,13 @@ exports.listOperationClientsAtApplication = function (body, user, originator, xC
                       let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
                       let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
                       let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
-                      
+
                       let operationClient = {};
                       operationClient.servingApplicationName = clientApplicationName;
                       operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
                       operationClient.operationName = operationName;
                       operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
-                      
+
                       operationClientList.push(operationClient);
                     }
                   }
@@ -502,27 +502,58 @@ exports.listOperationClientsAtApplication = function (body, user, originator, xC
  * returns inline_response_200_4
  **/
 exports.listOperationClientsReactingOnOperationServer = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-      "operation-client-list": [{
-        "addressed-application-name": "RegistryOffice",
-        "addressed-application-release-number": "0.0.1",
-        "addressed-operation-name": "/v1/register-application"
-      }, {
-        "addressed-application-name": "ExecutionAndTraceLog",
-        "addressed-application-release-number": "0.0.1",
-        "addressed-operation-name": "/v1/record-service-request"
-      }]
-    };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
+  return new Promise(async function (resolve, reject) {
+    let response = {};
+    let operationClientList = [];
+    try {
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let applicationName = body["receiving-application-name"];
+      let applicationReleaseNumber = body["receiving-application-release-number"];
+      let operationServerName = body["receiving-operation"];
+
+      /****************************************************************************************
+       * Preparing response body
+       ****************************************************************************************/
+      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+        applicationName,
+        applicationReleaseNumber);
+      if (controlConstruct) {
+        let operationServerUuid = getOperationServerUuid(controlConstruct, operationServerName);
+        if (operationServerUuid) {
+          let operationClientsUuidsReactingOnOperationServerList = getOperationClientsUuidsReactingOnOperationServerList(
+            controlConstruct,
+            operationServerUuid
+          );
+          if (operationClientsUuidsReactingOnOperationServerList) {
+            let clientsReactingOnOperationServerList = getClientsReactingOnOperationServerList(
+              controlConstruct,
+              operationClientsUuidsReactingOnOperationServerList
+            );
+            if (clientsReactingOnOperationServerList) {
+              operationClientList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(clientsReactingOnOperationServerList);
+            }
+          }
+        }
+      }
+
+      /****************************************************************************************
+       * Setting 'application/json' response body
+       ****************************************************************************************/
+      response['application/json'] = {
+        "operation-client-list": operationClientList
+      };
+    } catch (error) {
+      console.log(error);
+    }
+    if (Object.keys(response).length > 0) {
+      resolve(response[Object.keys(response)[0]]);
     } else {
       resolve();
     }
   });
 }
-
 
 /**
  * Provides list of names of operations that are supported by an application
@@ -1191,11 +1222,213 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
   });
 }
 
+/***************************************************************************************************************
+ ****************** Funtions that are specific to the listOperationClientsReactingOnOperationServer ************
+ ***************************************************************************************************************/
+
+/**
+ * Provides operationServerUuid for the operationServerName
+ * @param {*} controlConstruct complete control-construct instance
+ * @param {*} operationServerName operation name of the operation Server
+ * @returns operationServeruuid
+ */
+ function getOperationServerUuid(controlConstruct, operationServerName) {
+  let operationServerUuid;
+  try {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let i = 0; i < logicalTerminationPointList.length; i++) {
+      let logicalTerminationPoint = logicalTerminationPointList[i];
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
+        let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+        let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+        let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
+        if (operationName == operationServerName) {
+          operationServerUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+        }
+      }
+    }
+    return operationServerUuid;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+/**
+ * This function gets the operation client uuids reacting on the operation server list
+ * @param {*} controlConstruct 
+ * @param {*} operationServerUuid 
+ * @returns array
+ */
+ function getOperationClientsUuidsReactingOnOperationServerList(controlConstruct, operationServerUuid) {
+  let operationClientsUuidsReactingOnOperationServerList = [];
+  try {
+    let forwardingDomainList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN];
+    for (let i = 0; i < forwardingDomainList.length; i++) {
+      let forwardingDomain = forwardingDomainList[i];
+      let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+      for (let j = 0; j < forwardingConstructList.length; j++) {
+        let forwardingConstruct = forwardingConstructList[j];
+        let fcOutputUuidList = getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid);
+        for (let k = 0; k < fcOutputUuidList.length; k++) {
+          let fcOutputUuid = fcOutputUuidList[k];
+          operationClientsUuidsReactingOnOperationServerList.push(fcOutputUuid);
+        }
+      }
+    }
+    return operationClientsUuidsReactingOnOperationServerList;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+/**
+ * This function returns the list of output fc-port uuids for the operationServerUuid in the given forwardingConstruct
+ * @param {*} forwardingConstruct 
+ * @param {*} operationServerUuid 
+ * @returns array
+ */
+ function getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid) {
+  let fcOutputUuidList = [];
+  try {
+    if (isOperationServerIsInInput(forwardingConstruct, operationServerUuid)) {
+      let fcPortList = forwardingConstruct["fc-port"];
+      for (let i = 0; i < fcPortList.length; i++) {
+        let fcPort = fcPortList[i];
+        let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
+        if (fcPortDirection == FcPort.portDirectionEnum.OUTPUT) {
+          let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
+          fcOutputUuidList.push(logicalTerminationPoint);
+        }
+      }
+    }
+    return fcOutputUuidList;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+/**
+ * This function returns true if the operation server is listed as a input port in given forwarding construct
+ * @param {*} forwardingConstruct 
+ * @param {*} operationServerUuid 
+ * @returns boolean
+ */
+ function isOperationServerIsInInput(forwardingConstruct, operationServerUuid) {
+  let isOperationServerUuidIsAInput = false;
+  try {
+    let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
+    for (let i = 0; i < fcPortList.length; i++) {
+      let fcPort = fcPortList[i];
+      let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
+      if (fcPortDirection == FcPort.portDirectionEnum.INPUT) {
+        let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
+        if (logicalTerminationPoint == operationServerUuid) {
+          isOperationServerUuidIsAInput = true;
+        }
+      }
+    }
+    return isOperationServerUuidIsAInput;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+/**
+ * This function returns the list of clients information reacting on the operation server 
+ * @param {*} controlConstruct 
+ * @param {*} operationClientsUuidsReactingOnOperationServerList 
+ * @returns object in the form of {addressedApplicationName:"name",
+ * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
+ */
+ function getClientsReactingOnOperationServerList(controlConstruct,
+  operationClientsUuidsReactingOnOperationServerList) {
+  let clientsReactingOnOperationServerList = [];
+  try {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let i = 0; i < logicalTerminationPointList.length; i++) {
+      let logicalTerminationPoint = logicalTerminationPointList[i];
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+        let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
+        for (let j = 0; j < clientLtpList.length; j++) {
+          let clientLtp = clientLtpList[j];
+          if (operationClientsUuidsReactingOnOperationServerList.includes(clientLtp)) {
+            let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+            let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
+            let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+            let operationName = getOperationNameOfTheOperationClient(logicalTerminationPointList,
+              clientLtp);
+            let applicationName = httpClientCapability[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+            let releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+            let clientDetails = {};
+            clientDetails.addressedApplicationName = applicationName;
+            clientDetails.addressedApplicationReleaseNumber = releaseNumber;
+            clientDetails.addressedOperationName = operationName;
+            clientsReactingOnOperationServerList.push(clientDetails);
+          }
+        }
+      }
+    }
+    return clientsReactingOnOperationServerList;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+/**
+ * This function returns the operation name of the operation client uuid
+ * @param {*} uuid 
+ * @returns operationName
+ */
+ function getOperationNameOfTheOperationClient(logicalTerminationPointList,
+  operationClientsUuid) {
+  let operationName;
+  try {
+    for (let i = 0; i < logicalTerminationPointList.length; i++) {
+      let logicalTerminationPoint = logicalTerminationPointList[i];
+      let logicalTerminationPointUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT &&
+        logicalTerminationPointUuid == operationClientsUuid) {
+        let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+        let operaitonClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+        operationName = operaitonClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+      }
+    }
+    return operationName;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+/**********************************************************************************************************
+ * Generic functions used across 
+ **********************************************************************************************************/
+
+/**
+ * This function provides the uuid of the control-construct based on the logical-termination-point (or) 
+ * forwarding-domain (or) forwarding-construct uuid
+ * @param {*} uuid 
+ * @returns controlConstructUuid
+ */
 function figureOutControlConstructUuid(uuid) {
   let controlConstructUuid = uuid.split('-').slice(0, 4).join("-");
   return controlConstructUuid;
 }
 
+/**
+ * This function provides the values of the key from the provided nameList
+ * @param {*} nameList 
+ * @param {*} key 
+ * @returns keyValue
+ */
 function getValueFromKey(nameList, key) {
   for (let i = 0; i < nameList.length; i++) {
     let valueName = nameList[i]["value-name"];
