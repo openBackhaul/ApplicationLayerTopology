@@ -16,6 +16,68 @@ const LayerProtocol = require('./LayerProtocol');
 class NetworkControlDomain {
 
   /**
+   * @description This function returns the link list entries from the core-model-1-4:control-construct
+   * @returns {promise} returns link List.
+   **/
+  static async getLinkListAsync() {
+    return new Promise(async function (resolve, reject) {
+      try {
+        let linkList = await fileOperation.readFromDatabaseAsync(onfPaths.LINK);
+        resolve(linkList);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * @description This function deletes a link instance that matches the localId argument from its corresponding 
+   * core-model-1-4:control-construct/link
+   * @param {String} linkUuid : uuid of the link
+   * @returns {promise} boolean {true|false}
+   **/
+  static async deleteLinkAsync(linkUuid) {
+    return new Promise(async function (resolve, reject) {
+      let isDeleted = false;
+      try {
+        let linkPath = onfPaths.LINK +
+          "=" +
+          linkUuid;
+        isDeleted = await fileOperation.deletefromDatabaseAsync(
+          linkPath,
+          linkPath,
+          true);
+        resolve(isDeleted);
+      } catch (error) {
+        reject(false);
+      }
+    });
+  }
+
+  /**
+   * @description This function returns the link entries from the core-model-1-4:control-construct
+   * @returns {promise} returns link.
+   **/
+  static async getLinkAsync(linkUuid) {
+    return new Promise(async function (resolve, reject) {
+      let link;
+      try {
+        let linkList = await getLinkListAsync();
+        for (let i = 0; i < linkList.length; i++) {
+          let _link = linkList[i];
+          let _linkUuid = _link[onfAttributes.GLOBAL_CLASS.UUID];
+          if (_linkUuid == linkUuid) {
+            link = _link;
+          }
+        }
+        resolve(link);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
    * @description This function returns the forwarding-domain list entries from the core-model-1-4:control-construct
    * @returns {promise} returns ForwardingDomain List.
    **/
@@ -24,6 +86,22 @@ class NetworkControlDomain {
       try {
         let controlConstructList = await fileOperation.readFromDatabaseAsync(onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT);
         resolve(controlConstructList);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * @description This function returns the forwarding-domain list entries from the core-model-1-4:control-construct
+   * @returns {promise} returns ForwardingDomain List.
+   **/
+  static async getControlConstructAsync(controlConstructUuid) {
+    return new Promise(async function (resolve, reject) {
+      try {
+        let controlConstructUuidPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+        let controlConstruct = await fileOperation.readFromDatabaseAsync(controlConstructUuidPath);
+        resolve(controlConstruct);
       } catch (error) {
         reject(error);
       }
@@ -45,21 +123,21 @@ class NetworkControlDomain {
           for (let i = 0; i < controlConstructList.length; i++) {
             let controlConstruct = controlConstructList[i];
             let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-            for(let j=0; j< logicalTerminationPointList.length; j++){
+            for (let j = 0; j < logicalTerminationPointList.length; j++) {
               let logicalTerminationPoint = logicalTerminationPointList[j];
               let layerProtocolList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL]
               let layerProtocol = layerProtocolList[0];
               let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-              if(layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER){
+              if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
                 let httpServerPac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
                 let httpServerCapability = httpServerPac[onfAttributes.HTTP_SERVER.CAPABILITY];
                 let _applicationName = httpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
                 let _releaseNumber = httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
-                if(_applicationName == applicationName && _releaseNumber == releaseNumber){
+                if (_applicationName == applicationName && _releaseNumber == releaseNumber) {
                   controlConstructInstance = controlConstruct;
                 }
               }
-            }            
+            }
           }
           resolve(controlConstructInstance);
         } else {

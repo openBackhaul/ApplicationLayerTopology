@@ -37,14 +37,25 @@ module.exports.deleteFcPort = function deleteFcPort (req, res, next, body, user,
     });
 };
 
-module.exports.deleteLtpAndDependents = function deleteLtpAndDependents (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  IndividualServices.deleteLtpAndDependents(body, user, originator, xCorrelator, traceIndicator, customerJourney)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+module.exports.deleteLtpAndDependents = async function deleteLtpAndDependents (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  try {
+    let startTime = process.hrtime();
+    let responseCode = responseCodeEnum.code.NO_CONTENT;
+    let responseBodyToDocument = {};
+    await IndividualServices.deleteLtpAndDependents(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      .then(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      })
+      .catch(async function (response) {
+        responseBodyToDocument = responseBody;
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      });
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  } catch (error) {}
 };
 
 module.exports.disregardApplication = async function disregardApplication (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -199,14 +210,25 @@ module.exports.startApplicationInGenericRepresentation = function startApplicati
     });
 };
 
-module.exports.updateAllLtpsAndFcs = function updateAllLtpsAndFcs (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  IndividualServices.updateAllLtpsAndFcs(body, user, originator, xCorrelator, traceIndicator, customerJourney)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  try {
+    let startTime = process.hrtime();
+    let responseCode = responseCodeEnum.code.NO_CONTENT;
+    let responseBodyToDocument = {};
+    await IndividualServices.updateAllLtpsAndFcs(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      .then(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      })
+      .catch(async function (response) {
+        responseBodyToDocument = responseBody;
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      });
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  } catch (error) {}
 };
 
 module.exports.updateFc = function updateFc (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -229,12 +251,23 @@ module.exports.updateFcPort = function updateFcPort (req, res, next, body, user,
     });
 };
 
-module.exports.updateLtp = function updateLtp (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  IndividualServices.updateLtp(body, user, originator, xCorrelator, traceIndicator, customerJourney)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+module.exports.updateLtp = async function updateLtp (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  try {
+    let startTime = process.hrtime();
+    let responseCode = responseCodeEnum.code.NO_CONTENT;
+    let responseBodyToDocument = {};
+    await IndividualServices.updateLtp(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      .then(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      })
+      .catch(async function (response) {
+        responseBodyToDocument = responseBody;
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      });
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  } catch (error) {}
 };

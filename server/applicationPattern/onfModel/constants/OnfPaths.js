@@ -10,6 +10,13 @@
  const NETWORK_DOMAIN = "core-model-1-4:network-control-domain"
  const NETWORK_DOMAIN_CONTROL_CONSTRUCT = NETWORK_DOMAIN + "/control-construct";
 
+ /******************************************
+ ********links****************
+ *****************************************/
+
+ const LINK = NETWORK_DOMAIN + "/link";
+ const LINK_PORT = LINK + "={uuid}/link-port={local-id}";
+
 /******************************************
  ********control-construct****************
  *****************************************/
@@ -66,6 +73,8 @@ const FC_PORT_LOGICAL_TERMINATION_POINT = FC_PORT + "={fcPortLocalId}/logical-te
 
 module.exports = {
     NETWORK_DOMAIN,
+    LINK,
+    LINK_PORT,
     NETWORK_DOMAIN_CONTROL_CONSTRUCT,
     CONTROL_CONSTRUCT,
     CONTROL_CONSTRUCT_UUID,

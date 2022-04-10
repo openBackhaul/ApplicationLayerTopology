@@ -27,7 +27,18 @@ const NAME = {
 const CONTROL_CONSTRUCT = {
     PROFILE_COLLECTION: "profile-collection",
     LOGICAL_TERMINATION_POINT: "logical-termination-point",
-    FORWARDING_DOMAIN: "forwarding-domain"
+    FORWARDING_DOMAIN: "forwarding-domain",
+    LINK: "link"
+};
+
+/******************************************
+ ********************link******************
+ *****************************************/
+
+ const LINK = {
+    LINK_PORT: "link-port",
+    PORT_DIRECTION: "port-direction",
+    LOGICAL_TERMINATION_POINT: "logical-termination-point"
 };
 
 /******************************************
@@ -145,6 +156,7 @@ module.exports = {
     LOCAL_CLASS,
     NAME,
     CONTROL_CONSTRUCT,
+    LINK,
     PROFILE_COLLECTION,
     PROFILE,
     APPLICATION_PROFILE,

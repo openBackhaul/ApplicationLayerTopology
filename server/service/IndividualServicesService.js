@@ -28,6 +28,9 @@ const onfAttributes = require('../applicationPattern/onfModel/constants/OnfAttri
 
 const fileOperation = require('../applicationPattern/databaseDriver/JSONDriver');
 const NetworkControlDomain = require('../applicationPattern/onfModel/models/NetworkControlDomain');
+const FcPort = require('../applicationPattern/onfModel/models/FcPort');
+const ForwardingConstruct = require('../applicationPattern/onfModel/models/ForwardingConstruct');
+const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -95,8 +98,58 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
  * no response value expected for this operation
  **/
 exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let logicalTerminationPointUuid = body["uuid"];
+      let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
+
+      /****************************************************************************************
+       * Prepare input object to 
+       * configure control-construct list
+       ****************************************************************************************/
+      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT +
+        "=" +
+        controlConstructUuid;
+      let logicalTerminationPointPath = controlConstructPath +
+        "/logical-termination-point"
+      let logicalTerminationPointPathForTheUuid = logicalTerminationPointPath +
+        "=" +
+        logicalTerminationPointUuid;
+
+      let existingLogicalTerminationPoint = await fileOperation.readFromDatabaseAsync(logicalTerminationPointPathForTheUuid);
+
+      if (existingLogicalTerminationPoint) {
+        let layerProtocol = existingLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
+        let layerProtocolName = layerProtocol[0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+        let isdeleted = await fileOperation.deletefromDatabaseAsync(logicalTerminationPointPathForTheUuid,
+          existingLogicalTerminationPoint,
+          true);
+        if (isdeleted && (layerProtocolName== LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT || 
+          layerProtocolName== LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
+          await deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid);
+          await deleteDependentLinkPorts(logicalTerminationPointUuid);
+        }
+      }
+
+      /****************************************************************************************
+       * delete links
+       ****************************************************************************************/
+
+      
+
+      /****************************************************************************************
+       * Prepare attributes to automate forwarding-construct
+       ****************************************************************************************/
+
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -616,8 +669,47 @@ exports.startApplicationInGenericRepresentation = function (user, originator, xC
  * no response value expected for this operation
  **/
 exports.updateAllLtpsAndFcs = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let controlConstruct = body["core-model-1-4:control-construct"];
+      let controlConstructUuid = controlConstruct["uuid"];
+
+      /****************************************************************************************
+       * Prepare input object to 
+       * configure control-construct list
+       ****************************************************************************************/
+
+      let existingControlConstruct = await NetworkControlDomain.getControlConstructAsync(controlConstructUuid);
+      if (existingControlConstruct) {
+        let existingControlConstructAsAString = JSON.stringify(existingControlConstruct);
+        let newControlConstructAsAString = JSON.stringify(controlConstruct);
+        if (existingControlConstructAsAString != newControlConstructAsAString) {
+          await NetworkControlDomain.deleteControlConstructAsync(controlConstructUuid);
+          await NetworkControlDomain.addControlConstructAsync(controlConstruct);
+        }
+      } else {
+        await NetworkControlDomain.addControlConstructAsync(controlConstruct);
+      }
+
+      /****************************************************************************************
+       * Prepare attributes to configure forwarding-construct
+       ****************************************************************************************/
+
+
+
+      /****************************************************************************************
+       * Prepare attributes to automate forwarding-construct
+       ****************************************************************************************/
+
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -670,8 +762,51 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
  * no response value expected for this operation
  **/
 exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let logicalTerminationPoint = body;
+      let logicalTerminationPointUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+      let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
+
+      /****************************************************************************************
+       * Prepare input object to 
+       * configure control-construct list
+       ****************************************************************************************/
+      let logicalTerminationPointPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT +
+        "=" +
+        controlConstructUuid +
+        "/" + onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT;
+
+      let logicalTerminationPointPathForTheUuid = logicalTerminationPointPath +
+        "=" +
+        logicalTerminationPointUuid;
+
+      let existingLogicalTerminationPoint = await fileOperation.readFromDatabaseAsync(logicalTerminationPointPathForTheUuid);
+
+      if (existingLogicalTerminationPoint) {
+        let existingLogicalTerminationPointAsAString = JSON.stringify(existingLogicalTerminationPoint);
+        let newLogicalTerminationPointAsAString = JSON.stringify(logicalTerminationPoint);
+        if (existingLogicalTerminationPointAsAString != newLogicalTerminationPointAsAString) {
+          await fileOperation.deletefromDatabaseAsync(logicalTerminationPointPathForTheUuid,
+            existingLogicalTerminationPoint,
+            true);
+          await fileOperation.writeToDatabaseAsync(logicalTerminationPointPath,
+            logicalTerminationPoint,
+            true);
+        }
+      } else {
+        await fileOperation.writeToDatabaseAsync(logicalTerminationPointPath,
+          logicalTerminationPoint,
+          true);
+      }
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -683,7 +818,7 @@ exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicato
  * @description This function returns list of registered application information application-name , release-number.
  * @return {Promise} return the list of application information
  **/
- function getAllClientApplicationList() {
+function getAllClientApplicationList() {
   return new Promise(async function (resolve, reject) {
     let clientApplicationList = [];
     try {
@@ -719,4 +854,123 @@ exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicato
       reject(error);
     }
   });
+}
+
+async function deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid) {
+  return new Promise(async function (resolve, reject) {
+    try {
+      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+      let forwardingConstructPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN;
+
+      let forwardingDomainList = await fileOperation.readFromDatabaseAsync(
+        forwardingConstructPath);
+      /*************************************************************************************
+       ****************delete dependents , if a fc-port exist for them***********************
+       *************************************************************************************/
+      for (let i = 0; i < forwardingDomainList.length; i++) {
+        let forwardingDomain = forwardingDomainList[i];
+        let forwardingDomainUuid = forwardingDomain[onfAttributes.GLOBAL_CLASS.UUID];
+        let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+
+        for (let j = 0; j < forwardingConstructList.length; j++) {
+          let forwardingConstruct = forwardingConstructList[j];
+          let forwardingConstructUuid = forwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID];
+          let nameList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.NAME];
+          let forwardingKind = getValueFromKey(nameList, "ForwardingKind");
+          let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
+
+          for (let k = 0; k < fcPortList.length; k++) {
+            let fcPort = fcPortList[k];
+            let fcPortLocalId = fcPort[onfAttributes.LOCAL_CLASS.LOCAL_ID];
+            let FcPortlogicalTerminationPoint = fcPort[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+
+            if (FcPortlogicalTerminationPoint == logicalTerminationPointUuid) {
+              await deleteFcPorts(
+                forwardingKind,
+                controlConstructUuid,
+                forwardingDomainUuid,
+                forwardingConstructUuid,
+                fcPortLocalId
+              );
+            }
+
+          }
+        }
+      }
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+
+async function deleteFcPorts(forwardingName, controlConstructUuid, forwardingDomainUuid, forwardingConstructUuid, fcPortLocalId) {
+  return new Promise(async function (resolve, reject) {
+    try {
+      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+      let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
+      let forwardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT + "=" + forwardingConstructUuid;
+      let fcPortPath = forwardingConstructPath + "/" + onfAttributes.FORWARDING_CONSTRUCT.FC_PORT + "=" + fcPortLocalId;
+
+      if (forwardingName != ForwardingConstruct.name.forwardingConstructKindEnum.INVARIANT_PROCESS_SNIPPET) {
+        await fileOperation.deletefromDatabaseAsync(fcPortPath,
+          fcPortPath,
+          true);
+      } else {
+        fcPortPath = fcPortPath +
+          "/" + onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT;
+        await fileOperation.writeToDatabaseAsync(fcPortPath,
+          "-1",
+          false);
+      }
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
+  return new Promise(async function (resolve, reject) {
+    try {
+      let linkList = await NetworkControlDomain.getLinkListAsync();
+      if (linkList) {
+        for (let i = 0; i < linkList.length; i++) {
+          let link = linkList[i];
+          let linkUuid = link["uuid"];
+          let linkPortList = link["link-port"];
+          if(linkPortList){
+            for(let j=0;j<linkPortList.length;j++){
+              let linkPort = linkPortList[j];
+              let linkPortLogicalTerminationPoint = linkPort["logical-termination-point"];
+              if(linkPortLogicalTerminationPoint == logicalTerminationPointUuid){
+                await NetworkControlDomain.deleteLinkAsync(linkUuid);
+              }
+            }
+          }
+        }
+      }
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+function figureOutControlConstructUuid(uuid) {
+  let controlConstructUuid = uuid.split('-').slice(0, 4).join("-");
+  return controlConstructUuid;
+}
+
+function getValueFromKey(nameList, key) {
+  for (let i = 0; i < nameList.length; i++) {
+    let valueName = nameList[i]["value-name"];
+    if (valueName == key) {
+      return nameList[i]["value"];
+    }
+  }
+  return undefined;
 }
