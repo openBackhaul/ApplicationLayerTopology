@@ -288,6 +288,7 @@ function findMatchingInstanceFromList(individualFieldOfTheOAMPath, coreModelJson
     let nameOfTheList;
     let valueOfTheKeyAttributeOfTheList;
     let keyAttributeOfTheList;
+    let resultCoreModelJsonObject;
     try {
         nameOfTheList = individualFieldOfTheOAMPath.split("=")[0];
         valueOfTheKeyAttributeOfTheList = individualFieldOfTheOAMPath.split("=")[1];
@@ -295,14 +296,14 @@ function findMatchingInstanceFromList(individualFieldOfTheOAMPath, coreModelJson
         coreModelJsonObject = coreModelJsonObject[nameOfTheList];
         coreModelJsonObject.forEach(element => {
             if (element[keyAttributeOfTheList] == valueOfTheKeyAttributeOfTheList) {
-                coreModelJsonObject = element;
+                resultCoreModelJsonObject = element;
             }
         });
     } catch (error) {
         console.log(error);
         console.log(individualFieldOfTheOAMPath);
     }
-    return coreModelJsonObject;
+    return resultCoreModelJsonObject;
 }
 
 function findMatchingInstanceAndDeleteFromList(individualFieldOfTheOAMPath, coreModelJsonObject) {

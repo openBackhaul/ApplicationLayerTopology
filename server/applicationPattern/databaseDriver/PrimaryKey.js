@@ -17,5 +17,7 @@
      'forwarding-construct': "uuid",
      'fc-port': "local-id",
      'name':"value-name",
-     'control-construct':"uuid"
+     'control-construct':"uuid",
+     'link':"uuid",
+     'link-port':"local-id"
  }

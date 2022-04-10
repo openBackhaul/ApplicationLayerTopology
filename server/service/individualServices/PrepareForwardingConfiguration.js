@@ -286,16 +286,7 @@ exports.redirectTopologyChangeInformation = function (operationClientConfigurati
     });
 }
 
-/**
- * @description This function automates the forwarding construct by calling the appropriate call back operations based on the fcPort input and output directions.
- * @param {String} operationServerUuid operation server uuid of the request url
- * @param {list}   attributeList list of attributes required during forwarding construct automation(to send in the request body)
- * @param {String} user user who initiates this request
- * @param {string} originator originator of the request
- * @param {string} xCorrelator flow id of this request
- * @param {string} traceIndicator trace indicator of the request
- * @param {string} customerJourney customer journey of the request
- **/
+
  function getValueFromKey(nameList, key) {
     for (let i = 0; i < nameList.length; i++) {
         let valueName = nameList[i]["value-name"];
