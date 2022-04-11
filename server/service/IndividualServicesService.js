@@ -5,6 +5,8 @@ const LogicalTerminationPointService = require('../applicationPattern/onfModel/s
 const LogicalTerminationPointConfigurationStatus = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
 const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 
+const LinkServices = require('../applicationPattern/onfModel/services/LinkServices');
+
 const ForwardingConfigurationService = require('../applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('../applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
@@ -31,6 +33,8 @@ const NetworkControlDomain = require('../applicationPattern/onfModel/models/Netw
 const FcPort = require('../applicationPattern/onfModel/models/FcPort');
 const ForwardingConstruct = require('../applicationPattern/onfModel/models/ForwardingConstruct');
 const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
+const LinkPort = require('../applicationPattern/onfModel/models/LinkPort');
+const Link = require('../applicationPattern/onfModel/models/Link');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -43,12 +47,45 @@ const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtoc
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.addOperationClientToLink = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+
+exports.addOperationClientToLink = function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let EndPointDetails = body;
+
+      /****************************************************************************************
+       * Prepare logicalTerminatinPointConfigurationInput object to 
+       * configure logical-termination-point
+       ****************************************************************************************/
+      let linkUuid = await LinkServices.findOrCreateLinkForTheEndPointsAsync(EndPointDetails);
+
+
+      /****************************************************************************************
+       * Prepare attributes to automate forwarding-construct
+       ****************************************************************************************/
+      let forwardingAutomationInputList = await prepareForwardingAutomation.addOperationClientToLink(
+        linkUuid
+      );
+      ForwardingAutomationService.automateForwardingConstructAsync(
+        operationServerName,
+        forwardingAutomationInputList,
+        user,
+        xCorrelator,
+        traceIndicator,
+        customerJourney
+      );
+
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
-
 
 /**
  * Initiates process of embedding a new release
@@ -307,29 +344,53 @@ exports.listApplications = function (user, originator, xCorrelator, traceIndicat
  * returns inline_response_200_6
  **/
 exports.listEndPointsOfLink = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-      "link-end-point-list": [{
-        "application-name": "RegistryOffice",
-        "application-release-number": "0.0.1",
-        "operation-uuid": "ro-0-0-1-op-c-2070",
-        "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK"
-      }, {
-        "application-name": "ApplicationLayerTopology",
-        "application-release-number": "0.0.1",
-        "operation-uuid": "alt-0-0-1-op-s-0001",
-        "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SOURCE"
-      }]
-    };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
+  return new Promise(async function (resolve, reject) {
+    let response = {};
+    try {
+      /****************************************************************************************
+       * Preparing input from request body
+       ****************************************************************************************/
+      let linkUuid = body["link-uuid"];
+
+      /****************************************************************************************
+       * Preparing response body
+       ****************************************************************************************/
+
+      let linkEndPointList = [];
+      let link = await NetworkControlDomain.getLinkAsync(linkUuid);
+      let linkPortList = link[onfAttributes.LINK.LINK_PORT];
+      for (let i = 0; i < linkPortList.length; i++) {
+        let linkEndPoint = {};
+        let linkPort = linkPortList[i];
+        let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
+        let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPoint);
+        let controlConstruct = await NetworkControlDomain.getControlConstructAsync(controlConstructUuid);
+        linkEndPoint.operationUuid = logicalTerminationPoint;
+        if (controlConstruct) {
+          linkEndPoint.ltpDirection = getLtpDirection(controlConstruct, logicalTerminationPoint);
+          linkEndPoint.applicationName = getApplicationName(controlConstruct);
+          linkEndPoint.releaseNumber = getReleaseNumber(controlConstruct);
+        }
+        linkEndPointList.push(linkEndPoint);
+      }
+
+      /****************************************************************************************
+       * Setting 'application/json' response body
+       ****************************************************************************************/
+      response['application/json'] = {
+        "link-end-point-list": linkEndPointList
+      };
+    } catch (error) {
+      console.log(error);
+    }
+    if (Object.keys(response).length > 0) {
+      resolve(response[Object.keys(response)[0]]);
     } else {
       resolve();
     }
   });
-}
 
+}
 
 /**
  * Provides list of UUIDs of Links
@@ -342,17 +403,36 @@ exports.listEndPointsOfLink = function (body, user, originator, xCorrelator, tra
  * returns inline_response_200_5
  **/
 exports.listLinkUuids = function (user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-      "link-uuid-list": ["alt-0-0-1-op-link-0001", "alt-0-0-1-op-link-0002"]
-    };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
+  return new Promise(async function (resolve, reject) {
+    let response = {};
+    try {
+      let linkUuidList = [];
+      /****************************************************************************************
+       * Preparing response body
+       ****************************************************************************************/
+      let linkList = await NetworkControlDomain.getLinkListAsync();
+      for (let i = 0; i < linkList.length; i++) {
+        let link = linkList[i];
+        let linkUuid = link[onfAttributes.GLOBAL_CLASS.UUID];
+        linkUuidList.push(linkUuid);
+      }
+
+      /****************************************************************************************
+       * Setting 'application/json' response body
+       ****************************************************************************************/
+      response['application/json'] = {
+        "link-uuid-list": linkUuidList
+      };
+    } catch (error) {
+      console.log(error);
+    }
+    if (Object.keys(response).length > 0) {
+      resolve(response[Object.keys(response)[0]]);
     } else {
       resolve();
     }
   });
+
 }
 
 
@@ -834,12 +914,44 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.removeOperationClientFromLink = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+exports.removeOperationClientFromLink = function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let EndPointDetails = body;
+
+      /****************************************************************************************
+       * Prepare logicalTerminatinPointConfigurationInput object to 
+       * configure logical-termination-point
+       ****************************************************************************************/
+      let linkUuid = await LinkServices.deleteOperationClientFromTheEndPointsAsync(EndPointDetails);
+
+
+      /****************************************************************************************
+       * Prepare attributes to automate forwarding-construct
+       ****************************************************************************************/
+      let forwardingAutomationInputList = await prepareForwardingAutomation.removeOperationClientFromLink(
+        linkUuid
+      );
+      ForwardingAutomationService.automateForwardingConstructAsync(
+        operationServerName,
+        forwardingAutomationInputList,
+        user,
+        xCorrelator,
+        traceIndicator,
+        customerJourney
+      );
+
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
-
 
 /**
  * Starts application in generic representation
@@ -1293,6 +1405,49 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
 }
 
 /***************************************************************************************************************
+ ****************** Funtions that are specific to the addOperationClientToLink ************
+ ***************************************************************************************************************/
+
+/**
+ * Provides operationClientUuid for the operationClientName
+ * @param {*} controlConstruct complete control-construct instance
+ * @param {*} operationClientName operation name of the operation client
+ * @returns operationClientUuid
+ */
+function getOperationClientUuid(controlConstruct, operationClientName, consumingApplicationName, consumingApplicationReleaseNumber) {
+  let operationClientUuid;
+  try {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let i = 0; i < logicalTerminationPointList.length; i++) {
+      let logicalTerminationPoint = logicalTerminationPointList[i];
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
+        let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+        let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+        let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+        if (operationName == operationClientName) {
+          let _operationClientUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+          let applicationName = getApplicationName(logicalTerminationPointList,
+            _operationClientUuid);
+          let releaseNumber = getReleaseNumber(logicalTerminationPointList,
+            _operationClientUuid);
+          if (applicationName == consumingApplicationName && releaseNumber == consumingApplicationReleaseNumber) {
+            operationClientUuid = _operationClientUuid;
+          }
+        }
+      }
+    }
+    return operationClientUuid;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
+
+/***************************************************************************************************************
  ****************** Funtions that are specific to the listOperationClientsReactingOnOperationServer ************
  ***************************************************************************************************************/
 
@@ -1478,6 +1633,88 @@ function getOperationNameOfTheOperationClient(logicalTerminationPointList,
   }
 }
 
+/***************************************************************************************************************
+ * End point details
+ **************************************************************************************************************/
+
+/**
+ * This function returns the list of clients information reacting on the operation server 
+ * @param {*} controlConstruct 
+ * @param {*} operationClientsUuidsReactingOnOperationServerList 
+ * @returns object in the form of {addressedApplicationName:"name",
+ * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
+ */
+function getApplicationName(controlConstruct) {
+  let applicationName;
+  try {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let i = 0; i < logicalTerminationPointList.length; i++) {
+      let logicalTerminationPoint = logicalTerminationPointList[i];
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
+        let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
+        let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
+        applicationName = httpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
+      }
+    }
+    return applicationName;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+/**
+ * This function returns the list of clients information reacting on the operation server 
+ * @param {*} controlConstruct 
+ * @param {*} operationClientsUuidsReactingOnOperationServerList 
+ * @returns object in the form of {addressedApplicationName:"name",
+ * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
+ */
+function getReleaseNumber(controlConstruct) {
+  let releaseNumber;
+  try {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let i = 0; i < logicalTerminationPointList.length; i++) {
+      let logicalTerminationPoint = logicalTerminationPointList[i];
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
+        let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
+        let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
+        releaseNumber = httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
+      }
+    }
+    return releaseNumber;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+/**
+ * This function returns the list of clients information reacting on the operation server 
+ * @param {*} controlConstruct 
+ * @param {*} operationClientsUuidsReactingOnOperationServerList 
+ * @returns object in the form of {addressedApplicationName:"name",
+ * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
+ */
+function getLtpDirection(controlConstruct,
+  operationServerUuid) {
+  let ltpDirection;
+  try {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let i = 0; i < logicalTerminationPointList.length; i++) {
+      let logicalTerminationPoint = logicalTerminationPointList[i];
+      let logicalTerminationPointuuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+      if (logicalTerminationPointuuid == operationServerUuid) {
+        ltpDirection = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LTP_DIRECTION];
+      }
+    }
+    return ltpDirection;
+  } catch (error) {
+    console.log(error)
+  }
+}
 /**********************************************************************************************************
  * Generic functions used across 
  **********************************************************************************************************/

@@ -7,14 +7,25 @@ var restResponseHeader = require('../applicationPattern/rest/server/ResponseHead
 var restResponseBuilder = require('../applicationPattern/rest/server/ResponseBuilder');
 var executionAndTraceService = require('../basicServices/ExecutionAndTraceService');
 
-module.exports.addOperationClientToLink = function addOperationClientToLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  IndividualServices.addOperationClientToLink(body, user, originator, xCorrelator, traceIndicator, customerJourney)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+module.exports.addOperationClientToLink = async function addOperationClientToLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  try {
+    let startTime = process.hrtime();
+    let responseCode = responseCodeEnum.code.NO_CONTENT;
+    let responseBodyToDocument = {};
+    await IndividualServices.addOperationClientToLink(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      .then(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      })
+      .catch(async function (response) {
+        responseBodyToDocument = responseBody;
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      });
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  } catch (error) {}
 };
 
 module.exports.bequeathYourDataAndDie = function bequeathYourDataAndDie (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -100,24 +111,48 @@ module.exports.listApplications = function listApplications (req, res, next, use
     });
 };
 
-module.exports.listEndPointsOfLink = function listEndPointsOfLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  IndividualServices.listEndPointsOfLink(body, user, originator, xCorrelator, traceIndicator, customerJourney)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+module.exports.listEndPointsOfLink = async function listEndPointsOfLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  try {
+    let startTime = process.hrtime();
+    let responseCode = responseCodeEnum.code.OK;
+    let responseBodyToDocument = {};
+    await IndividualServices.listEndPointsOfLink(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      .then(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      })
+      .catch(async function (response) {
+        responseBodyToDocument = responseBody;
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      });
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  } catch (error) {}
 };
 
-module.exports.listLinkUuids = function listLinkUuids (req, res, next, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  IndividualServices.listLinkUuids(user, originator, xCorrelator, traceIndicator, customerJourney)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+module.exports.listLinkUuids = async function listLinkUuids (req, res, next, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  try {
+    let startTime = process.hrtime();
+    let responseCode = responseCodeEnum.code.OK;
+    let responseBodyToDocument = {};
+    await IndividualServices.listLinkUuids(user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      .then(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      })
+      .catch(async function (response) {
+        responseBodyToDocument = responseBody;
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      });
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports.listLinksToOperationClientsOfApplication = function listLinksToOperationClientsOfApplication (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -245,14 +280,25 @@ module.exports.regardApplication = async function regardApplication (req, res, n
     } catch (error) {}
 };
 
-module.exports.removeOperationClientFromLink = function removeOperationClientFromLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  IndividualServices.removeOperationClientFromLink(body, user, originator, xCorrelator, traceIndicator, customerJourney)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+module.exports.removeOperationClientFromLink = async function removeOperationClientFromLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  try {
+    let startTime = process.hrtime();
+    let responseCode = responseCodeEnum.code.NO_CONTENT;
+    let responseBodyToDocument = {};
+    await IndividualServices.removeOperationClientFromLink(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      .then(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      })
+      .catch(async function (response) {
+        responseBodyToDocument = responseBody;
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      });
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  } catch (error) {}
 };
 
 module.exports.startApplicationInGenericRepresentation = function startApplicationInGenericRepresentation (req, res, next, user, originator, xCorrelator, traceIndicator, customerJourney) {

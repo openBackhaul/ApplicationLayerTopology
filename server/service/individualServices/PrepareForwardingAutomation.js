@@ -146,6 +146,62 @@ exports.notifyLinkUpdates = function (logicalTerminationPointconfigurationStatus
     });
 }
 
+exports.addOperationClientToLink = function (linkUuid) {
+    return new Promise(async function (resolve, reject) {
+        let forwardingConstructAutomationList = [];
+        try {
+            let forwardingAutomation;
+
+            /***********************************************************************************
+             * LinkChangeNotification /v1/regard-updated-link
+             ************************************************************************************/
+            let linkChangeNotificationForwardingName = "LinkChangeNotification";
+            let linkChangeNotificationContext;
+            let linkChangeNotificationRequestBody = {};
+            linkChangeNotificationRequestBody.linkUuid = linkUuid;
+
+            linkChangeNotificationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(linkChangeNotificationRequestBody);
+            forwardingAutomation = new forwardingConstructAutomationInput(
+                linkChangeNotificationForwardingName,
+                linkChangeNotificationRequestBody,
+                linkChangeNotificationContext
+            );
+            forwardingConstructAutomationList.push(forwardingAutomation);
+            resolve(forwardingConstructAutomationList);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+exports.removeOperationClientFromLink = function (linkUuid) {
+    return new Promise(async function (resolve, reject) {
+        let forwardingConstructAutomationList = [];
+        try {
+            let forwardingAutomation;
+
+            /***********************************************************************************
+             * LinkChangeNotification /v1/regard-updated-link
+             ************************************************************************************/
+            let linkChangeNotificationForwardingName = "LinkChangeNotification";
+            let linkChangeNotificationContext;
+            let linkChangeNotificationRequestBody = {};
+            linkChangeNotificationRequestBody.linkUuid = linkUuid;
+
+            linkChangeNotificationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(linkChangeNotificationRequestBody);
+            forwardingAutomation = new forwardingConstructAutomationInput(
+                linkChangeNotificationForwardingName,
+                linkChangeNotificationRequestBody,
+                linkChangeNotificationContext
+            );
+            forwardingConstructAutomationList.push(forwardingAutomation);
+            resolve(forwardingConstructAutomationList);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
 exports.inquireOamRequestApprovals = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus) {
     return new Promise(async function (resolve, reject) {
         let forwardingConstructAutomationList = [];
