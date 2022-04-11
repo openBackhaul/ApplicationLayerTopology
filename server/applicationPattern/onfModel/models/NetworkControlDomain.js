@@ -62,7 +62,7 @@ class NetworkControlDomain {
     return new Promise(async function (resolve, reject) {
       let link;
       try {
-        let linkList = await getLinkListAsync();
+        let linkList = await NetworkControlDomain.getLinkListAsync();
         for (let i = 0; i < linkList.length; i++) {
           let _link = linkList[i];
           let _linkUuid = _link[onfAttributes.GLOBAL_CLASS.UUID];
@@ -185,6 +185,50 @@ class NetworkControlDomain {
         isDeleted = await fileOperation.deletefromDatabaseAsync(
           controlConstructPath,
           controlConstructUuid,
+          true);
+        resolve(isDeleted);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+
+  /**
+   * @description This function adds a link instance to the core-model-1-4:network-control-domain/link
+   * @param {String} link an instance of the link
+   * @returns {promise} returns {true|false}
+   **/
+   static addLinkAsync(link) {
+    return new Promise(async function (resolve, reject) {
+      let isCreated = false;
+      try {
+        link = onfFormatter.modifyJsonObjectKeysToKebabCase(link);
+        isCreated = await fileOperation.writeToDatabaseAsync(
+          onfPaths.LINK,
+          link,
+          true);
+        resolve(isCreated);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * @description This function deletes a link instance that matches the uuid argument from the 
+   * core-model-1-4:network-control-domain/link
+   * @param {String} linkUuid : uuid of the link
+   * @returns {promise} returns {true|false}
+   **/
+  static deleteLinkAsync(linkUuid) {
+    return new Promise(async function (resolve, reject) {
+      let isDeleted = false;
+      try {
+        let linkPath = onfPaths.LINK + "=" + linkUuid;
+        isDeleted = await fileOperation.deletefromDatabaseAsync(
+          linkPath,
+          linkUuid,
           true);
         resolve(isDeleted);
       } catch (error) {
