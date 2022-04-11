@@ -155,14 +155,25 @@ module.exports.listLinkUuids = async function listLinkUuids (req, res, next, use
   }
 };
 
-module.exports.listLinksToOperationClientsOfApplication = function listLinksToOperationClientsOfApplication (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  IndividualServices.listLinksToOperationClientsOfApplication(body, user, originator, xCorrelator, traceIndicator, customerJourney)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+module.exports.listLinksToOperationClientsOfApplication = async function listLinksToOperationClientsOfApplication (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  try {
+    let startTime = process.hrtime();
+    let responseCode = responseCodeEnum.code.OK;
+    let responseBodyToDocument = {};
+    await IndividualServices.listLinksToOperationClientsOfApplication(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      .then(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      })
+      .catch(async function (response) {
+        responseBodyToDocument = responseBody;
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      });
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  } catch (error) {}
 };
 
 module.exports.listOperationClientsAtApplication = async function listOperationClientsAtApplication (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
