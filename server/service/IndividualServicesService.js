@@ -449,21 +449,65 @@ exports.listLinkUuids = function (user, originator, xCorrelator, traceIndicator,
  * returns inline_response_200_7
  **/
 exports.listLinksToOperationClientsOfApplication = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-      "operation-server-list": [{
-        "serving-application-name": "TypeApprovalRegister",
-        "serving-application-release-number": "0.0.1",
-        "operation-name": "/v1/embed-yourself"
-      }, {
-        "serving-application-name": "TypeApprovalRegister",
-        "serving-application-release-number": "0.0.1",
-        "operation-name": "/v1/update-client"
-      }]
-    };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
+  return new Promise(async function (resolve, reject) {
+    let response = {};
+    let operationServerList = [];
+    try {
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let applicationName = body["application-name"];
+      let applicationReleaseNumber = body["application-release-number"];
+
+      /****************************************************************************************
+       * Preparing response body
+       ****************************************************************************************/
+      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+        applicationName,
+        applicationReleaseNumber);
+
+      if (controlConstruct) {
+        let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
+        let opertionClientUuidListWithLink = [];
+        let linkList = await NetworkControlDomain.getLinkListAsync();
+        for (let i = 0; i < linkList.length; i++) {
+          let link = linkList[i];
+          let linkPortList = link[onfAttributes.LINK.LINK_PORT];
+          for (let j = 0; j < linkPortList.length; j++) {
+            let linkPort = linkPortList[j];
+            let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
+            if (portDirection == LinkPort.portDirectionEnum.INPUT) {
+              let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
+              let controlConstructUuidOfTheLTP = figureOutControlConstructUuid(logicalTerminationPoint);
+              if (controlConstructUuidOfTheLTP == controlConstructUuid) {
+                opertionClientUuidListWithLink.push(logicalTerminationPoint);
+              }
+            }
+          }
+        }
+
+        let operationClientInformationList = getClientsReactingOnOperationServerList(controlConstruct, opertionClientUuidListWithLink);
+        for(let i=0;i<operationClientInformationList.length;i++){
+          let servingApplication = {};
+          let operationClientInformation = operationClientInformationList[i];
+          servingApplication.servingApplicationName = operationClientInformation.addressedApplicationName;
+          servingApplication.servingApplicationReleaseNumber = operationClientInformation.addressedApplicationReleaseNumber;
+          servingApplication.operationName = operationClientInformation.addressedOperationName;
+          servingApplication = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(servingApplication);
+          operationServerList.push(servingApplication);
+        }
+      }
+      /****************************************************************************************
+       * Setting 'application/json' response body
+       ****************************************************************************************/
+      response['application/json'] = {
+        "operation-server-list": operationServerList
+      };
+    } catch (error) {
+      console.log(error);
+    }
+    if (Object.keys(response).length > 0) {
+      resolve(response[Object.keys(response)[0]]);
     } else {
       resolve();
     }
