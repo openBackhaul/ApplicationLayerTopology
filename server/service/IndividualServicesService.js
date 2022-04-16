@@ -11,6 +11,7 @@ const ForwardingConfigurationService = require('../applicationPattern/onfModel/s
 const ForwardingAutomationService = require('../applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
 const prepareForwardingAutomation = require('./individualServices/PrepareForwardingAutomation');
+const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
 const ConfigurationStatus = require('../applicationPattern/onfModel/services/models/ConfigurationStatus');
 
 const logicalTerminationPoint = require('../applicationPattern/onfModel/models/LogicalTerminationPoint');
@@ -35,6 +36,7 @@ const ForwardingConstruct = require('../applicationPattern/onfModel/models/Forwa
 const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('../applicationPattern/onfModel/models/LinkPort');
 const Link = require('../applicationPattern/onfModel/models/Link');
+const TcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -98,9 +100,67 @@ exports.addOperationClientToLink = function (body, user, originator, xCorrelator
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    resolve();
+exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  return new Promise(async function (resolve, reject) {
+    try {
+
+      /****************************************************************************************
+       * Setting up required local variables from the request body
+       ****************************************************************************************/
+      let applicationName = body["new-application-name"];
+      let releaseNumber = body["new-application-release"];
+      let applicationAddress = body["new-application-address"];
+      let applicationPort = body["new-application-port"];
+
+      /****************************************************************************************
+       * Prepare logicalTerminatinPointConfigurationInput object to 
+       * configure logical-termination-point
+       ****************************************************************************************/
+      let isdataTransferRequired = true;
+      let currentApplicationName = await httpServerInterface.getApplicationNameAsync();
+      if (currentApplicationName == applicationName) {
+        let isUpdated = await httpClientInterface.setReleaseNumberAsync("alt-0-0-1-http-c-0010", releaseNumber);
+        let currentApplicationRemoteAddress = await TcpServerInterface.getLocalAddress();
+        let currentApplicationRemotePort = await TcpServerInterface.getLocalPort();
+        if((applicationAddress == currentApplicationRemoteAddress) && 
+        (applicationPort == currentApplicationRemotePort)){
+          isdataTransferRequired = true;
+        }
+        if (isUpdated) {
+          applicationName = await httpClientInterface.getApplicationNameAsync("alt-0-0-1-http-c-0010");
+          let operationList = [];
+          let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
+            applicationName,
+            releaseNumber,
+            applicationAddress,
+            applicationPort,
+            operationList
+          );
+          let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationInformationAsync(
+            logicalTerminatinPointConfigurationInput
+          );
+
+          /****************************************************************************************
+           * Prepare attributes to automate forwarding-construct
+           ****************************************************************************************/
+          let forwardingAutomationInputList = await prepareForwardingAutomation.bequeathYourDataAndDie(
+            logicalTerminationPointconfigurationStatus
+          );
+          ForwardingAutomationService.automateForwardingConstructAsync(
+            operationServerName,
+            forwardingAutomationInputList,
+            user,
+            xCorrelator,
+            traceIndicator,
+            customerJourney
+          );
+        }        
+      } 
+      softwareUpgrade.upgradeSoftwareVersion(isdataTransferRequired, user, xCorrelator, traceIndicator, customerJourney);   
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
