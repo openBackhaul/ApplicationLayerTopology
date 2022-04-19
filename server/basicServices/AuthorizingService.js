@@ -7,14 +7,13 @@
  * @module AuthorizingService
  **/
 
- const forwardingConstruct = require('../onfModel/models/ForwardingConstruct');
- const operationClientInterface = require('../onfModel/models/layerProtocols/OperationClientInterface');
- const httpServerInterface = require('../onfModel/models/layerProtocols/HttpServerInterface');
- const requestHeader = require('../rest/client/RequestHeader');
- const restRequestBuilder = require('../rest/client/RequestBuilder');
- const onfAttributeFormatter = require('../onfModel/utility/OnfAttributeFormatter');
- const authorizationCodeDecoder = require('./AuthorizationDecoder');
+ const operationClientInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
+ const httpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
+ const requestHeader = require('../applicationPattern/rest/client/RequestHeader');
+ const restRequestBuilder = require('../applicationPattern/rest/client/RequestBuilder');
+ const onfAttributeFormatter = require('../applicationPattern/onfModel/utility/OnfAttributeFormatter');
  const forwardingDomain = require('../applicationPattern/onfModel/models/ForwardingDomain');
+ const FcPort = require('../applicationPattern/onfModel/models/FcPort');
  
  /**
   * This function authorizes the user credentials<br>
@@ -28,19 +27,19 @@
   * 4. If the customerJourney is empty , then the value "unknown value" will be added<br>
   * 5. If trace-indicator value is empty , then the value will be assigned to 1<br>
   */
- exports.isAuthorized = function(authorizationCode, method) {
+ exports.isAuthorized = function (authorizationCode, method) {
      return new Promise(async function (resolve, reject) {
          let isAuthorized = false;
          try {
              let operationClientUuid = await getOperationClientToAuthenticateTheRequest();
-             let serviceName = await operationClientInterface.getOperationName(operationClientUuid);
-             let ipAddressAndPort = await operationClientInterface.getTcpIpAddressAndPortForTheOperationClient(operationClientUuid);
-             let operationKey = await operationClientInterface.getOperationKey(operationClientUuid);
+             let serviceName = await operationClientInterface.getOperationNameAsync(operationClientUuid);
+             let ipAddressAndPort = await operationClientInterface.getTcpIpAddressAndPortAsyncAsync(operationClientUuid);
+             let operationKey = await operationClientInterface.getOperationKeyAsync(operationClientUuid);
              let userName = decodeAuthorizationCodeAndExtractUserName(authorizationCode);
-             let applicationName = await httpServerInterface.getApplicationName();
-             let applicationReleaseNumber = await httpServerInterface.getReleaseNumber();
+             let applicationName = await httpServerInterface.getApplicationNameAsync();
+             let applicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
              let httpRequestHeader = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(new requestHeader(userName, applicationName, "", "", "unknown", operationKey));
-             let httpRequestBody = formulateResponseBody(applicationName,applicationReleaseNumber, authorizationCode, method)
+             let httpRequestBody = formulateResponseBody(applicationName, applicationReleaseNumber, authorizationCode, method)
              let response = await restRequestBuilder.BuildAndTriggerRestRequest(ipAddressAndPort, serviceName, "POST", httpRequestHeader, httpRequestBody);
              if (response !== undefined && response.status === 200) {
                  let responseBody = response.data;
@@ -64,7 +63,7 @@
   * @param {string} method HTTP method of the OAM layer call. It can be PUT,GET<br>
   * @returns {object} return the formulated responseBody<br>
   */
-  function formulateResponseBody(applicationName, releaseNumber, authorizationCode, method) {
+ function formulateResponseBody(applicationName, releaseNumber, authorizationCode, method) {
      let httpRequestBody = {};
      try {
          httpRequestBody = {
@@ -87,44 +86,45 @@
   * step 2: get the output fc-port from the forwarding-construct<br>
   */
  async function getOperationClientToAuthenticateTheRequest() {
-    return new Promise(async function (resolve, reject) {
-        try {
-            let operationClientUuid = undefined;
-            let forwardingConstruct = await forwardingDomain.getForwardingConstructForTheForwardingNameAsync(
-                "OamRequestCausesInquiryForAuthentication");
-            if (forwardingConstruct) {
-                let fcPortList = forwardingConstruct["fc-port"];
-                for (let i = 0; i < fcPortList.length; i++) {
-                    let fcPort = fcPortList[i];
-                    let fcPortDirection = fcPort["port-direction"];
-                    if (fcPortDirection == FcPort.portDirectionEnum.OUTPUT) {
-                        operationClientUuid = fcPort["logical-termination-point"];
-                    }
-                }
-            }
-            resolve(operationClientUuid);
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
+     return new Promise(async function (resolve, reject) {
+         try {
+             let operationClientUuid = undefined;
+             let forwardingConstruct = await forwardingDomain.getForwardingConstructForTheForwardingNameAsync(
+                 "OamRequestCausesInquiryForAuthentication");
+             if (forwardingConstruct) {
+                 let fcPortList = forwardingConstruct["fc-port"];
+                 for (let i = 0; i < fcPortList.length; i++) {
+                     let fcPort = fcPortList[i];
+                     let fcPortDirection = fcPort["port-direction"];
+                     if (fcPortDirection == FcPort.portDirectionEnum.OUTPUT) {
+                         operationClientUuid = fcPort["logical-termination-point"];
+                     }
+                 }
+             }
+             resolve(operationClientUuid);
+         } catch (error) {
+             reject(error);
+         }
+     });
+ }
  
  /**
   * @description To decode base64 authorization code from authorization header<br>
   * @param {string} authorizationCode base64 encoded authorization code<br>
   * @returns {Promise} returns user name based on the decoded authorization code
   **/
-  function decodeAuthorizationCodeAndExtractUserName(authorizationCode) {
-    try {
-        let base64EncodedString = authorizationCode.split(" ")[1];
-        let base64BufferObject = Buffer.from(base64EncodedString, "base64");
-        let base64DecodedString = base64BufferObject.toString("utf8");
-        let userName = base64DecodedString.split(":")[0];
-        console.log("Authorization code : " + authorizationCode);
-        console.log("decoded user name: " + userName);
-        return userName;
-    } catch (error) {
-        console.log(error);
-        return undefined;
-    }
-}
+ function decodeAuthorizationCodeAndExtractUserName(authorizationCode) {
+     try {
+         let base64EncodedString = authorizationCode.split(" ")[1];
+         let base64BufferObject = Buffer.from(base64EncodedString, "base64");
+         let base64DecodedString = base64BufferObject.toString("utf8");
+         let userName = base64DecodedString.split(":")[0];
+         console.log("Authorization code : " + authorizationCode);
+         console.log("decoded user name: " + userName);
+         return userName;
+     } catch (error) {
+         console.log(error);
+         return undefined;
+     }
+ }
+ 
