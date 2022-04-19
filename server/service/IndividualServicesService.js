@@ -124,7 +124,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
         let currentApplicationRemotePort = await TcpServerInterface.getLocalPort();
         if((applicationAddress == currentApplicationRemoteAddress) && 
         (applicationPort == currentApplicationRemotePort)){
-          isdataTransferRequired = true;
+          isdataTransferRequired = false;
         }
         if (isUpdated) {
           applicationName = await httpClientInterface.getApplicationNameAsync("alt-0-0-1-http-c-0010");
