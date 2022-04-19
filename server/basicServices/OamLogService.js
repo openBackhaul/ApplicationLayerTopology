@@ -41,10 +41,11 @@ exports.recordOamRequest = function (oamPath, requestBody, responseCode, authori
             let operationKey = await operationClientInterface.getOperationKeyAsync(operationClientUuid);
             let timestamp = moment().format();
             let applicationName = await HttpServerInterface.getApplicationNameAsync();
+            let releaseNumber = await HttpServerInterface.getReleaseNumberAsync();
             let userName = decodeAuthorizationCodeAndExtractUserName(authorizationCode);
             let stringifiedBody = JSON.stringify(requestBody);
             let httpRequestHeader = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(new requestHeader(userName, applicationName, "", "", "unknown", operationKey));
-            let httpRequestBody = formulateResponseBody(method, oamPath, stringifiedBody, responseCode, userName, timestamp,applicationName);
+            let httpRequestBody = formulateResponseBody(method, oamPath, stringifiedBody, responseCode, userName, timestamp, applicationName, releaseNumber);
             let response = await requestBuilder.BuildAndTriggerRestRequest(ipAddressAndPort, serviceName, "POST", httpRequestHeader, httpRequestBody);
             if (response !== undefined && response.status === 200) {
                 resolve(true);
@@ -66,16 +67,17 @@ exports.recordOamRequest = function (oamPath, requestBody, responseCode, authori
  * @param {string} timeStamp timestamp of the execution<br>
  * @returns {object} return the formulated responseBody<br>
  */
-function formulateResponseBody(method, oamPath, stringifiedBody, responseCode, userName, timeStamp,applicationName) {
+function formulateResponseBody(method, oamPath, stringifiedBody, responseCode, userName, timeStamp, applicationName, releaseNumber) {
     let httpRequestBody = {};
     try {
         httpRequestBody = {
             "application-name": applicationName,
+            "release-number": releaseNumber,
             "method": method,
             "resource": oamPath,
             "stringified-body": stringifiedBody,
             "response-code": responseCode,
-            "Authorization": userName,
+            "user-name": userName,
             "timestamp": timeStamp
         };
         return httpRequestBody;
@@ -110,16 +112,16 @@ async function getOperationClientToLogOamRequest() {
 }
 
 /**
-  * @description To decode base64 authorization code from authorization header<br>
-  * @param {string} authorizationCode base64 encoded authorization code<br>
-  * @returns {Promise} returns user name based on the decoded authorization code
-  * <b><u>Procedure :</u></b><br>
-  * <b>step 1 :</b> Get the authorization code from the header<br>
-  * <b>step 2 :</b> split the authorization code with delimiter "space" to ignore the prefix "basic" from the authorization code<br>
-  * <b>step 3 :</b> decode the encoded string (which will result in the format username:password)<br>
-  * <b>step 3 :</b> split the text with delimiter ":" to get the username<br>
-  **/
- function decodeAuthorizationCodeAndExtractUserName(authorizationCode) {
+ * @description To decode base64 authorization code from authorization header<br>
+ * @param {string} authorizationCode base64 encoded authorization code<br>
+ * @returns {Promise} returns user name based on the decoded authorization code
+ * <b><u>Procedure :</u></b><br>
+ * <b>step 1 :</b> Get the authorization code from the header<br>
+ * <b>step 2 :</b> split the authorization code with delimiter "space" to ignore the prefix "basic" from the authorization code<br>
+ * <b>step 3 :</b> decode the encoded string (which will result in the format username:password)<br>
+ * <b>step 3 :</b> split the text with delimiter ":" to get the username<br>
+ **/
+function decodeAuthorizationCodeAndExtractUserName(authorizationCode) {
     try {
         let base64EncodedString = authorizationCode.split(" ")[1];
         let base64BufferObject = Buffer.from(base64EncodedString, "base64");
@@ -133,5 +135,3 @@ async function getOperationClientToLogOamRequest() {
         return undefined;
     }
 }
-
-
