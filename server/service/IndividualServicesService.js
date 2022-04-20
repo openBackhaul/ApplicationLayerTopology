@@ -433,7 +433,7 @@ exports.listEndPointsOfLink = function (body, user, originator, xCorrelator, tra
         }
         linkEndPointList.push(linkEndPoint);
       }
-
+      linkEndPointList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(linkEndPointList);
       /****************************************************************************************
        * Setting 'application/json' response body
        ****************************************************************************************/
