@@ -429,7 +429,7 @@ exports.listEndPointsOfLink = function (body, user, originator, xCorrelator, tra
         if (controlConstruct) {
           linkEndPoint.ltpDirection = getLtpDirection(controlConstruct, logicalTerminationPoint);
           linkEndPoint.applicationName = getApplicationName(controlConstruct);
-          linkEndPoint.releaseNumber = getReleaseNumber(controlConstruct);
+          linkEndPoint.applicationReleaseNumber = getReleaseNumber(controlConstruct);
         }
         linkEndPointList.push(linkEndPoint);
       }
