@@ -97,7 +97,7 @@ module.exports.getOperationClientOperationalState = async function getOperationC
 };
 
 module.exports.putOperationClientDetailedLoggingIsOn = async function putOperationClientDetailedLoggingIsOn (req, res, next, body) {
-  let responseCode = responseCodeEnum.code.OK;
+  let responseCode = responseCodeEnum.code.NO_CONTENT;
   if (await authorizingService.isAuthorized(req.headers.authorization, req.method)) {
     await OperationClient.putOperationClientDetailedLoggingIsOn(req.url,body)
       .then(function (response) {
@@ -115,7 +115,7 @@ module.exports.putOperationClientDetailedLoggingIsOn = async function putOperati
 };
 
 module.exports.putOperationClientOperationKey = async function putOperationClientOperationKey (req, res, next, body, uuid) {
-  let responseCode = responseCodeEnum.code.OK;
+  let responseCode = responseCodeEnum.code.NO_CONTENT;
   if (await authorizingService.isAuthorized(req.headers.authorization, req.method)) {
     await OperationClient.putOperationClientOperationKey(req.url,body)
       .then(function (response) {
@@ -133,7 +133,7 @@ module.exports.putOperationClientOperationKey = async function putOperationClien
 };
 
 module.exports.putOperationClientOperationName = async function putOperationClientOperationName (req, res, next, body, uuid) {
-  let responseCode = responseCodeEnum.code.OK;
+  let responseCode = responseCodeEnum.code.NO_CONTENT;
   if (await authorizingService.isAuthorized(req.headers.authorization, req.method)) {
     await OperationClient.putOperationClientOperationName(req.url,body)
       .then(function (response) {

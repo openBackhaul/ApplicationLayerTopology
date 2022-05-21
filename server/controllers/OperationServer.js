@@ -61,7 +61,7 @@ module.exports.getOperationServerOperationName = async function getOperationServ
 };
 
 module.exports.putOperationServerLifeCycleState = async function putOperationServerLifeCycleState (req, res, next, body, uuid) {
-  let responseCode = responseCodeEnum.code.OK;
+  let responseCode = responseCodeEnum.code.NO_CONTENT;
   if (await authorizingService.isAuthorized(req.headers.authorization, req.method)) {
     await OperationServer.putOperationServerLifeCycleState(req.url,body)
       .then(function (response) {
@@ -79,7 +79,7 @@ module.exports.putOperationServerLifeCycleState = async function putOperationSer
 };
 
 module.exports.putOperationServerOperationKey = async function putOperationServerOperationKey (req, res, next, body, uuid) {
-  let responseCode = responseCodeEnum.code.OK;
+  let responseCode = responseCodeEnum.code.NO_CONTENT;
   if (await authorizingService.isAuthorized(req.headers.authorization, req.method)) {
     await OperationServer.putOperationServerOperationKey(req.url,body)
       .then(function (response) {
