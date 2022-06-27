@@ -6,7 +6,7 @@ Consolidates interface and forwarding information of the application layer
 - 1.0.0-tsi.d.t : Defintion to be used within the Transport SDN Introduction at Telefonica Germany
 
 ### Services
-- [ApplicationLayerTopology_0.0.2_tsi.220110.1955+services.1](./ApplicationLayerTopology_0.0.2_tsi.220110.1955+services.1.xlsx)
+- [ApplicationLayerTopology+services](./ApplicationLayerTopology+services.yaml)
 
 ### Forwardings
 - [ApplicationLayerTopology_0.0.2_tsi.220110.1955+forwardings.1](./ApplicationLayerTopology_0.0.2_tsi.220110.1955+forwardings.1.xlsx)
