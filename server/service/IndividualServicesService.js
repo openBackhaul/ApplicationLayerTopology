@@ -123,8 +123,8 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
         let isUpdated = await httpClientInterface.setReleaseNumberAsync(newReleaseUuid, releaseNumber);
         let currentApplicationRemoteAddress = await TcpServerInterface.getLocalAddress();
         let currentApplicationRemotePort = await TcpServerInterface.getLocalPort();
-        if((applicationAddress == currentApplicationRemoteAddress) && 
-        (applicationPort == currentApplicationRemotePort)){
+        if ((applicationAddress == currentApplicationRemoteAddress) &&
+          (applicationPort == currentApplicationRemotePort)) {
           isdataTransferRequired = false;
         }
         if (isUpdated) {
@@ -155,9 +155,9 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
             traceIndicator,
             customerJourney
           );
-        }        
-      } 
-      softwareUpgrade.upgradeSoftwareVersion(isdataTransferRequired, user, xCorrelator, traceIndicator, customerJourney);   
+        }
+      }
+      softwareUpgrade.upgradeSoftwareVersion(isdataTransferRequired, user, xCorrelator, traceIndicator, customerJourney);
       resolve();
     } catch (error) {
       reject(error);
@@ -1394,13 +1394,27 @@ function getAllClientApplicationList() {
           this.applicationReleaseNumber = applicationReleaseNumber;
         }
       };
-      let httpClientUuidList = await logicalTerminationPoint.getUuidListForTheProtocolAsync(layerProtocol.layerProtocolNameEnum.HTTP_CLIENT);
-      for (let i = 0; i < httpClientUuidList.length; i++) {
-        let httpClientUuid = httpClientUuidList[i];
-        let applicationName = await httpClientInterface.getApplicationNameAsync(httpClientUuid);
-        let applicationReleaseNumber = await httpClientInterface.getReleaseNumberAsync(httpClientUuid);
-        let clientApplication = new clientApplicationInformation(applicationName, applicationReleaseNumber);
-        clientApplicationList.push(clientApplication);
+      let controlConstructList = await NetworkControlDomain.getControlConstructListAsync();
+      for (let i = 0; i < controlConstructList.length; i++) {
+        let controlConstruct = controlConstructList[i];
+        try {
+          let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+          for (let i = 0; i < logicalTerminationPointList.length; i++) {
+            let logicalTerminationPoint = logicalTerminationPointList[i];
+            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
+              let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
+              let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
+              let applicationName = httpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
+              let applicationReleaseNumber = httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
+              let clientApplication = new clientApplicationInformation(applicationName, applicationReleaseNumber);
+              clientApplicationList.push(clientApplication);
+            }
+          }
+        } catch (error) {
+          console.log(error)
+        }
       }
       resolve(clientApplicationList);
     } catch (error) {
