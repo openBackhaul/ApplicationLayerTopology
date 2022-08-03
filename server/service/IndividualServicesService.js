@@ -193,18 +193,18 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
        * configure control-construct list
        ****************************************************************************************/
       let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
-
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-      let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-      let forwardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT + "=" + forwardingConstructUuid;
-      let fcPortPath = forwardingConstructPath + "/" + onfAttributes.FORWARDING_CONSTRUCT.FC_PORT + "=" + fcPortLocalId;
-      let isFcPortExists = await fileOperation.readFromDatabaseAsync(fcPortPath)
-      if (isFcPortExists) {
-        await fileOperation.deletefromDatabaseAsync(fcPortPath,
-          fcPortPath,
-          true);
+      if (forwardingDomainUuid != undefined) {
+        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+        let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
+        let forwardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT + "=" + forwardingConstructUuid;
+        let fcPortPath = forwardingConstructPath + "/" + onfAttributes.FORWARDING_CONSTRUCT.FC_PORT + "=" + fcPortLocalId;
+        let isFcPortExists = await fileOperation.readFromDatabaseAsync(fcPortPath)
+        if (isFcPortExists) {
+          await fileOperation.deletefromDatabaseAsync(fcPortPath,
+            fcPortPath,
+            true);
+        }
       }
-
       resolve();
     } catch (error) {
       reject(error);
@@ -1211,28 +1211,30 @@ exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator
        * configure control-construct list
        ****************************************************************************************/
       let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-      let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-      let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
-      let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
+      if (forwardingDomainUuid != undefined) {
+        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+        let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
+        let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
+        let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
 
-      let existingForwardingConstruct = await fileOperation.readFromDatabaseAsync(forwardingConstructPathForTheUuid);
+        let existingForwardingConstruct = await fileOperation.readFromDatabaseAsync(forwardingConstructPathForTheUuid);
 
-      if (existingForwardingConstruct) {
-        let existingForwardingConstructAsAString = JSON.stringify(existingForwardingConstruct);
-        let newForwardingConstructAsAString = JSON.stringify(forwardingConstruct);
-        if (existingForwardingConstructAsAString != newForwardingConstructAsAString) {
-          await fileOperation.deletefromDatabaseAsync(forwardingConstructPathForTheUuid,
-            existingForwardingConstruct,
-            true);
+        if (existingForwardingConstruct) {
+          let existingForwardingConstructAsAString = JSON.stringify(existingForwardingConstruct);
+          let newForwardingConstructAsAString = JSON.stringify(forwardingConstruct);
+          if (existingForwardingConstructAsAString != newForwardingConstructAsAString) {
+            await fileOperation.deletefromDatabaseAsync(forwardingConstructPathForTheUuid,
+              existingForwardingConstruct,
+              true);
+            await fileOperation.writeToDatabaseAsync(forardingConstructPath,
+              forwardingConstruct,
+              true);
+          }
+        } else {
           await fileOperation.writeToDatabaseAsync(forardingConstructPath,
             forwardingConstruct,
             true);
         }
-      } else {
-        await fileOperation.writeToDatabaseAsync(forardingConstructPath,
-          forwardingConstruct,
-          true);
       }
       resolve();
     } catch (error) {
@@ -1270,30 +1272,32 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
        * configure control-construct list
        ****************************************************************************************/
       let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-      let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-      let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
-      let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
-      let fcPortPath = forwardingConstructPathForTheUuid + "/fc-port";
-      let fcPortPathForTheUuid = fcPortPath + "=" + fcPortLocalId
+      if (forwardingDomainUuid != undefined) {
+        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
+        let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
+        let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
+        let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
+        let fcPortPath = forwardingConstructPathForTheUuid + "/fc-port";
+        let fcPortPathForTheUuid = fcPortPath + "=" + fcPortLocalId
 
-      let existingFcPort = await fileOperation.readFromDatabaseAsync(fcPortPathForTheUuid);
+        let existingFcPort = await fileOperation.readFromDatabaseAsync(fcPortPathForTheUuid);
 
-      if (existingFcPort) {
-        let existingFcPortAsAString = JSON.stringify(existingFcPort);
-        let newFcPortAsAString = JSON.stringify(fcPort);
-        if (existingFcPortAsAString != newFcPortAsAString) {
-          await fileOperation.deletefromDatabaseAsync(fcPortPathForTheUuid,
-            existingFcPort,
-            true);
+        if (existingFcPort) {
+          let existingFcPortAsAString = JSON.stringify(existingFcPort);
+          let newFcPortAsAString = JSON.stringify(fcPort);
+          if (existingFcPortAsAString != newFcPortAsAString) {
+            await fileOperation.deletefromDatabaseAsync(fcPortPathForTheUuid,
+              existingFcPort,
+              true);
+            await fileOperation.writeToDatabaseAsync(fcPortPath,
+              fcPort,
+              true);
+          }
+        } else {
           await fileOperation.writeToDatabaseAsync(fcPortPath,
             fcPort,
             true);
         }
-      } else {
-        await fileOperation.writeToDatabaseAsync(fcPortPath,
-          fcPort,
-          true);
       }
       resolve();
     } catch (error) {
@@ -1435,19 +1439,20 @@ async function getForwardingDomainUuid(controlConstructUuid, forwardingConstruct
       /*************************************************************************************
        ****************delete dependents , if a fc-port exist for them***********************
        *************************************************************************************/
-      for (let i = 0; i < forwardingDomainList.length; i++) {
-        let forwardingDomain = forwardingDomainList[i];
-        let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+      if (forwardingDomainList != undefined) {
+        for (let i = 0; i < forwardingDomainList.length; i++) {
+          let forwardingDomain = forwardingDomainList[i];
+          let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
 
-        for (let j = 0; j < forwardingConstructList.length; j++) {
-          let forwardingConstruct = forwardingConstructList[j];
-          let _forwardingConstructUuid = forwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-          if (_forwardingConstructUuid == forwardingConstructUuid) {
-            forwardingDomainUuid = forwardingDomain[onfAttributes.GLOBAL_CLASS.UUID];
+          for (let j = 0; j < forwardingConstructList.length; j++) {
+            let forwardingConstruct = forwardingConstructList[j];
+            let _forwardingConstructUuid = forwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID];
+            if (_forwardingConstructUuid == forwardingConstructUuid) {
+              forwardingDomainUuid = forwardingDomain[onfAttributes.GLOBAL_CLASS.UUID];
+            }
           }
         }
       }
-
       resolve(forwardingDomainUuid);
     } catch (error) {
       reject(error);
