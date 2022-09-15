@@ -220,7 +220,7 @@ class OperationServerInterface extends layerProtocol {
                 let operationServerPac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
                 let operationServerConfiguration = operationServerPac[onfAttributes.OPERATION_SERVER.CONFIGURATION];
                 lifeCycleState = operationServerConfiguration[onfAttributes.OPERATION_SERVER.LIFE_CYCLE_STATE];
-                /* Issues#80: below code is to filter life-cycle-state value and to the get the value from lifeCycleStateEnum(ENUM) instead of complete value from load.json */
+                /* Issues#80: filter life-cycle-state value to get the enum value not the complete value from load.json */
                 let lifeCycleStateEnum = OperationServerInterface.OperationServerInterfacePac.OperationServerInterfaceConfiguration.lifeCycleStateEnum;
                 for (let lifeCycleStateKey in lifeCycleStateEnum) {
                    if (lifeCycleStateEnum[lifeCycleStateKey] == lifeCycleState) {
