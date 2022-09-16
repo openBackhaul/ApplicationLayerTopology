@@ -40,7 +40,7 @@ class OperationServerInterface extends layerProtocol {
             static lifeCycleStateEnum = {
                 EXPERIMENTAL: "operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL",
                 OPERATIONAL: "operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_OPERATIONAL",
-                DEPRICATED: "operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_DEPRICATED",
+                DEPRECATED: "operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_DEPRECATED",
                 OBSOLETE: "operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_OBSOLETE",
                 UNKNOWN: "operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_UNKNOWN",
                 NOT_YET_DEFINED: "operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_NOT_YET_DEFINED"
@@ -220,6 +220,13 @@ class OperationServerInterface extends layerProtocol {
                 let operationServerPac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
                 let operationServerConfiguration = operationServerPac[onfAttributes.OPERATION_SERVER.CONFIGURATION];
                 lifeCycleState = operationServerConfiguration[onfAttributes.OPERATION_SERVER.LIFE_CYCLE_STATE];
+                /* Issues#80: filter life-cycle-state value to get the enum value not the complete value from load.json */
+                let lifeCycleStateEnum = OperationServerInterface.OperationServerInterfacePac.OperationServerInterfaceConfiguration.lifeCycleStateEnum;
+                for (let lifeCycleStateKey in lifeCycleStateEnum) {
+                   if (lifeCycleStateEnum[lifeCycleStateKey] == lifeCycleState) {
+                        lifeCycleState = lifeCycleStateKey;
+                    }
+                }
                 resolve(lifeCycleState);
             } catch (error) {
                 reject(error);
