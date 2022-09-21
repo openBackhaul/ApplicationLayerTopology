@@ -181,6 +181,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
 exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
+      await checkApplicationExists(originator);
 
       /****************************************************************************************
        * Setting up required local variables from the request body
@@ -228,6 +229,7 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
 exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
+      await checkApplicationExists(originator);
 
       /****************************************************************************************
        * Setting up required local variables from the request body
@@ -1142,6 +1144,7 @@ exports.startApplicationInGenericRepresentation = function (user, originator, xC
 exports.updateAllLtpsAndFcs = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
+      await checkApplicationExists(originator);
 
       /****************************************************************************************
        * Setting up required local variables from the request body
@@ -1199,6 +1202,7 @@ exports.updateAllLtpsAndFcs = function (body, user, originator, xCorrelator, tra
 exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
+      await checkApplicationExists(originator);
 
       /****************************************************************************************
        * Setting up required local variables from the request body
@@ -1259,6 +1263,7 @@ exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator
 exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
+      await checkApplicationExists(originator);
 
       /****************************************************************************************
        * Setting up required local variables from the request body
@@ -1322,6 +1327,7 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
 exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
+      await checkApplicationExists(originator);
 
       /****************************************************************************************
        * Setting up required local variables from the request body
@@ -1905,4 +1911,16 @@ function getValueFromKey(nameList, key) {
     }
   }
   return undefined;
+}
+
+/**
+ * Checks if http-client LTP with the given application name exists. Throws Error if not. 
+ * @param {string} applicationName
+ * @throws {Error} Will throw an error if the application does not exist.
+ */
+async function checkApplicationExists(applicationName) {
+  const applicationExists = await httpClientInterface.isApplicationExists(applicationName);
+  if (!applicationExists) {
+    throw new Error(`Application ${applicationName} is not in the list of known applications.`);
+  }
 }
