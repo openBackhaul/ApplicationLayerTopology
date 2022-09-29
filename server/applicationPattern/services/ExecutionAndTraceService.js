@@ -27,7 +27,7 @@ const FcPort = require('../onfModel/models/FcPort');
  * @param {object} responseBody  response body<br>
  * @returns {Promise<boolean>} returns true if the operation is successful. Promise is never rejected.<br>
  */
- exports.recordServiceRequestFromClient = function (serverApplicationName, serverApplicationReleaseNumber, xCorrelator, traceIndicator, userName, originator,
+exports.recordServiceRequestFromClient = function (serverApplicationName, serverApplicationReleaseNumber, xCorrelator, traceIndicator, userName, originator,
     operationName, responseCode, requestBody, responseBody) {
     return new Promise(async function (resolve, reject) {
         let httpRequestBody = {};
