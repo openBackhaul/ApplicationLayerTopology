@@ -5,7 +5,7 @@ var IndividualServices = require('../service/IndividualServicesService');
 var responseCodeEnum = require('../applicationPattern/rest/server/ResponseCode');
 var restResponseHeader = require('../applicationPattern/rest/server/ResponseHeader');
 var restResponseBuilder = require('../applicationPattern/rest/server/ResponseBuilder');
-var executionAndTraceService = require('../basicServices/ExecutionAndTraceService');
+var executionAndTraceService = require('../applicationPattern/services/ExecutionAndTraceService');
 
 module.exports.addOperationClientToLink = async function addOperationClientToLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {

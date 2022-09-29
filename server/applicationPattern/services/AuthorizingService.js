@@ -1,25 +1,20 @@
-/**
- * <p>This class provides functionality to authenticate a OAM layer request by getting an approval from the Administrator administration.</p>  
- * @author      prathiba.jeevan.external@telefonica.com
- * @since       05.09.2021
- * @version     1.0
- * @copyright   Telefónica Germany GmbH & Co. OHG
- * @module AuthorizingService
- **/
+ // @ts-check
+ 'use strict';
+ const requestHeader = require('../rest/client/RequestHeader');
+ const restRequestBuilder = require('../rest/client/RequestBuilder');
+ 
+ const onfAttributeFormatter = require('../onfModel/utility/OnfAttributeFormatter');
 
- const operationClientInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
- const httpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
- const requestHeader = require('../applicationPattern/rest/client/RequestHeader');
- const restRequestBuilder = require('../applicationPattern/rest/client/RequestBuilder');
- const onfAttributeFormatter = require('../applicationPattern/onfModel/utility/OnfAttributeFormatter');
- const forwardingDomain = require('../applicationPattern/onfModel/models/ForwardingDomain');
- const FcPort = require('../applicationPattern/onfModel/models/FcPort');
+ const operationClientInterface = require('../onfModel/models/layerProtocols/OperationClientInterface');
+ const httpServerInterface = require('../onfModel/models/layerProtocols/HttpServerInterface');
+ const forwardingDomain = require('../onfModel/models/ForwardingDomain');
+ const FcPort = require('../onfModel/models/FcPort');
  
  /**
   * This function authorizes the user credentials<br>
   * @param {string} authorizationCode authorization code received from the header<br>
   * @param {string} method is the https method name<br>
-  * @returns {boolean} return the authorization result<br>
+  * @returns {Promise<boolean>} return the authorization result<br>
   * This method performs the following step,<br>
   * step 1: extract the <br>
   * 2. If user value is empty , then the value from originator will be copied<br>
@@ -80,7 +75,7 @@
  
  /**
   * This function returns the operation client uuid of the service that needs to be called to authenticate the OAM requests<br>
-  * @returns {string} return the uuid of the operation client of the service that needs to be addressed to authenticate the OAM request<br>
+  * @returns {Promise<string>} return the uuid of the operation client of the service that needs to be addressed to authenticate the OAM request<br>
   * This method performs the following step,<br>
   * step 1: extract the forwarding-construct OamRequestCausesInquiryForAuthentication<br>
   * step 2: get the output fc-port from the forwarding-construct<br>
@@ -110,8 +105,8 @@
  
  /**
   * @description To decode base64 authorization code from authorization header<br>
-  * @param {string} authorizationCode base64 encoded authorization code<br>
-  * @returns {Promise} returns user name based on the decoded authorization code
+  * @param {string} authorizationCode base64 encoded authorization code<br> 
+  * @returns {string} returns user name based on the decoded authorization code
   **/
  function decodeAuthorizationCodeAndExtractUserName(authorizationCode) {
      try {
@@ -124,7 +119,7 @@
          return userName;
      } catch (error) {
          console.log(error);
-         return undefined;
+         return "";
      }
  }
  
