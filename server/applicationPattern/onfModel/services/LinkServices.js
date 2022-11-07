@@ -195,15 +195,18 @@ function createLinkAsync(consumingOperationuuid, servingOperationuuid) {
                     LinkPort.portDirectionEnum.INPUT,
                     consumingOperationuuid
                 );
-                let isLinkPortCreated = await Link.addLinkPortAsync(linkUuid, consumingOperationLinkPort);
-                if (isLinkPortCreated) {
+                let isConsumingOperationLinkPortCreated = await Link.addLinkPortAsync(linkUuid, consumingOperationLinkPort);
+                if (isConsumingOperationLinkPortCreated) {
                     let servingOperationLocalId = await LinkPort.generateNextLocalIdAsync(linkUuid);
                     let servingOperationLinkPort = new LinkPort(
                         servingOperationLocalId,
                         LinkPort.portDirectionEnum.OUTPUT,
                         servingOperationuuid
                     );
-                    await Link.addLinkPortAsync(linkUuid, servingOperationLinkPort);
+                    let isServingOperationLinkPortCreated = await Link.addLinkPortAsync(linkUuid, servingOperationLinkPort);
+                    if(isServingOperationLinkPortCreated){
+                        resolve(linkUuid); 
+                    }
                 }
             }
             resolve();
