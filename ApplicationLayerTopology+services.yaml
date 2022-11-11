@@ -63,7 +63,7 @@ servers:
           uuid: alt-1-0-0-op-s-3014
         - service-name: /v1/delete-fc-port
           uuid: alt-1-0-0-op-s-3015
-        - service-name: /v1/list-operation-clients-activated-by-operation-server-at-application
+        - service-name: /v1/list-operation-clients-reacting-on-operation-server
           uuid: alt-1-0-0-op-s-3016
         - service-name: /v1/list-link-uuids
           uuid: alt-1-0-0-op-s-3017
@@ -85,7 +85,6 @@ servers:
     own-ip-address: 10.118.125.157
     own-tcp-port: 1005
     uuid: alt-1-0-0-tcp-s-0000
-
 
 
 clients:
@@ -150,19 +149,19 @@ clients:
           - service-name: /v1/relay-operation-update
             uuid: alt-1-0-0-op-c-0023
         individual:
+          - service-name: /v1/notify-approvals
+            uuid: alt-1-0-0-op-c-im-ro-1-0-0-000
+          - service-name: /v1/notify-withdrawn-approvals
+            uuid: alt-1-0-0-op-c-im-ro-1-0-0-001
+          - service-name: /v1/end-subscription
+            uuid: alt-1-0-0-op-c-im-ro-1-0-0-002
+          - service-name: /v1/redirect-topology-change-information
+            uuid: alt-1-0-0-op-c-im-ro-1-0-0-004
       service:
         basic:
-          - service-name: /v1/redirect-topology-change-information
-            uuid: alt-1-0-0-op-c-2020
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-1-0-0-op-c-2021
         individual:
-          - service-name: /v1/notify-approvals
-            uuid: alt-1-0-0-op-c-3020
-          - service-name: /v1/notify-withdrawn-approvals
-            uuid: alt-1-0-0-op-c-3021
-          - service-name: /v1/end-subscription
-            uuid: alt-1-0-0-op-c-3022
+          - service-name: /v1/list-ltps-and-fcs
+            uuid: alt-1-0-0-op-c-is-ro-1-0-0-001
 
   - http-client:
       application-name: TypeApprovalRegister
@@ -176,13 +175,13 @@ clients:
       own-oam:
         basic:
         individual:
+          - service-name: /v1/redirect-topology-change-information
+            uuid: alt-1-0-0-op-c-im-tar-1-0-0-000
       service:
         basic:
-          - service-name: /v1/redirect-topology-change-information
-            uuid: alt-1-0-0-op-c-2030
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-1-0-0-op-c-2031
         individual:
+          - service-name: /v1/list-ltps-and-fcs
+            uuid: alt-1-0-0-op-c-is-tar-1-0-0-001
 
   - http-client:
       application-name: ExecutionAndTraceLog
@@ -195,16 +194,16 @@ clients:
     operation-clients:
       own-oam:
         basic:
-          - service-name: /v1/record-service-request
-            uuid: alt-1-0-0-op-c-0040
         individual:
+          - service-name: /v1/redirect-topology-change-information
+            uuid: alt-1-0-0-op-c-im-eatl-1-0-0-000
       service:
         basic:
-          - service-name: /v1/redirect-topology-change-information
-            uuid: alt-1-0-0-op-c-2040
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-1-0-0-op-c-2041
+          - service-name: /v1/record-service-request
+            uuid: alt-1-0-0-op-c-bs-eatl-1-0-0-000
         individual:
+          - service-name: /v1/list-ltps-and-fcs
+            uuid: alt-1-0-0-op-c-is-eatl-1-0-0-001
 
   - http-client:
       application-name: OamLog
@@ -217,16 +216,16 @@ clients:
     operation-clients:
       own-oam:
         basic:
-          - service-name: /v1/record-oam-request
-            uuid: alt-1-0-0-op-c-0050
         individual:
+          - service-name: /v1/redirect-topology-change-information
+            uuid: alt-1-0-0-op-c-im-ol-1-0-0-000
       service:
         basic:
-          - service-name: /v1/redirect-topology-change-information
-            uuid: alt-1-0-0-op-c-2050
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-1-0-0-op-c-2051
+          - service-name: /v1/record-oam-request
+            uuid: alt-1-0-0-op-c-bs-ol-1-0-0-000
         individual:
+          - service-name: /v1/list-ltps-and-fcs
+            uuid: alt-1-0-0-op-c-is-ol-1-0-0-001
 
   - http-client:
       application-name: AdministratorAdministration
@@ -239,16 +238,16 @@ clients:
     operation-clients:
       own-oam:
         basic:
-          - service-name: /v1/approve-oam-request
-            uuid: alt-1-0-0-op-c-0060
         individual:
+          - service-name: /v1/redirect-topology-change-information
+            uuid: alt-1-0-0-op-c-im-aa-1-0-0-000
       service:
         basic:
-          - service-name: /v1/redirect-topology-change-information
-            uuid: alt-1-0-0-op-c-2060
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-1-0-0-op-c-2061
+          - service-name: /v1/approve-oam-request
+            uuid: alt-1-0-0-op-c-bs-aa-1-0-0-000
         individual:
+          - service-name: /v1/list-ltps-and-fcs
+            uuid: alt-1-0-0-op-c-is-aa-1-0-0-001
 
   - http-client:
       application-name: ApplicationLayerTopology
@@ -274,13 +273,13 @@ clients:
           - service-name: /v1/delete-fc-port
             uuid: alt-1-0-0-op-c-0075
         individual:
+          - service-name: /v1/redirect-topology-change-information
+            uuid: alt-1-0-0-op-c-im-alt-1-0-0-000
       service:
         basic:
-          - service-name: /v1/redirect-topology-change-information
-            uuid: alt-1-0-0-op-c-2070
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-1-0-0-op-c-2071
         individual:
+          - service-name: /v1/list-ltps-and-fcs
+            uuid: alt-1-0-0-op-c-is-alt-1-0-0-001
 
   - http-client:
       application-name: OperationKeyManagement
@@ -294,15 +293,15 @@ clients:
       own-oam:
         basic:
         individual:
+          - service-name: /v1/redirect-topology-change-information
+            uuid: alt-1-0-0-op-c-im-okm-1-0-0-000
       service:
         basic:
-          - service-name: /v1/redirect-topology-change-information
-            uuid: alt-1-0-0-op-c-2080
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-1-0-0-op-c-2081
         individual:
           - service-name: /v1/regard-updated-link
             uuid: alt-1-0-0-op-c-3080
+          - service-name: /v1/list-ltps-and-fcs
+            uuid: alt-1-0-0-op-c-is-okm-1-0-0-001
 
   - http-client:
       application-name: CurrentController
@@ -316,10 +315,10 @@ clients:
       own-oam:
         basic:
         individual:
+          - service-name: /v1/redirect-topology-change-information
+            uuid: alt-1-0-0-op-c-im-cc-1-0-0-000
       service:
         basic:
-          - service-name: /v1/redirect-topology-change-information
-            uuid: alt-1-0-0-op-c-2300
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-1-0-0-op-c-2301
         individual:
+          - service-name: /v1/list-ltps-and-fcs
+            uuid: alt-1-0-0-op-c-is-cc-1-0-0-001

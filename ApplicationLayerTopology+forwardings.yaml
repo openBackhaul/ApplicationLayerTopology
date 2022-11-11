@@ -103,7 +103,7 @@ forwardings:
         uuid: alt-1-0-0-op-s-is-014
       - service-name: /v1/delete-fc-port
         uuid: alt-1-0-0-op-s-is-015
-      - service-name: /v1/list-operation-clients-activated-by-operation-server-at-application
+      - service-name: /v1/list-operation-clients-reacting-on-operation-server
         uuid: alt-1-0-0-op-s-is-016
       - service-name: /v1/list-link-uuids
         uuid: alt-1-0-0-op-s-is-017
@@ -134,6 +134,7 @@ forwardings:
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
+      # [all oam requests]
     consequent-requests:
       - client-name: OamLog://v1/record-oam-request
         uuid: alt-1-0-0-op-c-bs-ol-1-0-0-000
@@ -151,6 +152,7 @@ forwardings:
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
+      # [all oam requests]
     consequent-requests:
       - client-name: AdministratorAdministration://v1/approve-oam-request
         uuid: alt-1-0-0-op-c-bs-aa-1-0-0-000
@@ -213,7 +215,7 @@ forwardings:
         uuid: alt-1-0-0-op-s-im-000
     consequent-requests:
       - client-name: RegistryOffice:://v1/notify-approvals
-        uuid: alt-1-0-0-op-c-is-ro-1-0-0-000
+        uuid: alt-1-0-0-op-c-im-ro-1-0-0-000
 
   - forwarding-name: PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnApprovalsToNewRelease
     uuid: alt-1-0-0-op-fc-im-114
@@ -228,10 +230,10 @@ forwardings:
         uuid: alt-1-0-0-op-s-im-000
     consequent-requests:
       - client-name: RegistryOffice:://v1/notify-withdrawn-approvals
-        uuid: alt-1-0-0-op-c-is-ro-1-0-0-001
+        uuid: alt-1-0-0-op-c-im-ro-1-0-0-001
 
   - forwarding-name: PromptForBequeathingDataCausesRObeingRequestedToStopNotificationsToOldRelease
-    uuid: alt-1-0-0-op-fc-im-114
+    uuid: alt-1-0-0-op-fc-im-115
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -540,21 +542,21 @@ forwardings:
           uuid: alt-1-0-0-op-s-is-001
     consequent-requests:
       - client-name: RegistryOffice:://v1/list-ltps-and-fcs
-        uuid: alt-1-0-0-op-c-bs-ro-1-0-0-001
+        uuid: alt-1-0-0-op-c-is-ro-1-0-0-001
       - client-name: TypeApprovalRegister:://v1/list-ltps-and-fcs
-        uuid: alt-1-0-0-op-c-bs-tar-1-0-0-001
+        uuid: alt-1-0-0-op-c-is-tar-1-0-0-001
       - client-name: ExecutionAndTraceLog:://v1/list-ltps-and-fcs
-        uuid: alt-1-0-0-op-c-bs-eatl-1-0-0-001
+        uuid: alt-1-0-0-op-c-is-eatl-1-0-0-001
       - client-name: OamLog:://v1/list-ltps-and-fcs
-        uuid: alt-1-0-0-op-c-bs-ol-1-0-0-001
+        uuid: alt-1-0-0-op-c-is-ol-1-0-0-001
       - client-name: AdministratorAdministration:://v1/list-ltps-and-fcs
-        uuid: alt-1-0-0-op-c-bs-aa-1-0-0-001
+        uuid: alt-1-0-0-op-c-is-aa-1-0-0-001
       - client-name: ApplicationLayerTopology:://v1/list-ltps-and-fcs
-        uuid: alt-1-0-0-op-c-bs-alt-1-0-0-001
+        uuid: alt-1-0-0-op-c-is-alt-1-0-0-001
       - client-name: OperationKeyManagement:://v1/list-ltps-and-fcs
-        uuid: alt-1-0-0-op-c-bs-okm-1-0-0-001
+        uuid: alt-1-0-0-op-c-is-okm-1-0-0-001
       - client-name: CurrentController:://v1/list-ltps-and-fcs
-        uuid: alt-1-0-0-op-c-bs-cc-1-0-0-001
+        uuid: alt-1-0-0-op-c-is-cc-1-0-0-001
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation
     uuid: alt-1-0-0-op-fc-is-001
@@ -577,21 +579,21 @@ forwardings:
           uuid: alt-1-0-0-op-s-is-001
     consequent-requests:
       - client-name: RegistryOffice:://v1/redirect-topology-change-information
-        uuid: alt-1-0-0-op-c-bs-ro-1-0-0-000
+        uuid: alt-1-0-0-op-c-im-ro-1-0-0-004
       - client-name: TypeApprovalRegister:://v1/redirect-topology-change-information
-        uuid: alt-1-0-0-op-c-bs-tar-1-0-0-000
+        uuid: alt-1-0-0-op-c-im-tar-1-0-0-000
       - client-name: ExecutionAndTraceLog:://v1/redirect-topology-change-information
-        uuid: alt-1-0-0-op-c-bs-eatl-1-0-0-000
+        uuid: alt-1-0-0-op-c-im-eatl-1-0-0-000
       - client-name: OamLog:://v1/redirect-topology-change-information
-        uuid: alt-1-0-0-op-c-bs-ol-1-0-0-000
+        uuid: alt-1-0-0-op-c-im-ol-1-0-0-000
       - client-name: AdministratorAdministration:://v1/redirect-topology-change-information
-        uuid: alt-1-0-0-op-c-bs-aa-1-0-0-000
+        uuid: alt-1-0-0-op-c-im-aa-1-0-0-000
       - client-name: ApplicationLayerTopology:://v1/redirect-topology-change-information
-        uuid: alt-1-0-0-op-c-bs-alt-1-0-0-000
+        uuid: alt-1-0-0-op-c-im-alt-1-0-0-000
       - client-name: OperationKeyManagement:://v1/redirect-topology-change-information
-        uuid: alt-1-0-0-op-c-bs-okm-1-0-0-000
+        uuid: alt-1-0-0-op-c-im-okm-1-0-0-000
       - client-name: CurrentController:://v1/redirect-topology-change-information
-        uuid: alt-1-0-0-op-c-bs-cc-1-0-0-000
+        uuid: alt-1-0-0-op-c-im-cc-1-0-0-000
 
   - forwarding-name: LinkChangeNotification
     uuid: alt-1-0-0-op-fc-is-002
@@ -605,10 +607,10 @@ forwardings:
           uuid: alt-1-0-0-op-s-is-022
       fc-port-deletion:
         - server-name: /v1/end-subscription
-          uuid: alt-1-0-0-op-s-is-004
+          uuid: alt-1-0-0-op-s-bm-004
       operation-client-deletion:
         - server-name: /v1/end-subscription
-          uuid: alt-1-0-0-op-s-is-004
+          uuid: alt-1-0-0-op-s-bm-004
     initiating-requests:
         - server-name: /v1/add-operation-client-to-link
           uuid: alt-1-0-0-op-s-is-018
