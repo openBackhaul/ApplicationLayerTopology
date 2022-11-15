@@ -10,7 +10,7 @@
       "core-model-1-4:network-control-domain": {
         "control-construct": [
           {
-            "uuid": "alt-0-0-1",
+            "uuid": "alt-1-0-0",
             "profile-collection": {
               "profile": []
             },
@@ -3391,7 +3391,7 @@
             ]
           },
           {
-            "uuid": "ro-0-0-1",
+            "uuid": "ro-1-0-0",
             "profile-collection": {
               "profile": []
             },
@@ -7243,7 +7243,7 @@
             ]
           },
           {
-            "uuid": "tar-0-0-1",
+            "uuid": "tar-1-0-0",
             "profile-collection": {
               "profile": []
             },
@@ -9630,7 +9630,7 @@
             ]
           },
           {
-            "uuid": "eatl-0-0-1",
+            "uuid": "eatl-1-0-0",
             "profile-collection": {
               "profile": []
             },
@@ -12374,7 +12374,7 @@
             ]
           },
           {
-            "uuid": "ol-0-0-1",
+            "uuid": "ol-1-0-0",
             "profile-collection": {
               "profile": []
             },
@@ -15090,7 +15090,7 @@
             ]
           },
           {
-            "uuid": "aa-0-0-1",
+            "uuid": "aa-1-0-0",
             "profile-collection": {
               "profile": []
             },
@@ -17701,7 +17701,7 @@
             ]
           },
           {
-            "uuid": "okm-0-0-1",
+            "uuid": "okm-1-0-0",
             "profile-collection": {
               "profile": []
             },
