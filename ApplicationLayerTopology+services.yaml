@@ -360,12 +360,12 @@ clients:
       application-name: OperationKeyManagement
       release-number: 1.0.0
       uuid: alt-1-0-0-http-c-2080
-            alt-1-0-0-http-c-im-okm-1-0-0-000
+            alt-1-0-0-http-c-is-okm-1-0-0-000
     tcp-client:
       ip-address: 10.118.125.157
       tcp-port: 1006
       uuid: alt-1-0-0-tcp-c-2080
-            alt-1-0-0-tcp-c-im-okm-1-0-0-000
+            alt-1-0-0-tcp-c-is-okm-1-0-0-000
     operation-clients:
       own-oam:
         basic:
