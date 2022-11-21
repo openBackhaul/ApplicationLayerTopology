@@ -632,28 +632,28 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the OperationServer of the link [/core-model-1-4:network-control-domain/link=*/], which is to be complemented
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         serving-application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the OperationServer of the link [/core-model-1-4:network-control-domain/link=*/], which is to be complemented
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                         operation-name:
                           type: string
                           description: >
                             'Name of the operation, which is made available via the link [/core-model-1-4:network-control-domain/link=*/]
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                            AND [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            AND [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                         consuming-application-name:
                           type: string
                           description: >
                             'Name of application that holds the OperationClient, which shall be connected via the link [/core-model-1-4:network-control-domain/link=*/]
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
                         consuming-application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the OperationClient, which shall be connected via the link [/core-model-1-4:network-control-domain/link=*/]
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                       example:
                         serving-application-name: 'RegistryOffice'
                         serving-application-release-number: '1.0.0'
@@ -1407,26 +1407,26 @@ paths:
                   minLength: 3
                   description: >
                     'Name of application that shall become part of the application layer topology representation
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
+                    find or create [/core-model-1-4:network-control-domain/control-construct=alt-1-0-0/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   pattern: '^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$'
                   description: >
                     'Release of application that shall become part of the application layer topology representation
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                    find or create [/core-model-1-4:network-control-domain/control-construct=alt-1-0-0/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                 application-address:
                   type: string
                   pattern: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
                   description: >
                     'IP of application that shall become part of the application layer topology representation
-                    create or update [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                    create or update [/core-model-1-4:network-control-domain/control-construct=alt-1-0-0/logical-termination-point=alt-1-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                 application-port:      
                   type: integer
                   minimum: 0
                   maximum: 65535
                   description: >
                     'TCP port of application that shall become part of the application layer topology representation
-                    create or update [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
+                    create or update [/core-model-1-4:network-control-domain/control-construct=alt-1-0-0/logical-termination-point=alt-1-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '1.0.0'
@@ -2613,7 +2613,7 @@ paths:
                   type: string
                   description: >
                     'LtpUuid identifying the LTP, which is to be updated
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-*-*-*/uuid]'
+                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-*-*-*/uuid]'
                 ltp-direction:
                   type: string
                 client-ltp:
@@ -2907,7 +2907,7 @@ paths:
                   type: string
                   description: >
                     'LtpUuid identifying the LTP, which is to be deleted
-                    find in [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=alt-1-0-0-*-*-*/uuid]'
+                    find in [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-*-*-*/uuid]'
               example:
                 uuid: 'alt-1-0-0-op-s-bm-002'
       responses:
@@ -3208,7 +3208,7 @@ paths:
                   type: string
                   description: >
                     'FcUuid identifying the FC, which is to be updated
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=alt-1-0-0-op-fd-0000/forwarding-construct=alt-1-0-0-op-fc-*/uuid]'
+                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
                 name:
                   type: array
                   items:
@@ -3323,7 +3323,7 @@ paths:
                   type: string
                   description: >
                     'FcUuid identifying the FC, which is holding the FcPort that is to be updated
-                    find in [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=alt-1-0-0-op-fd-0000/forwarding-construct=alt-1-0-0-op-fc-*/uuid]'
+                    find in [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
                 fc-port:
                   type: object
                   required:
@@ -3335,7 +3335,7 @@ paths:
                       type: string
                       description: >
                         'FcPortLid identifying the FcPort, which is to be updated
-                        find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=alt-1-0-0-op-fd-0000/forwarding-construct=alt-1-0-0-op-fc-*/fc-port=*/local-id]'
+                        find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
                     port-direction:
                       type: string
                       enum:
@@ -3423,12 +3423,12 @@ paths:
                   type: string
                   description: >
                     'FcUuid identifying the FC, which is holding the FcPort that is to be deleted
-                    find in [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=alt-1-0-0-op-fd-0000/forwarding-construct=alt-1-0-0-op-fc-*/uuid]'
+                    find in [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
                 fc-port-local-id:
                   type: string
                   description: >
                     'FcPortLid identifying the FcPort, which is to be deleted
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=alt-1-0-0-op-fd-0000/forwarding-construct=alt-1-0-0-op-fc-*/fc-port=*/local-id]'
+                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
               example:
                 fc-uuid: 'alt-1-0-0-op-fc-3000'
                 fc-port-local-id: '202'
