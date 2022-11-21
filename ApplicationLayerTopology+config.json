@@ -26,11 +26,11 @@
                     },
                     "action-profile-configuration": {
                       "request": {
-                        "protocol-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-bm-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-protocol",
+                        "protocol-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-protocol",
                         "address": {
-                          "ipv-4-address-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-bm-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address"
+                          "ipv-4-address-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address"
                         },
-                        "port-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-bm-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port",
+                        "port-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port",
                         "operation-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-bs-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name"
                       }
                     }
@@ -49,11 +49,11 @@
                     },
                     "action-profile-configuration": {
                       "request": {
-                        "protocol-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-bm-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-protocol",
+                        "protocol-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-protocol",
                         "address": {
-                          "ipv-4-address-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-bm-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address"
+                          "ipv-4-address-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address"
                         },
-                        "port-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-bm-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port",
+                        "port-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port",
                         "operation-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-bs-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name"
                       }
                     }
@@ -72,11 +72,11 @@
                     },
                     "action-profile-configuration": {
                       "request": {
-                        "protocol-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-bm-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-protocol",
+                        "protocol-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-protocol",
                         "address": {
-                          "ipv-4-address-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-bm-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address"
+                          "ipv-4-address-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address"
                         },
-                        "port-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-bm-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port",
+                        "port-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-001/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port",
                         "operation-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-bs-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name"
                       }
                     }
@@ -96,7 +96,7 @@
                     },
                     "response-profile-configuration": {
                       "value": {
-                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name"
+                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name"
                       }
                     }
                   }
@@ -115,7 +115,7 @@
                     },
                     "response-profile-configuration": {
                       "value": {
-                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name"
+                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name"
                       }
                     }
                   }
@@ -134,7 +134,7 @@
                     },
                     "response-profile-configuration": {
                       "value": {
-                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number"
+                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number"
                       }
                     }
                   }
@@ -153,7 +153,7 @@
                     },
                     "response-profile-configuration": {
                       "value": {
-                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-purpose"
+                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-purpose"
                       }
                     }
                   }
@@ -172,7 +172,7 @@
                     },
                     "response-profile-configuration": {
                       "value": {
-                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/data-update-period"
+                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/data-update-period"
                       }
                     }
                   }
@@ -191,7 +191,7 @@
                     },
                     "response-profile-configuration": {
                       "value": {
-                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/owner-name"
+                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/owner-name"
                       }
                     }
                   }
@@ -210,7 +210,7 @@
                     },
                     "response-profile-configuration": {
                       "value": {
-                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/owner-email-address"
+                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/owner-email-address"
                       }
                     }
                   }
@@ -222,14 +222,14 @@
                     "response-profile-capability": {
                       "operation-name": "/v1/inform-about-release-history-in-generic-representation",
                       "field-name": {
-                        "field-name-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=0/release-number"
+                        "field-name-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=0/release-number"
                       },
                       "description": "Represents the first entry in the list of releases",
                       "datatype": "string"
                     },
                     "response-profile-configuration": {
                       "value": {
-                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=0/changes"
+                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=0/changes"
                       }
                     }
                   }
@@ -241,14 +241,14 @@
                     "response-profile-capability": {
                       "operation-name": "/v1/inform-about-release-history-in-generic-representation",
                       "field-name": {
-                        "field-name-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=1/release-number"
+                        "field-name-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=1/release-number"
                       },
                       "description": "List of release numbers and changes",
                       "datatype": "string"
                     },
                     "response-profile-configuration": {
                       "value": {
-                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=1/changes"
+                        "value-reference": "/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=1/changes"
                       }
                     }
                   }
@@ -630,7 +630,7 @@
                 "client-ltp": [
                 ],
                 "server-ltp": [
-                  "alt-2-0-0-http-s-bm-000"
+                  "alt-2-0-0-http-s-is-000"
                 ],
                 "layer-protocol": [
                   {
@@ -1471,6 +1471,30 @@
                 ]
               },
               {
+                "uuid": "alt-1-0-0-op-c-im-ro-1-0-0-004",
+                "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
+                "client-ltp": [],
+                "server-ltp": [
+                  "alt-1-0-0-http-c-bm-ro-1-0-0-000"
+                ],
+                "layer-protocol": [
+                  {
+                    "local-id": "0",
+                    "layer-protocol-name": "operation-client-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER",
+                    "operation-client-interface-1-0:operation-client-interface-pac": {
+                      "operation-client-interface-configuration": {
+                        "operation-name": "/v1/redirect-topology-change-information",
+                        "operation-key": "Operation key not yet provided."
+                      },
+                      "operation-client-interface-status": {
+                        "operational-state": "operation-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
+                        "life-cycle-state": "operation-client-interface-1-0:LIFE_CYCLE_STATE_TYPE_NOT_YET_DEFINED"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
                 "uuid": "alt-1-0-0-op-c-is-ro-1-0-0-001",
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [],
@@ -1574,6 +1598,7 @@
                   "alt-1-0-0-op-c-bm-ro-1-0-0-001",
                   "alt-1-0-0-op-c-bm-ro-1-0-0-002",
                   "alt-1-0-0-op-c-bm-ro-1-0-0-003",
+                  "alt-1-0-0-op-c-im-ro-1-0-0-004",
                   "alt-1-0-0-op-c-is-ro-1-0-0-001",
                   "alt-1-0-0-op-c-im-ro-1-0-0-000",
                   "alt-1-0-0-op-c-im-ro-1-0-0-001",
@@ -1798,7 +1823,8 @@
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [
                   "alt-1-0-0-op-c-bs-eatl-1-0-0-000",
-                  "alt-1-0-0-op-c-im-eatl-1-0-0-000"
+                  "alt-1-0-0-op-c-im-eatl-1-0-0-000",
+                  "alt-1-0-0-op-c-is-eatl-1-0-0-001"
                 ],
                 "server-ltp": [
                   "alt-1-0-0-tcp-c-im-eatl-1-0-0-000"
@@ -2507,7 +2533,8 @@
                 "uuid": "alt-1-0-0-http-c-im-cc-1-0-0-000",
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [
-                  "alt-1-0-0-op-c-im-cc-1-0-0-000"
+                  "alt-1-0-0-op-c-im-cc-1-0-0-000",
+                  "alt-1-0-0-op-c-is-cc-1-0-0-001"
                 ],
                 "server-ltp": [
                   "alt-1-0-0-tcp-c-im-cc-1-0-0-000"
@@ -3548,6 +3575,11 @@
                         "local-id": "100",
                         "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
                         "logical-termination-point": "alt-1-0-0-op-s-is-001"
+                      },
+                      {
+                        "local-id": "200",
+                        "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
+                        "logical-termination-point": "alt-1-0-0-op-c-im-ro-1-0-0-004" 
                       },
                       {
                         "local-id": "201",
