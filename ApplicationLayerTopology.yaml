@@ -632,12 +632,12 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the OperationServer of the link [/core-model-1-4:network-control-domain/link=*/], which is to be complemented
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         serving-application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the OperationServer of the link [/core-model-1-4:network-control-domain/link=*/], which is to be complemented
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                         operation-name:
                           type: string
                           description: >
@@ -2118,12 +2118,12 @@ paths:
                       type: string
                       description: >
                         'Name of application
-                        from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                        from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                     application-release-number:
                       type: string
                       description: >
                         'Release of application
-                        from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                        from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 example:
                   - application-name: 'RegistryOffice'
                     application-release-number: '1.0.0'
@@ -2209,8 +2209,8 @@ paths:
                       type: string
                       description: >
                         'CcUuid identifying the CC, which is to be updated
-                        find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/uuid]'
-                      example: '*-1-0-0'
+                        find or create [/core-model-1-4:network-control-domain/control-construct=*/uuid]'
+                      example: 'ro-1-0-0'
                     logical-termination-point:
                       type: array
                       uniqueItems: true
@@ -2613,7 +2613,7 @@ paths:
                   type: string
                   description: >
                     'LtpUuid identifying the LTP, which is to be updated
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-*-*-*/uuid]'
+                    find or create [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-*-*-*/uuid]'
                 ltp-direction:
                   type: string
                 client-ltp:
@@ -2907,7 +2907,7 @@ paths:
                   type: string
                   description: >
                     'LtpUuid identifying the LTP, which is to be deleted
-                    find in [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-*-*-*/uuid]'
+                    find in [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-*-*-*/uuid]'
               example:
                 uuid: 'alt-1-0-0-op-s-bm-002'
       responses:
@@ -2984,12 +2984,12 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServers
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServers
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '1.0.0'
@@ -3009,7 +3009,7 @@ paths:
                       type: string
                       description: >
                         'Name of operationServer
-                        from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                        from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                 example:
                   operation-server-name-list:
                     - '/v1/register-yourself'
@@ -3085,12 +3085,12 @@ paths:
                   type: string
                   description: >
                     'Name of application that has the OperationClients
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   description: >
                     'Release of application that has the OperationClients
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '1.0.0'
@@ -3117,17 +3117,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the consumed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
                         serving-application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the consumed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         operation-name:
                           type: string
                           description: >
                             'Name of the consumed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 example:
                   operation-client-list:
                     - serving-application-name: 'TypeApprovalRegister'
@@ -3208,7 +3208,7 @@ paths:
                   type: string
                   description: >
                     'FcUuid identifying the FC, which is to be updated
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
+                    find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
                 name:
                   type: array
                   items:
@@ -3323,7 +3323,7 @@ paths:
                   type: string
                   description: >
                     'FcUuid identifying the FC, which is holding the FcPort that is to be updated
-                    find in [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
+                    find in [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
                 fc-port:
                   type: object
                   required:
@@ -3335,7 +3335,7 @@ paths:
                       type: string
                       description: >
                         'FcPortLid identifying the FcPort, which is to be updated
-                        find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
+                        find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
                     port-direction:
                       type: string
                       enum:
@@ -3423,12 +3423,12 @@ paths:
                   type: string
                   description: >
                     'FcUuid identifying the FC, which is holding the FcPort that is to be deleted
-                    find in [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
+                    find in [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
                 fc-port-local-id:
                   type: string
                   description: >
                     'FcPortLid identifying the FcPort, which is to be deleted
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
+                    find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
               example:
                 fc-uuid: 'alt-1-0-0-op-fc-3000'
                 fc-port-local-id: '202'
@@ -3507,17 +3507,17 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServer that receives some request
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 receiving-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServer that receives some request
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 receiving-operation:
                   type: string
                   description: >
                     'Name of operation that receives some request
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
               example:
                 receiving-application-name: 'TypeApprovalRegister'
                 receiving-application-release-number: '1.0.0'
@@ -3545,17 +3545,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the addressed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
                         addressed-application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the addressed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         addressed-operation-name:
                           type: string
                           description: >
                             'Name of the addressed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 example:
                   operation-client-list:
                     - addressed-application-name: 'RegistryOffice'
@@ -3716,28 +3716,28 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServer of the link, which is to be complemented
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 serving-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServer of the link, which is to be complemented
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 operation-name:
                   type: string
                   description: >
                     'Name of the operation, which is made available via the link
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                    AND find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                    AND find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 consuming-application-name:
                   type: string
                   description: >
                     'Name of application that holds the OperationClient, which shall be connected via the link
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 consuming-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationClient, which shall be connected via the link
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 serving-application-name: 'RegistryOffice'
                 serving-application-release-number: '1.0.0'
@@ -3820,28 +3820,28 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServer, which shall no longer be consumed
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 serving-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServer, which shall no longer be consumed
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 operation-name:
                   type: string
                   description: >
                     'Name of the operation, which shall no longer be consumed
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                    AND find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                    AND find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 consuming-application-name:
                   type: string
                   description: >
                     'Name of application, which shall no longer consume the operation
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 consuming-application-release-number:
                   type: string
                   description: >
                     'Release of application, which shall no longer consume the operation
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 serving-application-name: 'RegistryOffice'
                 serving-application-release-number: '1.0.0'
@@ -4050,12 +4050,12 @@ paths:
                   type: string
                   description: >
                     'Name of application that is connected to other applications by links
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   description: >
                     'Release of application that is connected to other applications by links
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '1.0.0'
@@ -4082,17 +4082,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that is connected by link [/core-model-1-4:network-control-domain/link=*/uuid]
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         serving-application-release-number:
                           type: string
                           description: >
                             'Release of application that is connected by link [/core-model-1-4:network-control-domain/link=*/uuid]
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                         operation-name:
                           type: string
                           description: >
                             'Name of operation that is connected by link [/core-model-1-4:network-control-domain/link=*/uuid]
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                 example:
                   operation-server-list:
                     - serving-application-name: 'TypeApprovalRegister'
