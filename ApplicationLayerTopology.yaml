@@ -84,7 +84,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -176,7 +176,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -536,7 +536,7 @@ paths:
                               example:
                                 - uuid: 'alt-1-0-0-op-fd-0000'
                                   forwarding-construct:
-                                    - uuid: 'alt-1-0-0-op-fc-0000'
+                                    - uuid: 'alt-1-0-0-op-fc-bm-000'
                                       name:
                                         - value-name: 'ForwardingKind'
                                           value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -549,7 +549,7 @@ paths:
                                         - local-id: '100'
                                           port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
                                           logical-termination-point: 'alt-1-0-0-op-s-bm-000'
-                                    - uuid: 'alt-1-0-0-op-fc-0001'
+                                    - uuid: 'alt-1-0-0-op-fc-bm-001'
                                       name:
                                         - value-name: 'ForwardingKind'
                                           value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -580,7 +580,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -678,7 +678,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -775,7 +775,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -871,7 +871,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -955,7 +955,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -1051,7 +1051,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -1126,7 +1126,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -1215,7 +1215,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -1348,7 +1348,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -1450,7 +1450,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -1806,7 +1806,7 @@ paths:
                                 example:
                                   - uuid: 'alt-1-0-0-op-fd-0000'
                                     forwarding-construct:
-                                      - uuid: 'alt-1-0-0-op-fc-0000'
+                                      - uuid: 'alt-1-0-0-op-fc-bm-000'
                                         name:
                                           - value-name: 'ForwardingKind'
                                             value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -1819,7 +1819,7 @@ paths:
                                           - local-id: '100'
                                             port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
                                             logical-termination-point: 'alt-1-0-0-op-s-bm-000'
-                                      - uuid: 'alt-1-0-0-op-fc-0001'
+                                      - uuid: 'alt-1-0-0-op-fc-bm-001'
                                         name:
                                           - value-name: 'ForwardingKind'
                                             value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -1847,7 +1847,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -1978,7 +1978,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -2059,7 +2059,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -2144,7 +2144,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -2511,7 +2511,7 @@ paths:
                       example:
                         - uuid: 'alt-1-0-0-op-fd-0000'
                           forwarding-construct:
-                            - uuid: 'alt-1-0-0-op-fc-0000'
+                            - uuid: 'alt-1-0-0-op-fc-bm-000'
                               name:
                                 - value-name: 'ForwardingKind'
                                   value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -2524,7 +2524,7 @@ paths:
                                 - local-id: '100'
                                   port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
                                   logical-termination-point: 'alt-1-0-0-op-s-bm-000'
-                            - uuid: 'alt-1-0-0-op-fc-0001'
+                            - uuid: 'alt-1-0-0-op-fc-bm-001'
                               name:
                                 - value-name: 'ForwardingKind'
                                   value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -2555,7 +2555,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -2853,7 +2853,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -2928,7 +2928,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3029,7 +3029,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3151,7 +3151,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3237,7 +3237,7 @@ paths:
                       logical-termination-point:
                         type: string
               example:
-                uuid: 'alt-1-0-0-op-fc-0003'
+                uuid: 'alt-1-0-0-op-fc-bm-003'
                 name:
                   - value-name: 'ForwardingKind'
                     value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -3268,7 +3268,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3345,7 +3345,7 @@ paths:
                     logical-termination-point:
                       type: string
               example:
-                fc-uuid: 'alt-1-0-0-op-fc-0003'
+                fc-uuid: 'alt-1-0-0-op-fc-bm-003'
                 fc-port:
                   local-id: '000'
                   port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
@@ -3368,7 +3368,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3430,7 +3430,7 @@ paths:
                     'FcPortLid identifying the FcPort, which is to be deleted
                     find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-0000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
               example:
-                fc-uuid: 'alt-1-0-0-op-fc-3000'
+                fc-uuid: 'alt-1-0-0-op-fc-is-000'
                 fc-port-local-id: '202'
       responses:
         '204':
@@ -3450,7 +3450,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3579,7 +3579,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3657,7 +3657,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3762,7 +3762,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3866,7 +3866,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -3991,7 +3991,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -4116,7 +4116,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -4224,7 +4224,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -4292,7 +4292,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -4402,7 +4402,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -4508,7 +4508,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -4627,7 +4627,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -4719,7 +4719,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -4825,7 +4825,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -4941,7 +4941,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -5046,7 +5046,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -5154,7 +5154,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -5242,7 +5242,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -5349,7 +5349,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -5476,7 +5476,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -5582,7 +5582,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -5939,7 +5939,7 @@ paths:
                         example:
                           - uuid: 'alt-1-0-0-op-fd-0000'
                             forwarding-construct:
-                              - uuid: 'alt-1-0-0-op-fc-0000'
+                              - uuid: 'alt-1-0-0-op-fc-bm-000'
                                 name:
                                   - value-name: 'ForwardingKind'
                                     value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -5952,7 +5952,7 @@ paths:
                                   - local-id: '100'
                                     port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
                                     logical-termination-point: 'alt-1-0-0-op-s-bm-000'
-                              - uuid: 'alt-1-0-0-op-fc-0001'
+                              - uuid: 'alt-1-0-0-op-fc-bm-001'
                                 name:
                                   - value-name: 'ForwardingKind'
                                     value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -5980,7 +5980,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -6122,7 +6122,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -6475,7 +6475,7 @@ paths:
                               example:
                                 - uuid: 'alt-1-0-0-op-fd-0000'
                                   forwarding-construct:
-                                    - uuid: 'alt-1-0-0-op-fc-0000'
+                                    - uuid: 'alt-1-0-0-op-fc-bm-000'
                                       name:
                                         - value-name: 'ForwardingKind'
                                           value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -6488,7 +6488,7 @@ paths:
                                         - local-id: '100'
                                           port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
                                           logical-termination-point: 'alt-1-0-0-op-s-bm-000'
-                                    - uuid: 'alt-1-0-0-op-fc-0001'
+                                    - uuid: 'alt-1-0-0-op-fc-bm-001'
                                       name:
                                         - value-name: 'ForwardingKind'
                                           value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -6519,7 +6519,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -6808,7 +6808,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -6874,7 +6874,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -6950,7 +6950,7 @@ paths:
                               logical-termination-point:
                                 type: string
                       example:
-                        uuid: 'alt-1-0-0-op-fc-0003'
+                        uuid: 'alt-1-0-0-op-fc-bm-003'
                         name:
                           - value-name: 'ForwardingKind'
                             value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -6981,7 +6981,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -7046,7 +7046,7 @@ paths:
                             logical-termination-point:
                               type: string
                       example:
-                        fc-uuid: 'alt-1-0-0-op-fc-0003'
+                        fc-uuid: 'alt-1-0-0-op-fc-bm-003'
                         fc-port:
                           local-id: '000'
                           port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
@@ -7069,7 +7069,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -7119,7 +7119,7 @@ paths:
                         fc-port-local-id:
                           type: string
                       example:
-                        fc-uuid: 'alt-1-0-0-op-fc-3000'
+                        fc-uuid: 'alt-1-0-0-op-fc-is-000'
                         fc-port-local-id: '202'
               responses:
                 '204':
@@ -7139,7 +7139,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -7428,7 +7428,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -7494,7 +7494,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -7570,7 +7570,7 @@ paths:
                               logical-termination-point:
                                 type: string
                       example:
-                        uuid: 'alt-1-0-0-op-fc-0003'
+                        uuid: 'alt-1-0-0-op-fc-bm-003'
                         name:
                           - value-name: 'ForwardingKind'
                             value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -7601,7 +7601,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -7666,7 +7666,7 @@ paths:
                             logical-termination-point:
                               type: string
                       example:
-                        fc-uuid: 'alt-1-0-0-op-fc-0003'
+                        fc-uuid: 'alt-1-0-0-op-fc-bm-003'
                         fc-port:
                           local-id: '000'
                           port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
@@ -7689,7 +7689,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -7739,7 +7739,7 @@ paths:
                         fc-port-local-id:
                           type: string
                       example:
-                        fc-uuid: 'alt-1-0-0-op-fc-3000'
+                        fc-uuid: 'alt-1-0-0-op-fc-is-000'
                         fc-port-local-id: '202'
               responses:
                 '204':
@@ -7759,7 +7759,7 @@ paths:
                       schema:
                         type: integer
                         example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
                     life-cycle-state:
                       schema:
                         type: string
@@ -7847,7 +7847,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -7944,7 +7944,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -8050,7 +8050,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -8215,7 +8215,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -8293,7 +8293,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -8410,7 +8410,7 @@ paths:
               schema:
                 type: integer
                 example: 850
-              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+              description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
             life-cycle-state:
               schema:
                 type: string
@@ -9189,7 +9189,7 @@ paths:
                         example:
                           - uuid: 'alt-1-0-0-op-fd-0000'
                             forwarding-construct:
-                              - uuid: 'alt-1-0-0-op-fc-0003'
+                              - uuid: 'alt-1-0-0-op-fc-bm-003'
                                 name:
                                   - value-name: 'ForwardingKind'
                                     value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -9202,7 +9202,7 @@ paths:
                                   - local-id: '200'
                                     port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
                                     logical-termination-point: 'alt-1-0-0-op-c-bs-ol-1-0-0-000'
-                              - uuid: 'alt-1-0-0-op-fc-0004'
+                              - uuid: 'alt-1-0-0-op-fc-bm-004'
                                 name:
                                   - value-name: 'ForwardingKind'
                                     value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -10545,7 +10545,7 @@ components:
       schema: 
         type: string
         example: 'Unknown value'
-      description: 'Holds information supporting customer’s journey to which the execution applies'
+      description: 'Holds information supporting customerâ€™s journey to which the execution applies'
   responses:
     responseForErroredServiceRequests:
       description: 'Response in case of errored service requests'
@@ -10569,7 +10569,7 @@ components:
           schema:
             type: integer
             example: 850
-          description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+          description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database accessâ€¦). Expressed in milliseconds'
     responseForErroredOamRequests:
       description: 'Response in case of errored OaM requests'
       content:
