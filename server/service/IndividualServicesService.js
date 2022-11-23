@@ -259,7 +259,7 @@ exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, 
           existingLogicalTerminationPoint,
           true);
         if (isdeleted && (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT ||
-            layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
+          layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
           await deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid);
           await deleteDependentLinkPorts(logicalTerminationPointUuid);
         }
@@ -298,60 +298,63 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
        * Prepare logicalTerminatinPointConfigurationInput object to 
        * configure logical-termination-point
        ****************************************************************************************/
+      let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
+      let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
+      if (!(applicationName == ownApplicationName && applicationReleaseNumber == ownApplicationReleaseNumber)) {
 
-      let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.deleteApplicationInformationAsync(
-        applicationName,
-        applicationReleaseNumber
-      );
-
-      /****************************************************************************************
-       * Prepare attributes to configure forwarding-construct
-       ****************************************************************************************/
-
-      let forwardingConfigurationInputList = [];
-      let forwardingConstructConfigurationStatus;
-      let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
-
-      if (operationClientConfigurationStatusList) {
-        forwardingConfigurationInputList = await prepareForwardingConfiguration.disregardApplication(
-          operationClientConfigurationStatusList
+        let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.deleteApplicationInformationAsync(
+          applicationName,
+          applicationReleaseNumber
         );
-        forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-        unConfigureForwardingConstructAsync(
+
+        /****************************************************************************************
+         * Prepare attributes to configure forwarding-construct
+         ****************************************************************************************/
+
+        let forwardingConfigurationInputList = [];
+        let forwardingConstructConfigurationStatus;
+        let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
+
+        if (operationClientConfigurationStatusList) {
+          forwardingConfigurationInputList = await prepareForwardingConfiguration.disregardApplication(
+            operationClientConfigurationStatusList
+          );
+          forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
+            unConfigureForwardingConstructAsync(
+              operationServerName,
+              forwardingConfigurationInputList
+            );
+        }
+
+
+        /****************************************************************************************
+         * Prepare attributes to configure control-construct
+         ****************************************************************************************/
+        // remove the entry from control-construct
+        let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+          applicationName,
+          applicationReleaseNumber);
+        if (controlConstruct) {
+          let controlConstructUuid = controlConstruct["uuid"];
+          await NetworkControlDomain.deleteControlConstructAsync(controlConstructUuid);
+        }
+
+        /****************************************************************************************
+         * Prepare attributes to automate forwarding-construct
+         ****************************************************************************************/
+        let forwardingAutomationInputList = await prepareForwardingAutomation.disregardApplication(
+          logicalTerminationPointconfigurationStatus,
+          forwardingConstructConfigurationStatus
+        );
+        ForwardingAutomationService.automateForwardingConstructAsync(
           operationServerName,
-          forwardingConfigurationInputList
+          forwardingAutomationInputList,
+          user,
+          xCorrelator,
+          traceIndicator,
+          customerJourney
         );
       }
-
-
-      /****************************************************************************************
-       * Prepare attributes to configure control-construct
-       ****************************************************************************************/
-      // remove the entry from control-construct
-      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
-        applicationName,
-        applicationReleaseNumber);
-      if (controlConstruct) {
-        let controlConstructUuid = controlConstruct["uuid"];
-        await NetworkControlDomain.deleteControlConstructAsync(controlConstructUuid);
-      }
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-      let forwardingAutomationInputList = await prepareForwardingAutomation.disregardApplication(
-        logicalTerminationPointconfigurationStatus,
-        forwardingConstructConfigurationStatus
-      );
-      ForwardingAutomationService.automateForwardingConstructAsync(
-        operationServerName,
-        forwardingAutomationInputList,
-        user,
-        xCorrelator,
-        traceIndicator,
-        customerJourney
-      );
-
       resolve();
     } catch (error) {
       reject(error);
@@ -862,10 +865,10 @@ exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, trace
           subscriberOperation
         );
         forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-        configureForwardingConstructAsync(
-          operationServerName,
-          forwardingConfigurationInputList
-        );
+          configureForwardingConstructAsync(
+            operationServerName,
+            forwardingConfigurationInputList
+          );
       }
 
       /****************************************************************************************
@@ -967,42 +970,44 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
       /****************************************************************************************
        * Prepare attributes to configure forwarding-construct
        ****************************************************************************************/
+      let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
+      let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
+      if (!(applicationName == ownApplicationName && applicationReleaseNumber == ownApplicationReleaseNumber)) {
+        let forwardingConfigurationInputList = [];
+        let forwardingConstructConfigurationStatus;
+        let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
 
-      let forwardingConfigurationInputList = [];
-      let forwardingConstructConfigurationStatus;
-      let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
+        if (operationClientConfigurationStatusList) {
+          forwardingConfigurationInputList = await prepareForwardingConfiguration.regardApplication(
+            operationClientConfigurationStatusList,
+            listLTPsFCsOperation,
+            redirectTopologyInformationOperation
+          );
+          forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
+            configureForwardingConstructAsync(
+              operationServerName,
+              forwardingConfigurationInputList
+            );
+        }
 
-      if (operationClientConfigurationStatusList) {
-        forwardingConfigurationInputList = await prepareForwardingConfiguration.regardApplication(
-          operationClientConfigurationStatusList,
-          listLTPsFCsOperation,
-          redirectTopologyInformationOperation
+        /****************************************************************************************
+         * Prepare attributes to automate forwarding-construct
+         ****************************************************************************************/
+        let forwardingAutomationInputList = await prepareForwardingAutomation.regardApplication(
+          logicalTerminationPointconfigurationStatus,
+          forwardingConstructConfigurationStatus,
+          applicationName,
+          applicationReleaseNumber
         );
-        forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-        configureForwardingConstructAsync(
+        ForwardingAutomationService.automateForwardingConstructAsync(
           operationServerName,
-          forwardingConfigurationInputList
+          forwardingAutomationInputList,
+          user,
+          xCorrelator,
+          traceIndicator,
+          customerJourney
         );
       }
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-      let forwardingAutomationInputList = await prepareForwardingAutomation.regardApplication(
-        logicalTerminationPointconfigurationStatus,
-        forwardingConstructConfigurationStatus,
-        applicationName,
-        applicationReleaseNumber
-      );
-      ForwardingAutomationService.automateForwardingConstructAsync(
-        operationServerName,
-        forwardingAutomationInputList,
-        user,
-        xCorrelator,
-        traceIndicator,
-        customerJourney
-      );
-
       resolve();
     } catch (error) {
       reject(error);
