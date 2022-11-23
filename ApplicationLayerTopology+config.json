@@ -2581,7 +2581,7 @@
             ],
             "forwarding-domain": [
               {
-                "uuid": "alt-1-0-0-op-fd-0000",
+                "uuid": "alt-1-0-0-op-fd-000",
                 "forwarding-construct": [
                   {
                     "uuid": "alt-1-0-0-op-fc-bm-000",
