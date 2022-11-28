@@ -1723,31 +1723,6 @@
                 ]
               },
               {
-                "uuid": "alt-2-0-0-op-c-bs-eatl-1-0-0-000",
-                "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
-                "client-ltp": [],
-                "server-ltp": [
-                  "alt-2-0-0-http-c-im-eatl-1-0-0-000"
-                ],
-                "layer-protocol": [
-                  {
-                    "local-id": "0",
-                    "layer-protocol-name": "operation-client-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER",
-                    "operation-client-interface-1-0:operation-client-interface-pac": {
-                      "operation-client-interface-configuration": {
-                        "operation-name": "/v1/record-service-request",
-                        "operation-key": "Operation key not yet provided.",
-                        "detailed-logging-is-on": "false"
-                      },
-                      "operation-client-interface-status": {
-                        "operational-state": "operation-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
-                        "life-cycle-state": "operation-client-interface-1-0:LIFE_CYCLE_STATE_TYPE_NOT_YET_DEFINED"
-                      }
-                    }
-                  }
-                ]
-              },
-              {
                 "uuid": "alt-2-0-0-op-c-im-eatl-1-0-0-000",
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [],
@@ -1761,6 +1736,31 @@
                     "operation-client-interface-1-0:operation-client-interface-pac": {
                       "operation-client-interface-configuration": {
                         "operation-name": "/v1/redirect-topology-change-information",
+                        "operation-key": "Operation key not yet provided.",
+                        "detailed-logging-is-on": "false"
+                      },
+                      "operation-client-interface-status": {
+                        "operational-state": "operation-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
+                        "life-cycle-state": "operation-client-interface-1-0:LIFE_CYCLE_STATE_TYPE_NOT_YET_DEFINED"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "uuid": "alt-2-0-0-op-c-bs-eatl-1-0-0-000",
+                "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
+                "client-ltp": [],
+                "server-ltp": [
+                  "alt-2-0-0-http-c-im-eatl-1-0-0-000"
+                ],
+                "layer-protocol": [
+                  {
+                    "local-id": "0",
+                    "layer-protocol-name": "operation-client-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER",
+                    "operation-client-interface-1-0:operation-client-interface-pac": {
+                      "operation-client-interface-configuration": {
+                        "operation-name": "/v1/record-service-request",
                         "operation-key": "Operation key not yet provided.",
                         "detailed-logging-is-on": "false"
                       },
@@ -1801,8 +1801,8 @@
                 "uuid": "alt-2-0-0-http-c-im-eatl-1-0-0-000",
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [
-                  "alt-2-0-0-op-c-bs-eatl-1-0-0-000",
                   "alt-2-0-0-op-c-im-eatl-1-0-0-000",
+                  "alt-2-0-0-op-c-bs-eatl-1-0-0-000",
                   "alt-2-0-0-op-c-is-eatl-1-0-0-001"
                 ],
                 "server-ltp": [
@@ -1848,30 +1848,6 @@
                 ]
               },
               {
-                "uuid": "alt-2-0-0-op-c-bs-ol-1-0-0-000",
-                "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
-                "client-ltp": [],
-                "server-ltp": [
-                  "alt-2-0-0-http-c-im-ol-1-0-0-000"
-                ],
-                "layer-protocol": [
-                  {
-                    "local-id": "0",
-                    "layer-protocol-name": "operation-client-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER",
-                    "operation-client-interface-1-0:operation-client-interface-pac": {
-                      "operation-client-interface-configuration": {
-                        "operation-name": "/v1/record-oam-request",
-                        "operation-key": "Operation key not yet provided."
-                      },
-                      "operation-client-interface-status": {
-                        "operational-state": "operation-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
-                        "life-cycle-state": "operation-client-interface-1-0:LIFE_CYCLE_STATE_TYPE_NOT_YET_DEFINED"
-                      }
-                    }
-                  }
-                ]
-              },
-              {
                 "uuid": "alt-2-0-0-op-c-im-ol-1-0-0-000",
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [],
@@ -1885,6 +1861,30 @@
                     "operation-client-interface-1-0:operation-client-interface-pac": {
                       "operation-client-interface-configuration": {
                         "operation-name": "/v1/redirect-topology-change-information",
+                        "operation-key": "Operation key not yet provided."
+                      },
+                      "operation-client-interface-status": {
+                        "operational-state": "operation-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
+                        "life-cycle-state": "operation-client-interface-1-0:LIFE_CYCLE_STATE_TYPE_NOT_YET_DEFINED"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "uuid": "alt-2-0-0-op-c-bs-ol-1-0-0-000",
+                "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
+                "client-ltp": [],
+                "server-ltp": [
+                  "alt-2-0-0-http-c-im-ol-1-0-0-000"
+                ],
+                "layer-protocol": [
+                  {
+                    "local-id": "0",
+                    "layer-protocol-name": "operation-client-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER",
+                    "operation-client-interface-1-0:operation-client-interface-pac": {
+                      "operation-client-interface-configuration": {
+                        "operation-name": "/v1/record-oam-request",
                         "operation-key": "Operation key not yet provided."
                       },
                       "operation-client-interface-status": {
@@ -1923,8 +1923,8 @@
                 "uuid": "alt-2-0-0-http-c-im-ol-1-0-0-000",
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [
-                  "alt-2-0-0-op-c-bs-ol-1-0-0-000",
                   "alt-2-0-0-op-c-im-ol-1-0-0-000",
+                  "alt-2-0-0-op-c-bs-ol-1-0-0-000",
                   "alt-2-0-0-op-c-is-ol-1-0-0-001"
                 ],
                 "server-ltp": [
@@ -1970,30 +1970,6 @@
                 ]
               },
               {
-                "uuid": "alt-2-0-0-op-c-bs-aa-1-0-0-000",
-                "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
-                "client-ltp": [],
-                "server-ltp": [
-                  "alt-2-0-0-http-c-im-aa-1-0-0-000"
-                ],
-                "layer-protocol": [
-                  {
-                    "local-id": "0",
-                    "layer-protocol-name": "operation-client-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER",
-                    "operation-client-interface-1-0:operation-client-interface-pac": {
-                      "operation-client-interface-configuration": {
-                        "operation-name": "/v1/approve-oam-request",
-                        "operation-key": "Operation key not yet provided."
-                      },
-                      "operation-client-interface-status": {
-                        "operational-state": "operation-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
-                        "life-cycle-state": "operation-client-interface-1-0:LIFE_CYCLE_STATE_TYPE_NOT_YET_DEFINED"
-                      }
-                    }
-                  }
-                ]
-              },
-              {
                 "uuid": "alt-2-0-0-op-c-im-aa-1-0-0-000",
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [],
@@ -2007,6 +1983,30 @@
                     "operation-client-interface-1-0:operation-client-interface-pac": {
                       "operation-client-interface-configuration": {
                         "operation-name": "/v1/redirect-topology-change-information",
+                        "operation-key": "Operation key not yet provided."
+                      },
+                      "operation-client-interface-status": {
+                        "operational-state": "operation-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
+                        "life-cycle-state": "operation-client-interface-1-0:LIFE_CYCLE_STATE_TYPE_NOT_YET_DEFINED"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "uuid": "alt-2-0-0-op-c-bs-aa-1-0-0-000",
+                "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
+                "client-ltp": [],
+                "server-ltp": [
+                  "alt-2-0-0-http-c-im-aa-1-0-0-000"
+                ],
+                "layer-protocol": [
+                  {
+                    "local-id": "0",
+                    "layer-protocol-name": "operation-client-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER",
+                    "operation-client-interface-1-0:operation-client-interface-pac": {
+                      "operation-client-interface-configuration": {
+                        "operation-name": "/v1/approve-oam-request",
                         "operation-key": "Operation key not yet provided."
                       },
                       "operation-client-interface-status": {
@@ -2045,8 +2045,8 @@
                 "uuid": "alt-2-0-0-http-c-im-aa-1-0-0-000",
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [
-                  "alt-2-0-0-op-c-bs-aa-1-0-0-000",
                   "alt-2-0-0-op-c-im-aa-1-0-0-000",
+                  "alt-2-0-0-op-c-bs-aa-1-0-0-000",
                   "alt-2-0-0-op-c-is-aa-1-0-0-001"
                 ],
                 "server-ltp": [
