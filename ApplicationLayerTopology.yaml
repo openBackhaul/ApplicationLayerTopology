@@ -504,7 +504,7 @@ paths:
                           type: string
                           description: >
                             'Names of the operation that shall be addressed by notifications about new approvals
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]'
+                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         subscriber-address:
                           type: string
                           description: >
@@ -600,7 +600,7 @@ paths:
                           type: string
                           description: >
                             'Names of the operation that shall be addressed by notifications about withdrawn approvals
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-002/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]'
+                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         subscriber-address:
                           type: string
                           description: >
