@@ -189,7 +189,7 @@ clients:
         basic:
         individual:
           - service-name: /v1/redirect-topology-change-information
-            uuid: alt-2-0-0-op-c-im-tar-1-0-0-000
+            uuid: alt-2-0-0-op-c-im-tar-1-0-0-004
       service:
         basic:
         individual:
@@ -210,7 +210,7 @@ clients:
         basic:
         individual:
           - service-name: /v1/redirect-topology-change-information
-            uuid: alt-2-0-0-op-c-im-eatl-1-0-0-000
+            uuid: alt-2-0-0-op-c-im-eatl-1-0-0-004
       service:
         basic:
           - service-name: /v1/record-service-request
@@ -233,7 +233,7 @@ clients:
         basic:
         individual:
           - service-name: /v1/redirect-topology-change-information
-            uuid: alt-2-0-0-op-c-im-ol-1-0-0-000
+            uuid: alt-2-0-0-op-c-im-ol-1-0-0-004
       service:
         basic:
           - service-name: /v1/record-oam-request
@@ -256,7 +256,7 @@ clients:
         basic:
         individual:
           - service-name: /v1/redirect-topology-change-information
-            uuid: alt-2-0-0-op-c-im-aa-1-0-0-000
+            uuid: alt-2-0-0-op-c-im-aa-1-0-0-004
       service:
         basic:
           - service-name: /v1/approve-oam-request
@@ -291,7 +291,7 @@ clients:
             uuid: alt-2-0-0-op-c-bm-alt-2-0-0-005
         individual:
           - service-name: /v1/redirect-topology-change-information
-            uuid: alt-2-0-0-op-c-im-alt-2-0-0-000
+            uuid: alt-2-0-0-op-c-im-alt-2-0-0-004
       service:
         basic:
         individual:
@@ -312,7 +312,7 @@ clients:
         basic:
         individual:
           - service-name: /v1/redirect-topology-change-information
-            uuid: alt-2-0-0-op-c-im-okm-1-0-0-000
+            uuid: alt-2-0-0-op-c-im-okm-1-0-0-004
       service:
         basic:
         individual:
@@ -335,7 +335,7 @@ clients:
         basic:
         individual:
           - service-name: /v1/redirect-topology-change-information
-            uuid: alt-2-0-0-op-c-im-cc-1-0-0-000
+            uuid: alt-2-0-0-op-c-im-cc-1-0-0-004
       service:
         basic:
         individual:

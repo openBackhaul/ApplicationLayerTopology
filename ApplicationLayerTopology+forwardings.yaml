@@ -581,19 +581,19 @@ forwardings:
       - client-name: RegistryOffice:://v1/redirect-topology-change-information
         uuid: alt-2-0-0-op-c-im-ro-2-0-0-004
       - client-name: TypeApprovalRegister:://v1/redirect-topology-change-information
-        uuid: alt-2-0-0-op-c-im-tar-1-0-0-000
+        uuid: alt-2-0-0-op-c-im-tar-1-0-0-004
       - client-name: ExecutionAndTraceLog:://v1/redirect-topology-change-information
-        uuid: alt-2-0-0-op-c-im-eatl-1-0-0-000
+        uuid: alt-2-0-0-op-c-im-eatl-1-0-0-004
       - client-name: OamLog:://v1/redirect-topology-change-information
-        uuid: alt-2-0-0-op-c-im-ol-1-0-0-000
+        uuid: alt-2-0-0-op-c-im-ol-1-0-0-004
       - client-name: AdministratorAdministration:://v1/redirect-topology-change-information
-        uuid: alt-2-0-0-op-c-im-aa-1-0-0-000
+        uuid: alt-2-0-0-op-c-im-aa-1-0-0-004
       - client-name: ApplicationLayerTopology:://v1/redirect-topology-change-information
-        uuid: alt-2-0-0-op-c-im-alt-2-0-0-000
+        uuid: alt-2-0-0-op-c-im-alt-2-0-0-004
       - client-name: OperationKeyManagement:://v1/redirect-topology-change-information
-        uuid: alt-2-0-0-op-c-im-okm-1-0-0-000
+        uuid: alt-2-0-0-op-c-im-okm-1-0-0-004
       - client-name: CurrentController:://v1/redirect-topology-change-information
-        uuid: alt-2-0-0-op-c-im-cc-1-0-0-000
+        uuid: alt-2-0-0-op-c-im-cc-1-0-0-004
 
   - forwarding-name: LinkChangeNotification
     uuid: alt-2-0-0-op-fc-is-002
