@@ -61,8 +61,6 @@ forwardings:
         uuid: alt-2-0-0-op-s-bm-005
       - server-name: /v1/update-client
         uuid: alt-2-0-0-op-s-bm-007
-      - server-name: /v1/list-ltps-and-fcs
-        uuid: alt-2-0-0-op-s-bm-008
       - server-name: /v1/redirect-topology-change-information
         uuid: alt-2-0-0-op-s-bm-009
       - server-name: /v1/update-operation-key
@@ -520,43 +518,6 @@ forwardings:
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/delete-fc-port
         uuid: alt-2-0-0-op-c-bm-alt-2-0-0-005
-
-  - forwarding-name: NewApplicationCausesRequestForLatestTopologyInformation
-    uuid: alt-2-0-0-op-fc-is-000
-    forwarding-type: ProcessSnippet
-    management-requests:
-      operation-client-update:
-        - server-name: /v1/regard-application
-          uuid: alt-2-0-0-op-s-is-001
-      fc-port-update:
-        - server-name: /v1/regard-application
-          uuid: alt-2-0-0-op-s-is-001
-      fc-port-deletion:
-        - server-name: /v1/disregard-application
-          uuid: alt-2-0-0-op-s-is-002
-      operation-client-deletion:
-        - server-name: /v1/disregard-application
-          uuid: alt-2-0-0-op-s-is-002
-    initiating-requests:
-      - server-name: /v1/regard-application
-        uuid: alt-2-0-0-op-s-is-001
-    consequent-requests:
-      - client-name: RegistryOffice:://v1/list-ltps-and-fcs
-        uuid: alt-2-0-0-op-c-is-ro-2-0-0-001
-      - client-name: TypeApprovalRegister:://v1/list-ltps-and-fcs
-        uuid: alt-2-0-0-op-c-is-tar-1-0-0-001
-      - client-name: ExecutionAndTraceLog:://v1/list-ltps-and-fcs
-        uuid: alt-2-0-0-op-c-is-eatl-1-0-0-001
-      - client-name: OamLog:://v1/list-ltps-and-fcs
-        uuid: alt-2-0-0-op-c-is-ol-1-0-0-001
-      - client-name: AdministratorAdministration:://v1/list-ltps-and-fcs
-        uuid: alt-2-0-0-op-c-is-aa-1-0-0-001
-      - client-name: ApplicationLayerTopology:://v1/list-ltps-and-fcs
-        uuid: alt-2-0-0-op-c-is-alt-2-0-0-001
-      - client-name: OperationKeyManagement:://v1/list-ltps-and-fcs
-        uuid: alt-2-0-0-op-c-is-okm-1-0-0-001
-      - client-name: CurrentController:://v1/list-ltps-and-fcs
-        uuid: alt-2-0-0-op-c-is-cc-1-0-0-001
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation
     uuid: alt-2-0-0-op-fc-is-001
