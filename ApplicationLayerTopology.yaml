@@ -1746,7 +1746,12 @@ paths:
       - $ref: '#/components/parameters/customer-journey'
     post:
       operationId: deleteLtpAndDependents
-      summary: 'An OperationClient identified by LtpUuid and all its entries in FCs and Links gets deleted'
+      summary: 'Deletes a *Client LTP and all its dependents'
+      description: >
+        'An OperationClient, HttpClient or TcpClient identified by LtpUuid gets deleted.
+        If a serving HttpClient gets deleted, all client OperationClients get deleted too.
+        If the last serving TcpClient gets deleted, the client HttpClient gets deleted too.
+        If an OperationClient is referenced in an FcPort or a LinkPort, the referencing FcPort or LinkPort gets deleted, too.'
       tags:
         - IndividualServices
       security:
