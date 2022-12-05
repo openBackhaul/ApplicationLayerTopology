@@ -61,6 +61,8 @@ forwardings:
         uuid: alt-2-0-0-op-s-bm-005
       - server-name: /v1/update-client
         uuid: alt-2-0-0-op-s-bm-007
+      - server-name: /v1/list-ltps-and-fcs
+        uuid: alt-2-0-0-op-s-bm-008
       - server-name: /v1/redirect-topology-change-information
         uuid: alt-2-0-0-op-s-bm-009
       - server-name: /v1/update-operation-key
