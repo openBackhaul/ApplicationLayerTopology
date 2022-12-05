@@ -172,8 +172,6 @@ clients:
       service:
         basic:
         individual:
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-2-0-0-op-c-is-ro-2-0-0-001
 
   - http-client:
       application-name: TypeApprovalRegister
@@ -193,8 +191,6 @@ clients:
       service:
         basic:
         individual:
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-2-0-0-op-c-is-tar-1-0-0-001
 
   - http-client:
       application-name: ExecutionAndTraceLog
@@ -216,8 +212,6 @@ clients:
           - service-name: /v1/record-service-request
             uuid: alt-2-0-0-op-c-bs-eatl-1-0-0-000
         individual:
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-2-0-0-op-c-is-eatl-1-0-0-001
 
   - http-client:
       application-name: OamLog
@@ -239,8 +233,6 @@ clients:
           - service-name: /v1/record-oam-request
             uuid: alt-2-0-0-op-c-bs-ol-1-0-0-000
         individual:
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-2-0-0-op-c-is-ol-1-0-0-001
 
   - http-client:
       application-name: AdministratorAdministration
@@ -262,8 +254,6 @@ clients:
           - service-name: /v1/approve-oam-request
             uuid: alt-2-0-0-op-c-bs-aa-1-0-0-000
         individual:
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-2-0-0-op-c-is-aa-1-0-0-001
 
   - http-client:
       application-name: ApplicationLayerTopology
@@ -295,8 +285,6 @@ clients:
       service:
         basic:
         individual:
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-2-0-0-op-c-is-alt-2-0-0-001
 
   - http-client:
       application-name: OperationKeyManagement
@@ -318,8 +306,6 @@ clients:
         individual:
           - service-name: /v1/regard-updated-link
             uuid: alt-2-0-0-op-c-is-okm-1-0-0-000
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-2-0-0-op-c-is-okm-1-0-0-001
 
   - http-client:
       application-name: CurrentController
@@ -339,5 +325,3 @@ clients:
       service:
         basic:
         individual:
-          - service-name: /v1/list-ltps-and-fcs
-            uuid: alt-2-0-0-op-c-is-cc-1-0-0-001
