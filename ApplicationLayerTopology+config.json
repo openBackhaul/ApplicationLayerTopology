@@ -735,7 +735,7 @@
                         "operation-name": "/v1/update-all-ltps-and-fcs"
                       },
                       "operation-server-interface-configuration": {
-                        "life-cycle-state": "operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL",
+                        "life-cycle-state": "operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_DEPRECATED",
                         "operation-key": "Operation key not yet provided."
                       }
                     }
