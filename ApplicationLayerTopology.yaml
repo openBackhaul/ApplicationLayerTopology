@@ -1535,6 +1535,7 @@ paths:
                       description: >
                         'CcUuid identifying the CC, which is to be updated
                         find or create [/core-model-1-4:network-control-domain/control-construct=*/uuid]'
+                      pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})$'
                       example: 'ro-2-0-0'
                     logical-termination-point:
                       type: array
@@ -1745,7 +1746,12 @@ paths:
       - $ref: '#/components/parameters/customer-journey'
     post:
       operationId: deleteLtpAndDependents
-      summary: 'An OperationClient identified by LtpUuid and all its entries in FCs and Links gets deleted'
+      summary: 'Deletes a *Client LTP and all its dependents'
+      description: >
+        'An OperationClient, HttpClient or TcpClient identified by LtpUuid gets deleted.
+        If a serving HttpClient gets deleted, all client OperationClients get deleted too.
+        If the last serving TcpClient gets deleted, the client HttpClient gets deleted too.
+        If an OperationClient is referenced in an FcPort or a LinkPort, the referencing FcPort or LinkPort gets deleted, too.'
       tags:
         - IndividualServices
       security:
@@ -1761,8 +1767,9 @@ paths:
               properties:
                 uuid:
                   type: string
+                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-(op|http|tcp)-c-([bi][ms])-([0-9]{3})$'
                   description: >
-                    'LtpUuid identifying the LTP, which is to be deleted
+                    'LtpUuid identifying the LTP of an OperationClient, HttpClient or TcpClient, which is to be deleted
                     find in [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*/uuid]'
               example:
                 uuid: 'alt-2-0-0-op-s-bm-002'
@@ -2062,6 +2069,7 @@ paths:
               properties:
                 uuid:
                   type: string
+                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-fc-([bi][ms])-([0-9]{3})$'
                   description: >
                     'FcUuid identifying the FC, which is to be updated
                     find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
@@ -2088,10 +2096,24 @@ paths:
                     properties:
                       local-id:
                         type: string
+                        description: >
+                          'FcPortLid identifying the FcPort, which is to be updated
+                          find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
                       port-direction:
                         type: string
+                        enum:
+                          - 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
+                          - 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
+                          - 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
+                        description: >
+                          'Direction of the FcPort, which is to be updated
+                          find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/port-direction]'
                       logical-termination-point:
                         type: string
+                        pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-([sc])-([bi][ms])((-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})){0,1})-([0-9]{3})$'
+                        description: >
+                          'LTP, which is to be connected by the FcPort
+                          find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/logical-termination-point]'
               example:
                 uuid: 'alt-2-0-0-op-fc-bm-003'
                 name:
@@ -2177,6 +2199,7 @@ paths:
               properties:
                 fc-uuid:
                   type: string
+                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-fc-([bi][ms])-([0-9]{3})$'
                   description: >
                     'FcUuid identifying the FC, which is holding the FcPort that is to be updated
                     find in [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
@@ -2198,8 +2221,15 @@ paths:
                         - 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
                         - 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
                         - 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
+                      description: >
+                        'Direction of the FcPort, which is to be updated
+                        find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/port-direction]'
                     logical-termination-point:
                       type: string
+                      pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-([sc])-([bi][ms])((-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})){0,1})-([0-9]{3})$'
+                      description: >
+                        'LTP, which is to be connected by the FcPort
+                        find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/logical-termination-point]'
               example:
                 fc-uuid: 'alt-2-0-0-op-fc-bm-003'
                 fc-port:
@@ -2277,6 +2307,7 @@ paths:
               properties:
                 fc-uuid:
                   type: string
+                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-fc-([bi][ms])-([0-9]{3})$'
                   description: >
                     'FcUuid identifying the FC, which is holding the FcPort that is to be deleted
                     find in [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
@@ -2496,8 +2527,8 @@ paths:
                         from [/core-model-1-4:network-control-domain/link=*/uuid]'
                 example:
                   link-uuid-list:
-                    - 'alt-2-0-0-op-link-0001'
-                    - 'alt-2-0-0-op-link-0002'
+                    - 'alt-2-0-0-op-link-001'
+                    - 'alt-2-0-0-op-link-002'
           headers:
             x-correlator:
               schema:
@@ -2775,11 +2806,12 @@ paths:
               properties:
                 link-uuid:
                   type: string
+                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-link-([0-9]{3})$'
                   description: >
                     'UUID of Link with searched end points
                     find [/core-model-1-4:network-control-domain/link=*/uuid]'
               example:
-                link-uuid: 'alt-2-0-0-op-link-0001'
+                link-uuid: 'alt-2-0-0-op-link-001'
       responses:
         '200':
           description: 'List of operation UUIDs belonging to given link provided'
@@ -3160,7 +3192,7 @@ paths:
                         link-uuid:
                           type: string
                       example:
-                        link-uuid: 'alt-2-0-0-op-link-0001'
+                        link-uuid: 'alt-2-0-0-op-link-001'
               responses:
                 '204':
                   description: 'OKM will update OperationKeys on updated Link'
