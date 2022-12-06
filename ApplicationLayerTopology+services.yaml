@@ -82,13 +82,13 @@ servers:
   http-server:
     own-application-name: ApplicationLayerTopology
     own-release-number: 2.0.0
-    uuid: alt-2-0-0-http-s-is-000
+    uuid: alt-2-0-0-http-s-bm-000
   tpc-server:
     - description: Without TLS layer
       local-protocol: http
       own-ip-address: 1.1.3.13
       own-tcp-port: 3013
-      uuid: alt-2-0-0-tcp-s-is-000
+      uuid: alt-2-0-0-tcp-s-bm-000
     - description: With TLS layer
       local-protocol: https
       own-ip-address: 1.2.3.13
