@@ -38,13 +38,13 @@ paths:
                   type: string
                   description: >
                     'Name of application that shall be target of the handover process
-                    find or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                    find or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                 new-application-release:
                   type: string
                   pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that shall be target of the handover process
-                    find or update [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                    find or update [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                 new-application-protocol:
                   type: string
                   enum:
@@ -52,7 +52,7 @@ paths:
                     - 'HTTPS'
                   description: >
                     'Protocol to be used for addressing the application that shall be target of the handover process
-                    update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
+                    update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
                 new-application-address:
                   type: object
                   minProperties: 1
@@ -69,20 +69,20 @@ paths:
                           pattern: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
                           description: >
                             'IP address of application that shall be target of the handover process
-                            update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                     domain-name:
                       type: string
                       pattern: '^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$'
                       description: >
                         'Domain name of application that shall be target of the handover process
-                        update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
+                        update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
                 new-application-port:
                   type: integer
                   minimum: 0
                   maximum: 65535
                   description: >
                     'Port of application that shall be target of the handover process
-                    update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
+                    update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
               example:
                 new-application-name: 'NewApplicationName'
                 new-application-release: '2.0.0'
@@ -123,7 +123,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-im-000/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-im-000/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -138,7 +138,7 @@ paths:
           $ref: '#/components/responses/responseForErroredServiceRequests'
       callbacks:
         PromptForBequeathingDataCausesTransferOfListOfApplications:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-nr-2-0-0-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-nr-2-0-0-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -162,22 +162,22 @@ paths:
                           type: string
                           description: >
                             'Name of application that shall become part of the application layer topology representation
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                         application-release-number:
                           type: string
                           description: >
                             'Release of application that shall become part of the application layer topology representation
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         application-address:
                           type: string
                           description: >
                             'IP of application that shall become part of the application layer topology representation
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                         application-port:
                           type: integer
                           description: >
                             'TCP port of application that shall become part of the application layer topology representation
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
                       example:
                         application-name: 'RegistryOffice'
                         application-release-number: '2.0.0'
@@ -227,249 +227,8 @@ paths:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
-        PromptForBequeathingDataCausesTransferOfLtpsAndFcs:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-nr-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
-            post:
-              parameters:
-                - $ref: '#/components/parameters/user'
-                - $ref: '#/components/parameters/originator'
-                - $ref: '#/components/parameters/x-correlator'
-                - $ref: '#/components/parameters/trace-indicator'
-                - $ref: '#/components/parameters/customer-journey'
-              requestBody:
-                required: true
-                content:
-                  application/json:
-                    schema:
-                      type: object
-                      description: >
-                        'Documentation of all interfaces and internal connections of an application
-                        replace [/core-model-1-4:network-control-domain/control-construct=*/]'
-                      required:
-                        - core-model-1-4:control-construct
-                      properties:
-                        core-model-1-4:control-construct:
-                          type: object
-                          required:
-                            - uuid
-                            - logical-termination-point
-                            - forwarding-domain
-                          properties:
-                            uuid:
-                              type: string
-                              description: >
-                                'CcUuid identifying the CC, which is to be updated
-                                from [/core-model-1-4:network-control-domain/control-construct=*/uuid]'
-                              example: '*-1-0-0'
-                            logical-termination-point:
-                              type: array
-                              uniqueItems: true
-                              items:
-                                $ref: '#/components/schemas/logicalTerminationPoint'
-                              example:
-                                - uuid: 'alt-2-0-0-op-s-bm-000'
-                                  ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
-                                  client-ltp: []
-                                  server-ltp: ['alt-2-0-0-http-s-is-000']
-                                  layer-protocol:
-                                    - local-id: '0'
-                                      layer-protocol-name: 'operation-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER'
-                                      operation-server-interface-1-0:operation-server-interface-pac:
-                                        operation-server-interface-capability:
-                                          operation-name: '/v1/register-yourself'
-                                        operation-server-interface-configuration:
-                                          life-cycle-state: 'operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL'
-                                - uuid: 'alt-2-0-0-http-s-is-000'
-                                  ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
-                                  client-ltp: ['alt-2-0-0-op-s-bm-000']
-                                  server-ltp: []
-                                  layer-protocol:
-                                    - local-id: '0'
-                                      layer-protocol-name: 'http-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_HTTP_LAYER'
-                                      http-server-interface-1-0:http-server-interface-pac:
-                                        http-server-interface-capability:
-                                          application-name: 'RegistryOffice'
-                                          release-number: '2.0.0'
-                                          data-update-period: 'http-server-interface-1-0:DATA_UPDATE_PERIOD_TYPE_REAL_TIME'
-                            forwarding-domain:
-                              type: array
-                              minItems: 1
-                              maxItems: 1
-                              items:
-                                $ref: '#/components/schemas/forwardingDomain'
-                              example:
-                                - uuid: 'alt-2-0-0-op-fd-000'
-                                  forwarding-construct:
-                                    - uuid: 'alt-2-0-0-op-fc-bm-000'
-                                      name:
-                                        - value-name: 'ForwardingKind'
-                                          value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
-                                        - value-name: 'ForwardingName'
-                                          value: 'PromptForRegisteringCausesRegistrationRequest'
-                                      fc-port:
-                                        - local-id: '000'
-                                          port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
-                                          logical-termination-point: 'alt-2-0-0-op-s-bm-000'
-                                        - local-id: '100'
-                                          port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
-                                          logical-termination-point: 'alt-2-0-0-op-s-bm-000'
-                                    - uuid: 'alt-2-0-0-op-fc-bm-001'
-                                      name:
-                                        - value-name: 'ForwardingKind'
-                                          value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
-                                        - value-name: 'ForwardingName'
-                                          value: 'PromptForEmbeddingCausesRequestForBequeathingData'
-                                      fc-port:
-                                        - local-id: '100'
-                                          port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
-                                          logical-termination-point: 'alt-2-0-0-op-s-bm-001'
-                                        - local-id: '200'
-                                          port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
-                                          logical-termination-point: 'alt-2-0-0-op-c-bm-ro-2-0-0-000'
-              responses:
-                '204':
-                  description: 'Interfaces and internal connections replaced by new data'
-                  headers:
-                    x-correlator:
-                      schema:
-                        type: string
-                        example: '550e8400-e29b-11d4-a716-446655440000'
-                      description: 'UUID for the service execution flow that allows to correlate requests and responses. Its value must be identical at the response compared with its corresponding request'
-                    exec-time:
-                      schema:
-                        type: integer
-                        example: 1100
-                      description: 'Value written by the service provider, reporting the total elapsed time for the execution, including all the additional processing needed to retrieve the data from the backend service. Expressed in milliseconds'
-                    backend-time:
-                      schema:
-                        type: integer
-                        example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
-                    life-cycle-state:
-                      schema:
-                        type: string
-                        enum:
-                          - 'EXPERIMENTAL'
-                          - 'OPERATIONAL'
-                          - 'DEPRECATED'
-                          - 'OBSOLETE'
-                          - 'UNKNOWN'
-                          - 'NOT_YET_DEFINED'
-                        example: 'EXPERIMENTAL'
-                      description: >
-                          'Life cycle state of the consumed service'
-                '400':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                '401':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                '403':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                '404':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                '500':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                default:
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-        PromptForBequeathingDataCausesTransferOfLinkInformation:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-nr-2-0-0-002/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
-            post:
-              parameters:
-                - $ref: '#/components/parameters/user'
-                - $ref: '#/components/parameters/originator'
-                - $ref: '#/components/parameters/x-correlator'
-                - $ref: '#/components/parameters/trace-indicator'
-                - $ref: '#/components/parameters/customer-journey'
-              requestBody:
-                required: true
-                content:
-                  application/json:
-                    schema:
-                      type: object
-                      required:
-                        - serving-application-name
-                        - serving-application-release-number
-                        - operation-name
-                        - consuming-application-name
-                        - consuming-application-release-number
-                      properties:
-                        serving-application-name:
-                          type: string
-                          description: >
-                            'Name of application that holds the OperationServer of the link [/core-model-1-4:network-control-domain/link=*/], which is to be complemented
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
-                        serving-application-release-number:
-                          type: string
-                          description: >
-                            'Release of application that holds the OperationServer of the link [/core-model-1-4:network-control-domain/link=*/], which is to be complemented
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
-                        operation-name:
-                          type: string
-                          description: >
-                            'Name of the operation, which is made available via the link [/core-model-1-4:network-control-domain/link=*/]
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                            AND [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
-                        consuming-application-name:
-                          type: string
-                          description: >
-                            'Name of application that holds the OperationClient, which shall be connected via the link [/core-model-1-4:network-control-domain/link=*/]
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
-                        consuming-application-release-number:
-                          type: string
-                          description: >
-                            'Release of application that holds the OperationClient, which shall be connected via the link [/core-model-1-4:network-control-domain/link=*/]
-                            from [/core-model-1-4:network-control-domain/control-construct=*-1-0-0/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
-                      example:
-                        serving-application-name: 'RegistryOffice'
-                        serving-application-release-number: '2.0.0'
-                        operation-name: '/v1/register-application'
-                        consuming-application-name: 'TypeApprovalRegister'
-                        consuming-application-release-number: '1.0.0'
-              responses:
-                '204':
-                  description: 'OperationClient connected with OperationServer'
-                  headers:
-                    x-correlator:
-                      schema:
-                        type: string
-                        example: '550e8400-e29b-11d4-a716-446655440000'
-                      description: 'UUID for the service execution flow that allows to correlate requests and responses. Its value must be identical at the response compared with its corresponding request'
-                    exec-time:
-                      schema:
-                        type: integer
-                        example: 1100
-                      description: 'Value written by the service provider, reporting the total elapsed time for the execution, including all the additional processing needed to retrieve the data from the backend service. Expressed in milliseconds'
-                    backend-time:
-                      schema:
-                        type: integer
-                        example: 850
-                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
-                    life-cycle-state:
-                      schema:
-                        type: string
-                        enum:
-                          - 'EXPERIMENTAL'
-                          - 'OPERATIONAL'
-                          - 'DEPRECATED'
-                          - 'OBSOLETE'
-                          - 'UNKNOWN'
-                          - 'NOT_YET_DEFINED'
-                        example: 'EXPERIMENTAL'
-                      description: >
-                          'Life cycle state of the consumed service'
-                '400':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                '401':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                '403':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                '404':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                '500':
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
-                default:
-                  $ref: '#/components/responses/responseForErroredServiceRequests'
         PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOfNewApplicationsToNewRelease:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -494,27 +253,27 @@ paths:
                           type: string
                           description: >
                             'Own application name
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         subscriber-release-number:
                           type: string
                           description: >
                             'Future release number
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         subscriber-operation:
                           type: string
                           description: >
                             'Names of the operation that shall be addressed by notifications about new approvals
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         subscriber-address:
                           type: string
                           description: >
                             'Future IP address
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                         subscriber-port:
                           type: integer
                           description: >
                             'Future port
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
                       example:
                         subscriber-application: 'ExecutionAndTraceLog'
                         subscriber-release-number: '1.0.0'
@@ -565,7 +324,7 @@ paths:
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
         PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnApprovalsToNewRelease:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -590,27 +349,27 @@ paths:
                           type: string
                           description: >
                             'Own application name
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         subscriber-release-number:
                           type: string
                           description: >
                             'Future release number
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         subscriber-operation:
                           type: string
                           description: >
                             'Names of the operation that shall be addressed by notifications about withdrawn approvals
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         subscriber-address:
                           type: string
                           description: >
                             'Future IP address
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                         subscriber-port:
                           type: integer
                           description: >
                             'Future port
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
                       example:
                         subscriber-application: 'ExecutionAndTraceLog'
                         subscriber-release-number: '1.0.0'
@@ -661,7 +420,7 @@ paths:
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
         PromptForBequeathingDataCausesRObeingRequestedToStopNotificationsToOldRelease:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-002/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-002/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -684,19 +443,19 @@ paths:
                           type: string
                           description: >
                             'Own application name
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         subscriber-release-number:
                           type: string
                           description: >
                             'Old release number
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-bm-or-1-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-bm-or-1-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         subscription:
                           type: string
                           description: >
                             'Name of operation that had been addressed for starting getting notifications
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                             and
-                            from  [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]'
+                            from  [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]'
                       example:
                         subscriber-application: 'ExecutionAndTraceLog'
                         subscriber-release-number: '1.0.0'
@@ -745,7 +504,7 @@ paths:
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
         PromptForBequeathingDataCausesRequestForBroadcastingInfoAboutServerReplacement:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -771,22 +530,22 @@ paths:
                           type: string
                           description: >
                             'Own application name
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         old-application-release-number:
                           type: string
                           description: >
                             'Old release number
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-bm-or-1-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-bm-or-1-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         new-application-release-number:
                           type: string
                           description: >
                             'Future release number
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-im-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         new-application-protocol:
                           type: string
                           description: >
                             'Future protocol to be used
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
                         new-application-address:
                           type: object
                           minProperties: 1
@@ -802,17 +561,17 @@ paths:
                                   type: string
                                   description: >
                                     'Future IPv4 address
-                                    from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                                    from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                             domain-name:
                               type: string
                               description: >
                                 'Future domain name
-                                from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
+                                from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
                         new-application-port:
                           type: integer
                           description: >
                             'Future port
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-im-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
                       example:
                         application-name: 'RegistryOffice'
                         old-application-release-number: '1.0.0'
@@ -866,7 +625,7 @@ paths:
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
         PromptForBequeathingDataCausesRequestForDeregisteringOfOldRelease:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-002/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-002/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -888,12 +647,12 @@ paths:
                           type: string
                           description: >
                             'Own application name
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         application-release-number:
                           type: string
                           description: >
                             'Own release number
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                       example:
                         application-name: 'BadApplication'
                         application-release-number: '1.0.0'
@@ -941,7 +700,7 @@ paths:
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
         PromptingNewReleaseForUpdatingServerCausesRequestForBroadcastingInfoAboutBackwardCompatibleUpdateOfOperation:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-003/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-bm-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-003/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             description: >
               'This callback belongs to the sequence of actions that have to be done during the bequeath-your-data-and-die process, despite the forwarding gets neither managed nor directly initiated by the /v1/bequeath-your-data-and-die request.
               After consuming applications have been redirected to the new release, the new release is triggered (this callback) to request the RegistryOffice for broadcasting information about backward compatible replacements of services.'
@@ -968,22 +727,22 @@ paths:
                           type: string
                           description: >
                             'Own application name
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         application-release-number:
                           type: string
                           description: >
                             'Own release number
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                         old-operation-name:
                           type: string
                           description: >
                             'Name of the deprecated operation
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         new-operation-name:
                           type: string
                           description: >
                             'Name of the replacing operation
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                       example:
                         application-name: 'AdministratorAdministration'
                         application-release-number: '1.0.0'
@@ -1065,13 +824,13 @@ paths:
                   minLength: 3
                   description: >
                     'Name of application that shall become part of the application layer topology representation
-                    find or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                    find or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                 release-number:
                   type: string
                   pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that shall become part of the application layer topology representation
-                    find or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                    find or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                 protocol:
                   type: string
                   enum:
@@ -1079,7 +838,7 @@ paths:
                     - 'HTTPS'
                   description: >
                     'Protocol to be used for requesting service request notifications
-                    update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
+                    update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
                 address:
                   type: object
                   minProperties: 1
@@ -1096,20 +855,20 @@ paths:
                           pattern: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
                           description: >
                             'IP of application that shall become part of the application layer topology representation
-                            update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                     domain-name:
                       type: string
                       pattern: '^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$'
                       description: >
                         'Domain name of application that shall be requested for service request notifications
-                        update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
+                        update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
                 port:
                   type: integer
                   minimum: 0
                   maximum: 65535
                   description: >
                     'TCP port of application that shall become part of the application layer topology representation
-                    update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
+                    update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
               example:
                 application-name: 'RegistryOffice'
                 release-number: '2.0.0'
@@ -1150,7 +909,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1165,7 +924,7 @@ paths:
           $ref: '#/components/responses/responseForErroredServiceRequests'
       callbacks:
         NewApplicationCausesRequestForTopologyChangeInformation:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-im-*-*-*-*-004/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-*-*-*-*-004/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -1182,7 +941,6 @@ paths:
                       required:
                         - topology-application
                         - topology-application-release-number
-                        - topology-operation-application-update
                         - topology-operation-ltp-update
                         - topology-operation-ltp-deletion
                         - topology-operation-fc-update
@@ -1195,56 +953,50 @@ paths:
                           type: string
                           description: >
                             'Own application name
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         topology-application-release-number:
                           type: string
                           description: >
                             'Own release number
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-s-is-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
-                        topology-operation-application-update:
-                          type: string
-                          description: >
-                            'Operation for updating the entire information about an application
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-bm-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                         topology-operation-ltp-update:
                           type: string
                           description: >
                             'Operation for updating an LTP
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         topology-operation-ltp-deletion:
                           type: string
                           description: >
                             'Operation for deleting an LTP
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-006/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-006/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         topology-operation-fc-update:
                           type: string
                           description: >
                             'Operation for updating an FC port
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-013/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-013/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         topology-operation-fc-port-update:
                           type: string
                           description: >
                             'Operation for updating an FC port
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-014/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-014/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         topology-operation-fc-port-deletion:
                           type: string
                           description: >
                             'Operation for deleting an FC port
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-015/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-015/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         topology-application-address:
                           type: string
                           description: >
                             'IP address of application that shall record the service requests
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-bm-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address]'
                         topology-application-port:
                           type: integer
                           description: >
                             'Port of application that shall record the service requests
-                            from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-s-is-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port]'
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-bm-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port]'
                       example:
                         topology-application: 'ApplicationLayerTopology'
                         topology-application-release-number: '2.0.0'
-                        topology-operation-application-update: '/v1/update-all-ltps-and-fcs'
                         topology-operation-ltp-update: '/v1/update-ltp'
                         topology-operation-ltp-deletion: '/v1/delete-ltp-and-dependents'
                         topology-operation-fc-update: '/v1/update-fc'
@@ -1323,13 +1075,13 @@ paths:
                   type: string
                   description: >
                     'Name of application that shall no longer be part of the application layer topology representation
-                    find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                    find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                 release-number:
                   type: string
                   pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that shall no longer be part of the application layer topology representation
-                    find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                    find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
               example:
                 application-name: 'CurrentController'
                 release-number: '0.0.6'
@@ -1365,7 +1117,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1412,15 +1164,15 @@ paths:
                     application-name:
                       type: string
                       description: >
-                        'from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                        'from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                     release-number:
                       type: string
                       description: >
-                        'from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                        'from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                     protocol:
                       type: string
                       description: >
-                        'from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
+                        'from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
                     address:
                       type: object
                       properties:
@@ -1430,15 +1182,15 @@ paths:
                             ipv-4-address:
                               type: string
                               description: >
-                                'from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                                'from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                         domain-name:
                           type: string
                           description: >
-                            'from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
+                            'from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
                     port:
                       type: integer
                       description: >
-                        'from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
+                        'from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
                   example:
                     - application-name: 'RegistryOffice'
                       release-number: '2.0.0'
@@ -1483,7 +1235,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-003/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-003/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1519,7 +1271,7 @@ paths:
               type: object
               description: >
                 'Documentation of all interfaces and internal connections of an application
-                replace [/core-model-1-4:network-control-domain/control-construct=*/]'
+                replace [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/]'
               required:
                 - core-model-1-4:control-construct
               properties:
@@ -1534,19 +1286,19 @@ paths:
                       type: string
                       description: >
                         'CcUuid identifying the CC, which is to be updated
-                        find or create [/core-model-1-4:network-control-domain/control-construct=*/uuid]'
+                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/uuid]'
                       pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})$'
-                      example: 'ro-2-0-0'
+                      example: 'cc-1-0-0'
                     logical-termination-point:
                       type: array
                       uniqueItems: true
                       items:
                         $ref: '#/components/schemas/logicalTerminationPoint'
                       example:
-                        - uuid: 'alt-2-0-0-op-s-bm-000'
+                        - uuid: 'cc-1-0-0-op-s-bm-000'
                           ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
                           client-ltp: []
-                          server-ltp: ['alt-2-0-0-http-s-is-000']
+                          server-ltp: ['cc-1-0-0-http-s-bm-000']
                           layer-protocol:
                             - local-id: '0'
                               layer-protocol-name: 'operation-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER'
@@ -1555,17 +1307,17 @@ paths:
                                   operation-name: '/v1/register-yourself'
                                 operation-server-interface-configuration:
                                   life-cycle-state: 'operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL'
-                        - uuid: 'alt-2-0-0-http-s-is-000'
+                        - uuid: 'cc-1-0-0-http-s-bm-000'
                           ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
-                          client-ltp: ['alt-2-0-0-op-s-bm-000']
+                          client-ltp: ['cc-1-0-0-op-s-bm-000']
                           server-ltp: []
                           layer-protocol:
                             - local-id: '0'
                               layer-protocol-name: 'http-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_HTTP_LAYER'
                               http-server-interface-1-0:http-server-interface-pac:
                                 http-server-interface-capability:
-                                  application-name: 'RegistryOffice'
-                                  release-number: '2.0.0'
+                                  application-name: 'CurrentController'
+                                  release-number: '1.0.0'
                                   data-update-period: 'http-server-interface-1-0:DATA_UPDATE_PERIOD_TYPE_REAL_TIME'
                     forwarding-domain:
                       type: array
@@ -1574,9 +1326,9 @@ paths:
                       items:
                         $ref: '#/components/schemas/forwardingDomain'
                       example:
-                        - uuid: 'alt-2-0-0-op-fd-000'
+                        - uuid: 'cc-1-0-0-op-fd-000'
                           forwarding-construct:
-                            - uuid: 'alt-2-0-0-op-fc-bm-000'
+                            - uuid: 'cc-1-0-0-op-fc-bm-000'
                               name:
                                 - value-name: 'ForwardingKind'
                                   value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -1585,11 +1337,11 @@ paths:
                               fc-port:
                                 - local-id: '000'
                                   port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
-                                  logical-termination-point: 'alt-2-0-0-op-s-bm-000'
+                                  logical-termination-point: 'cc-1-0-0-op-s-bm-000'
                                 - local-id: '100'
                                   port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
-                                  logical-termination-point: 'alt-2-0-0-op-s-bm-000'
-                            - uuid: 'alt-2-0-0-op-fc-bm-001'
+                                  logical-termination-point: 'cc-1-0-0-op-s-bm-000'
+                            - uuid: 'cc-1-0-0-op-fc-bm-001'
                               name:
                                 - value-name: 'ForwardingKind'
                                   value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -1598,10 +1350,10 @@ paths:
                               fc-port:
                                 - local-id: '100'
                                   port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
-                                  logical-termination-point: 'alt-2-0-0-op-s-bm-001'
+                                  logical-termination-point: 'cc-1-0-0-op-s-bm-001'
                                 - local-id: '200'
                                   port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
-                                  logical-termination-point: 'alt-2-0-0-op-c-bm-ro-2-0-0-000'
+                                  logical-termination-point: 'cc-1-0-0-op-c-bm-cc-1-0-0-000'
       responses:
         '204':
           description: 'Interfaces and internal connections replaced by new data'
@@ -1634,7 +1386,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1656,7 +1408,7 @@ paths:
       - $ref: '#/components/parameters/customer-journey'
     post:
       operationId: updateLtp
-      summary: 'Existing documentation of the interface identified by LtpUuid will be replaced'
+      summary: 'Documentation about the interface identified by LtpUuid gets either replaced or created'
       tags:
         - IndividualServices
       security:
@@ -1667,31 +1419,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/logicalTerminationPoint'
+              description: >
+                'Documentation of an interface at an application
+                update or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*/]'
             example:
-              - uuid: 'alt-2-0-0-op-s-bm-000'
-                ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
-                client-ltp: []
-                server-ltp: ['alt-2-0-0-http-s-is-000']
-                layer-protocol:
-                  - local-id: '0'
-                    layer-protocol-name: 'operation-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER'
-                    operation-server-interface-1-0:operation-server-interface-pac:
-                      operation-server-interface-capability:
-                        operation-name: '/v1/register-yourself'
-                      operation-server-interface-configuration:
-                        life-cycle-state: 'operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL'
-              - uuid: 'alt-2-0-0-http-s-is-000'
-                ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
-                client-ltp: ['alt-2-0-0-op-s-bm-000']
-                server-ltp: []
-                layer-protocol:
-                  - local-id: '0'
-                    layer-protocol-name: 'http-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_HTTP_LAYER'
-                    http-server-interface-1-0:http-server-interface-pac:
-                      http-server-interface-capability:
-                        application-name: 'RegistryOffice'
-                        release-number: '2.0.0'
-                        data-update-period: 'http-server-interface-1-0:DATA_UPDATE_PERIOD_TYPE_REAL_TIME'
+              uuid: 'cc-1-0-0-op-s-bm-000'
+              ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
+              client-ltp: []
+              server-ltp: ['cc-1-0-0-http-s-bm-000']
+              layer-protocol:
+                - local-id: '0'
+                  layer-protocol-name: 'operation-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER'
+                  operation-server-interface-1-0:operation-server-interface-pac:
+                    operation-server-interface-capability:
+                      operation-name: '/v1/register-yourself'
+                    operation-server-interface-configuration:
+                      life-cycle-state: 'operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL'
       responses:
         '204':
           description: 'LTP will be updated'
@@ -1724,7 +1467,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1746,7 +1489,7 @@ paths:
       - $ref: '#/components/parameters/customer-journey'
     post:
       operationId: deleteLtpAndDependents
-      summary: 'Deletes a *Client LTP and all its dependents'
+      summary: 'Deletes an OperationClient, HttpClient or TcpClient LTP and all its dependents'
       description: >
         'An OperationClient, HttpClient or TcpClient identified by LtpUuid gets deleted.
         If a serving HttpClient gets deleted, all client OperationClients get deleted too.
@@ -1767,12 +1510,13 @@ paths:
               properties:
                 uuid:
                   type: string
-                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-(op|http|tcp)-c-([bi][ms])-([0-9]{3})$'
+                  pattern:
+                    '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-((op-c-([bi][ms]))|(http-c)|(tcp-c))-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{3})$'
                   description: >
                     'LtpUuid identifying the LTP of an OperationClient, HttpClient or TcpClient, which is to be deleted
-                    find in [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*/uuid]'
+                    find in [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*/uuid]'
               example:
-                uuid: 'alt-2-0-0-op-s-bm-002'
+                uuid: 'cc-1-0-0-op-c-bm-alt-2-0-0-000'
       responses:
         '204':
           description: 'LTP and entries in FCs and Links will be deleted'
@@ -1805,7 +1549,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-006/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-006/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1847,12 +1591,12 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServers
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServers
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '2.0.0'
@@ -1872,7 +1616,7 @@ paths:
                       type: string
                       description: >
                         'Name of operationServer
-                        from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                        from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                 example:
                   operation-server-name-list:
                     - '/v1/register-yourself'
@@ -1906,7 +1650,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-009/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-009/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1948,12 +1692,12 @@ paths:
                   type: string
                   description: >
                     'Name of application that has the OperationClients
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   description: >
                     'Release of application that has the OperationClients
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '2.0.0'
@@ -1980,17 +1724,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the consumed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                         serving-application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the consumed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         operation-name:
                           type: string
                           description: >
                             'Name of the consumed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 example:
                   operation-client-list:
                     - serving-application-name: 'TypeApprovalRegister'
@@ -2028,7 +1772,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-010/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-010/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2051,7 +1795,7 @@ paths:
       - $ref: '#/components/parameters/customer-journey'
     post:
       operationId: updateFc
-      summary: 'Existing documentation of an FC identified by FcUuid will be replaced'
+      summary: 'Documentation about an FC identified by FcUuid gets either replaced or created'
       tags:
         - IndividualServices
       security:
@@ -2072,7 +1816,7 @@ paths:
                   pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-fc-([bi][ms])-([0-9]{3})$'
                   description: >
                     'FcUuid identifying the FC, which is to be updated
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
+                    find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/uuid]'
                 name:
                   type: array
                   items:
@@ -2098,7 +1842,7 @@ paths:
                         type: string
                         description: >
                           'FcPortLid identifying the FcPort, which is to be updated
-                          find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
+                          find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/local-id]'
                       port-direction:
                         type: string
                         enum:
@@ -2107,15 +1851,15 @@ paths:
                           - 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
                         description: >
                           'Direction of the FcPort, which is to be updated
-                          find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/port-direction]'
+                          find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/port-direction]'
                       logical-termination-point:
                         type: string
                         pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-([sc])-([bi][ms])((-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})){0,1})-([0-9]{3})$'
                         description: >
                           'LTP, which is to be connected by the FcPort
-                          find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/logical-termination-point]'
+                          find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/logical-termination-point]'
               example:
-                uuid: 'alt-2-0-0-op-fc-bm-003'
+                uuid: 'cc-1-0-0-op-fc-bm-003'
                 name:
                   - value-name: 'ForwardingKind'
                     value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
@@ -2124,10 +1868,10 @@ paths:
                 fc-port:
                   - local-id: '000'
                     port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
-                    logical-termination-point: 'alt-2-0-0-op-s-bm-003'
+                    logical-termination-point: 'cc-1-0-0-op-s-bm-003'
                   - local-id: '200'
                     port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
-                    logical-termination-point: 'alt-2-0-0-op-c-bs-ol-1-0-0-000'
+                    logical-termination-point: 'cc-1-0-0-op-c-bs-ol-1-0-0-000'
       responses:
         '204':
           description: 'FC will be updated'
@@ -2160,7 +1904,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-013/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-013/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2182,7 +1926,7 @@ paths:
       - $ref: '#/components/parameters/customer-journey'
     post:
       operationId: updateFcPort
-      summary: 'Existing documentation of an FcPort identified by FcUuid and FcPortLid will be replaced'
+      summary: 'Documentation about an FcPort identified by FcUuid and FcPortLid gets either replaced or created'
       tags:
         - IndividualServices
       security:
@@ -2201,8 +1945,8 @@ paths:
                   type: string
                   pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-fc-([bi][ms])-([0-9]{3})$'
                   description: >
-                    'FcUuid identifying the FC, which is holding the FcPort that is to be updated
-                    find in [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
+                    'FcUuid identifying the FC, which is holding the FcPort that is to be replaced or created
+                    find in [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/uuid]'
                 fc-port:
                   type: object
                   required:
@@ -2213,8 +1957,8 @@ paths:
                     local-id:
                       type: string
                       description: >
-                        'FcPortLid identifying the FcPort, which is to be updated
-                        find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
+                        'FcPortLid identifying the FcPort, which is to be replaced or created
+                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/local-id]'
                     port-direction:
                       type: string
                       enum:
@@ -2222,20 +1966,20 @@ paths:
                         - 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
                         - 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
                       description: >
-                        'Direction of the FcPort, which is to be updated
-                        find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/port-direction]'
+                        'Direction of the FcPort, which is to be replaced or created
+                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/port-direction]'
                     logical-termination-point:
                       type: string
                       pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-([sc])-([bi][ms])((-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})){0,1})-([0-9]{3})$'
                       description: >
                         'LTP, which is to be connected by the FcPort
-                        find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/logical-termination-point]'
+                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/logical-termination-point]'
               example:
-                fc-uuid: 'alt-2-0-0-op-fc-bm-003'
+                fc-uuid: 'cc-1-0-0-op-fc-bm-003'
                 fc-port:
                   local-id: '000'
                   port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
-                  logical-termination-point: 'alt-2-0-0-op-s-bm-003'
+                  logical-termination-point: 'cc-1-0-0-op-s-bm-003'
       responses:
         '204':
           description: 'FC port will be updated'
@@ -2268,7 +2012,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-014/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-014/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2310,14 +2054,14 @@ paths:
                   pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-fc-([bi][ms])-([0-9]{3})$'
                   description: >
                     'FcUuid identifying the FC, which is holding the FcPort that is to be deleted
-                    find in [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
+                    find in [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/uuid]'
                 fc-port-local-id:
                   type: string
                   description: >
                     'FcPortLid identifying the FcPort, which is to be deleted
-                    find or create [/core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
+                    find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/local-id]'
               example:
-                fc-uuid: 'alt-2-0-0-op-fc-is-000'
+                fc-uuid: 'cc-1-0-0-op-fc-is-000'
                 fc-port-local-id: '202'
       responses:
         '204':
@@ -2351,7 +2095,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-015/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-015/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2394,17 +2138,17 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServer that receives some request
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 receiving-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServer that receives some request
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 receiving-operation:
                   type: string
                   description: >
                     'Name of operation that receives some request
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
               example:
                 receiving-application-name: 'TypeApprovalRegister'
                 receiving-application-release-number: '1.0.0'
@@ -2432,17 +2176,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the addressed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                         addressed-application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the addressed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         addressed-operation-name:
                           type: string
                           description: >
                             'Name of the addressed operation
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 example:
                   operation-client-list:
                     - addressed-application-name: 'RegistryOffice'
@@ -2480,7 +2224,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-016/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-016/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2524,11 +2268,11 @@ paths:
                       type: string
                       description: >
                         'UUID of Link
-                        from [/core-model-1-4:network-control-domain/link=*/uuid]'
+                        from [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]'
                 example:
                   link-uuid-list:
-                    - 'alt-2-0-0-op-link-001'
-                    - 'alt-2-0-0-op-link-002'
+                    - 'cc-1-0-0-op-link-001'
+                    - 'cc-1-0-0-op-link-002'
           headers:
             x-correlator:
               schema:
@@ -2558,7 +2302,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-017/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-017/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2603,29 +2347,29 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServer of the link, which is to be complemented
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 serving-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServer of the link, which is to be complemented
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 operation-name:
                   type: string
                   minLength: 6
                   description: >
                     'Name of the operation, which is made available via the link
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                    AND find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                    AND find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 consuming-application-name:
                   type: string
                   description: >
                     'Name of application that holds the OperationClient, which shall be connected via the link
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 consuming-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationClient, which shall be connected via the link
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 serving-application-name: 'RegistryOffice'
                 serving-application-release-number: '2.0.0'
@@ -2664,7 +2408,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-018/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-018/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2708,28 +2452,28 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServer, which shall no longer be consumed
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 serving-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServer, which shall no longer be consumed
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 operation-name:
                   type: string
                   description: >
                     'Name of the operation, which shall no longer be consumed
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                    AND find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                    AND find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 consuming-application-name:
                   type: string
                   description: >
                     'Name of application, which shall no longer consume the operation
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 consuming-application-release-number:
                   type: string
                   description: >
                     'Release of application, which shall no longer consume the operation
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 serving-application-name: 'RegistryOffice'
                 serving-application-release-number: '2.0.0'
@@ -2768,7 +2512,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-019/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-019/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2809,7 +2553,7 @@ paths:
                   pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-link-([0-9]{3})$'
                   description: >
                     'UUID of Link with searched end points
-                    find [/core-model-1-4:network-control-domain/link=*/uuid]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]'
               example:
                 link-uuid: 'alt-2-0-0-op-link-001'
       responses:
@@ -2836,17 +2580,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the link end point (operationServer or operationClient)
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-2-0-0-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/application-name]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/application-name]'
                         application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the link end point (operationServer or operationClient)
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-2-0-0-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/release-number]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/release-number]'
                         operation-uuid:
                           type: string
                           description: >
                             'UUID of the operation (server or client) at the link end point
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-2-0-0-op-*-*/uuid]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-*-*/uuid]'
                         ltp-direction:
                           type: string
                           enum:
@@ -2854,7 +2598,7 @@ paths:
                             - 'core-model-1-4:TERMINATION_DIRECTION_SINK'
                           description: >
                               'Identifies OperationServer (SOURCE) and OperationClient (SINK)
-                              from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-2-0-0-op-*-*/ltp-direction]'
+                              from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-*-*/ltp-direction]'
                 example:
                   link-end-point-list:
                     - application-name: 'RegistryOffice'
@@ -2894,7 +2638,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-020/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-020/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2939,12 +2683,12 @@ paths:
                   type: string
                   description: >
                     'Name of application that is connected to other applications by links
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   description: >
                     'Release of application that is connected to other applications by links
-                    find [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '2.0.0'
@@ -2970,18 +2714,18 @@ paths:
                         serving-application-name:
                           type: string
                           description: >
-                            'Name of application that is connected by link [/core-model-1-4:network-control-domain/link=*/uuid]
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            'Name of application that is connected by link [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         serving-application-release-number:
                           type: string
                           description: >
-                            'Release of application that is connected by link [/core-model-1-4:network-control-domain/link=*/uuid]
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                            'Release of application that is connected by link [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                         operation-name:
                           type: string
                           description: >
-                            'Name of operation that is connected by link [/core-model-1-4:network-control-domain/link=*/uuid]
-                            from [/core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            'Name of operation that is connected by link [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                 example:
                   operation-server-list:
                     - serving-application-name: 'TypeApprovalRegister'
@@ -3019,7 +2763,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-021/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-021/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -3065,19 +2809,19 @@ paths:
                   type: string
                   description: >
                     'Name of application that wants to receive notifications about updates of Links
-                    find or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                    find or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                 subscriber-release-number:
                   type: string
                   pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that wants to receive notifications about updates of Links
-                    find or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                    find or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                 subscriber-operation:
                   type: string
                   minLength: 6
                   description: >
                     'Name of the operation that shall be addressed by notifications about updates of Links
-                    update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]'
+                    update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]'
                 subscriber-protocol:
                   type: string
                   enum:
@@ -3085,7 +2829,7 @@ paths:
                     - 'HTTPS'
                   description: >
                     'Protocol to be used for addressing the application that wants to receive notifications about new approvals
-                    update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
+                    update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
                 subscriber-address:
                   type: object
                   minProperties: 1
@@ -3102,20 +2846,20 @@ paths:
                           pattern: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
                           description: >
                             'IPv4 address of application that wants to receive notifications about updates of Links
-                            update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                     domain-name:
                       type: string
                       pattern: '^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$'
                       description: >
                         'Domain name of application that wants to receive notifications about new approvals
-                        update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
+                        update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
                 subscriber-port:
                   type: integer
                   minimum: 0
                   maximum: 65535
                   description: >
                     'TCP port of application that wants to receive notifications about updates of Links
-                    update or create [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
+                    update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
               example:
                 subscriber-application: 'OperationKeyManagement'
                 subscriber-release-number: '1.0.0'
@@ -3157,7 +2901,7 @@ paths:
                 example: 'EXPERIMENTAL'
               description: >
                   'Life cycle state of the consumed service
-                  find in [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-s-is-022/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-022/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -3172,7 +2916,7 @@ paths:
           $ref: '#/components/responses/responseForErroredServiceRequests'
       callbacks:
         LinkChangeNotification:
-          url: #[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=alt-2-0-0-op-c-is-*-*-*-*-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-is-*-*-*-*-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -3272,7 +3016,7 @@ components:
         example: 'Resolver'
       description: >
         'Identification for the system consuming the API, as defined in
-         [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+         [/core-model-1-4:control-construct/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
     x-correlator:
       name: x-correlator
       in: header
@@ -3362,17 +3106,17 @@ components:
                 type: string
                 description: >
                   'Field name
-                  from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/profile-collection/profile=alt-2-0-0-response-p-*/response-profile-1-0:response-profile-pac/response-profile-capability/field-name]'
+                  from [/core-model-1-4:control-construct/profile-collection/profile=alt-2-0-0-response-p-*/response-profile-1-0:response-profile-pac/response-profile-capability/field-name]'
               value:
                 type: string
                 description: >
                   'Field value
-                  from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/profile-collection/profile=alt-2-0-0-response-p-*/response-profile-1-0:response-profile-pac/response-profile-configuration/value]'
+                  from [/core-model-1-4:control-construct/profile-collection/profile=alt-2-0-0-response-p-*/response-profile-1-0:response-profile-pac/response-profile-configuration/value]'
               datatype:
                 type: string
                 description: >
                   'Field datatype
-                  from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/profile-collection/profile=alt-2-0-0-response-p-*/response-profile-1-0:response-profile-pac/response-profile-capability/datatype]'
+                  from [/core-model-1-4:control-construct/profile-collection/profile=alt-2-0-0-response-p-*/response-profile-1-0:response-profile-pac/response-profile-capability/datatype]'
         consequent-action-list:
           type: array
           items:
@@ -3386,20 +3130,20 @@ components:
                 type: string
                 description: >
                   'Label that shall be presented on the button
-                  from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-capability/label]'
+                  from [/core-model-1-4:control-construct/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-capability/label]'
               request:
                 type: string
                 description: >
                   'Request that shall be called, when button gets pressed
                   from
-                  [{/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=*-1-0-0-tcp-s-bm-*/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-protocol}]
+                  [{/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-bm-*/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-protocol}]
                   ://
-                  [{/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=*-1-0-0-tcp-s-bm-*/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address}
+                  [{/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-bm-*/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address}
                   or
-                  {/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=*-1-0-0-tcp-s-bm-*/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/domain-name}]
+                  {/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-bm-*/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/domain-name}]
                   :
-                  [{/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/logical-termination-point=*-1-0-0-tcp-s-bm-*/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port}]
-                  [{/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-configuration/consequent-operation-reference}]'
+                  [{/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-bm-*/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port}]
+                  [{/core-model-1-4:control-construct/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-configuration/consequent-operation-reference}]'
               input-value-list:
                 type: array
                 items:
@@ -3411,17 +3155,17 @@ components:
                       type: string
                       description: >
                         'Name of an input value required for executing the Request
-                        from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-capability/input-value-list=*/name]'
+                        from [/core-model-1-4:control-construct/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-capability/input-value-list=*/name]'
                     unit:
                       type: string
                       description: >
                         'Unit of an input value required for executing the Request
-                        from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-capability/input-value-list=*/unit]'
+                        from [/core-model-1-4:control-construct/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-capability/input-value-list=*/unit]'
               display-in-new-browser-window:
                 type: boolean
                 description: >
                   'True in case Request shall be represented in a new browser window
-                  from [/core-model-1-4:network-control-domain/control-construct=alt-2-0-0/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-capability/display-in-new-browser-window]'
+                  from [/core-model-1-4:control-construct/profile-collection/profile=alt-2-0-0-action-p-*/action-profile-1-0:action-profile-pac/action-profile-capability/display-in-new-browser-window]'
     logicalTerminationPoint:
       type: object
       required:
