@@ -1510,7 +1510,8 @@ paths:
               properties:
                 uuid:
                   type: string
-                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-(op|http|tcp)-c-([bi][ms])-([0-9]{3})$'
+                  pattern: 
+                    '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-((op-c-([bi][ms]))|(http-c)|(tcp-c))-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{3})$'
                   description: >
                     'LtpUuid identifying the LTP of an OperationClient, HttpClient or TcpClient, which is to be deleted
                     find in [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*/uuid]'
