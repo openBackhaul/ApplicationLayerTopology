@@ -1423,30 +1423,18 @@ paths:
                 'Documentation of an interface at an application
                 update or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*/]'
             example:
-              - uuid: 'cc-1-0-0-op-s-bm-000'
-                ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
-                client-ltp: []
-                server-ltp: ['cc-1-0-0-http-s-bm-000']
-                layer-protocol:
-                  - local-id: '0'
-                    layer-protocol-name: 'operation-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER'
-                    operation-server-interface-1-0:operation-server-interface-pac:
-                      operation-server-interface-capability:
-                        operation-name: '/v1/register-yourself'
-                      operation-server-interface-configuration:
-                        life-cycle-state: 'operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL'
-              - uuid: 'cc-1-0-0-http-s-bm-000'
-                ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
-                client-ltp: ['cc-1-0-0-op-s-bm-000']
-                server-ltp: []
-                layer-protocol:
-                  - local-id: '0'
-                    layer-protocol-name: 'http-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_HTTP_LAYER'
-                    http-server-interface-1-0:http-server-interface-pac:
-                      http-server-interface-capability:
-                        application-name: 'CurrentController'
-                        release-number: '1.0.0'
-                        data-update-period: 'http-server-interface-1-0:DATA_UPDATE_PERIOD_TYPE_REAL_TIME'
+              uuid: 'cc-1-0-0-op-s-bm-000'
+              ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
+              client-ltp: []
+              server-ltp: ['cc-1-0-0-http-s-bm-000']
+              layer-protocol:
+                - local-id: '0'
+                  layer-protocol-name: 'operation-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER'
+                  operation-server-interface-1-0:operation-server-interface-pac:
+                    operation-server-interface-capability:
+                      operation-name: '/v1/register-yourself'
+                    operation-server-interface-configuration:
+                      life-cycle-state: 'operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL'
       responses:
         '204':
           description: 'LTP will be updated'
@@ -1527,7 +1515,7 @@ paths:
                     'LtpUuid identifying the LTP of an OperationClient, HttpClient or TcpClient, which is to be deleted
                     find in [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*/uuid]'
               example:
-                uuid: 'cc-1-0-0-op-s-bm-002'
+                uuid: 'cc-1-0-0-op-c-bm-alt-2-0-0-000'
       responses:
         '204':
           description: 'LTP and entries in FCs and Links will be deleted'
@@ -1602,12 +1590,12 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServers
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServers
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '2.0.0'
@@ -1627,7 +1615,7 @@ paths:
                       type: string
                       description: >
                         'Name of operationServer
-                        from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                        from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                 example:
                   operation-server-name-list:
                     - '/v1/register-yourself'
@@ -1703,12 +1691,12 @@ paths:
                   type: string
                   description: >
                     'Name of application that has the OperationClients
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   description: >
                     'Release of application that has the OperationClients
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '2.0.0'
@@ -1735,17 +1723,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the consumed operation
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                         serving-application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the consumed operation
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         operation-name:
                           type: string
                           description: >
                             'Name of the consumed operation
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 example:
                   operation-client-list:
                     - serving-application-name: 'TypeApprovalRegister'
@@ -1827,7 +1815,7 @@ paths:
                   pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-fc-([bi][ms])-([0-9]{3})$'
                   description: >
                     'FcUuid identifying the FC, which is to be updated
-                    find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
+                    find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/uuid]'
                 name:
                   type: array
                   items:
@@ -1853,7 +1841,7 @@ paths:
                         type: string
                         description: >
                           'FcPortLid identifying the FcPort, which is to be updated
-                          find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
+                          find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/local-id]'
                       port-direction:
                         type: string
                         enum:
@@ -1862,13 +1850,13 @@ paths:
                           - 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
                         description: >
                           'Direction of the FcPort, which is to be updated
-                          find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/port-direction]'
+                          find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/port-direction]'
                       logical-termination-point:
                         type: string
                         pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-([sc])-([bi][ms])((-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})){0,1})-([0-9]{3})$'
                         description: >
                           'LTP, which is to be connected by the FcPort
-                          find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/logical-termination-point]'
+                          find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/logical-termination-point]'
               example:
                 uuid: 'cc-1-0-0-op-fc-bm-003'
                 name:
@@ -1957,7 +1945,7 @@ paths:
                   pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-fc-([bi][ms])-([0-9]{3})$'
                   description: >
                     'FcUuid identifying the FC, which is holding the FcPort that is to be replaced or created
-                    find in [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
+                    find in [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/uuid]'
                 fc-port:
                   type: object
                   required:
@@ -1969,7 +1957,7 @@ paths:
                       type: string
                       description: >
                         'FcPortLid identifying the FcPort, which is to be replaced or created
-                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
+                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/local-id]'
                     port-direction:
                       type: string
                       enum:
@@ -1978,13 +1966,13 @@ paths:
                         - 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
                       description: >
                         'Direction of the FcPort, which is to be replaced or created
-                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/port-direction]'
+                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/port-direction]'
                     logical-termination-point:
                       type: string
                       pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-([sc])-([bi][ms])((-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})){0,1})-([0-9]{3})$'
                       description: >
                         'LTP, which is to be connected by the FcPort
-                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/logical-termination-point]'
+                        find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/logical-termination-point]'
               example:
                 fc-uuid: 'cc-1-0-0-op-fc-bm-003'
                 fc-port:
@@ -2065,12 +2053,12 @@ paths:
                   pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-fc-([bi][ms])-([0-9]{3})$'
                   description: >
                     'FcUuid identifying the FC, which is holding the FcPort that is to be deleted
-                    find in [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/uuid]'
+                    find in [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/uuid]'
                 fc-port-local-id:
                   type: string
                   description: >
                     'FcPortLid identifying the FcPort, which is to be deleted
-                    find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-1-0-0-op-fd-000/forwarding-construct=*-1-0-0-op-fc-*/fc-port=*/local-id]'
+                    find or create [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/forwarding-domain=*-op-fd-000/forwarding-construct=*-op-fc-*/fc-port=*/local-id]'
               example:
                 fc-uuid: 'cc-1-0-0-op-fc-is-000'
                 fc-port-local-id: '202'
@@ -2149,17 +2137,17 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServer that receives some request
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 receiving-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServer that receives some request
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 receiving-operation:
                   type: string
                   description: >
                     'Name of operation that receives some request
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
               example:
                 receiving-application-name: 'TypeApprovalRegister'
                 receiving-application-release-number: '1.0.0'
@@ -2187,17 +2175,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the addressed operation
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                         addressed-application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the addressed operation
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
                         addressed-operation-name:
                           type: string
                           description: >
                             'Name of the addressed operation
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 example:
                   operation-client-list:
                     - addressed-application-name: 'RegistryOffice'
@@ -2358,29 +2346,29 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServer of the link, which is to be complemented
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 serving-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServer of the link, which is to be complemented
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 operation-name:
                   type: string
                   minLength: 6
                   description: >
                     'Name of the operation, which is made available via the link
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                    AND find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                    AND find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 consuming-application-name:
                   type: string
                   description: >
                     'Name of application that holds the OperationClient, which shall be connected via the link
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 consuming-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationClient, which shall be connected via the link
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 serving-application-name: 'RegistryOffice'
                 serving-application-release-number: '2.0.0'
@@ -2463,28 +2451,28 @@ paths:
                   type: string
                   description: >
                     'Name of application that holds the OperationServer, which shall no longer be consumed
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 serving-application-release-number:
                   type: string
                   description: >
                     'Release of application that holds the OperationServer, which shall no longer be consumed
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                 operation-name:
                   type: string
                   description: >
                     'Name of the operation, which shall no longer be consumed
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                    AND find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                    AND find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-c-*/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                 consuming-application-name:
                   type: string
                   description: >
                     'Name of application, which shall no longer consume the operation
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 consuming-application-release-number:
                   type: string
                   description: >
                     'Release of application, which shall no longer consume the operation
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 serving-application-name: 'RegistryOffice'
                 serving-application-release-number: '2.0.0'
@@ -2591,17 +2579,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that holds the link end point (operationServer or operationClient)
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-2-0-0-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/application-name]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/application-name]'
                         application-release-number:
                           type: string
                           description: >
                             'Release of application that holds the link end point (operationServer or operationClient)
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-2-0-0-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/release-number]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/release-number]'
                         operation-uuid:
                           type: string
                           description: >
                             'UUID of the operation (server or client) at the link end point
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-2-0-0-op-*-*/uuid]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-*-*/uuid]'
                         ltp-direction:
                           type: string
                           enum:
@@ -2609,7 +2597,7 @@ paths:
                             - 'core-model-1-4:TERMINATION_DIRECTION_SINK'
                           description: >
                               'Identifies OperationServer (SOURCE) and OperationClient (SINK)
-                              from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=alt-2-0-0-op-*-*/ltp-direction]'
+                              from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-*-*/ltp-direction]'
                 example:
                   link-end-point-list:
                     - application-name: 'RegistryOffice'
@@ -2694,12 +2682,12 @@ paths:
                   type: string
                   description: >
                     'Name of application that is connected to other applications by links
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
                   description: >
                     'Release of application that is connected to other applications by links
-                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                    find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
                 application-release-number: '2.0.0'
@@ -2726,17 +2714,17 @@ paths:
                           type: string
                           description: >
                             'Name of application that is connected by link [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                         serving-application-release-number:
                           type: string
                           description: >
                             'Release of application that is connected by link [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                         operation-name:
                           type: string
                           description: >
                             'Name of operation that is connected by link [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]
-                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-1-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                            from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                 example:
                   operation-server-list:
                     - serving-application-name: 'TypeApprovalRegister'
