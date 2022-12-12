@@ -1594,6 +1594,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
+                  pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that holds the OperationServers
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
@@ -1695,6 +1696,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
+                  pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that has the OperationClients
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
@@ -2141,6 +2143,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 receiving-application-release-number:
                   type: string
+                  pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that holds the OperationServer that receives some request
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
@@ -2350,6 +2353,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 serving-application-release-number:
                   type: string
+                  pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that holds the OperationServer of the link, which is to be complemented
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
@@ -2367,6 +2371,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 consuming-application-release-number:
                   type: string
+                  pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that holds the OperationClient, which shall be connected via the link
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
@@ -2455,6 +2460,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 serving-application-release-number:
                   type: string
+                  pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that holds the OperationServer, which shall no longer be consumed
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
@@ -2471,6 +2477,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 consuming-application-release-number:
                   type: string
+                  pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application, which shall no longer consume the operation
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
@@ -2686,6 +2693,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
                 application-release-number:
                   type: string
+                  pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
                     'Release of application that is connected to other applications by links
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-*-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
