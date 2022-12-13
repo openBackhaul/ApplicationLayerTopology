@@ -89,11 +89,6 @@ servers:
       own-ip-address: 1.1.3.13
       own-tcp-port: 3013
       uuid: alt-2-0-0-tcp-s-000
-    - description: With TLS layer
-      local-protocol: https
-      own-ip-address: 1.2.3.13
-      own-tcp-port: 3213
-      uuid: alt-2-0-0-tcp-s-001
 
 
 clients:
