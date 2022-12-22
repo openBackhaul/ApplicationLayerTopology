@@ -154,35 +154,55 @@ paths:
                       type: object
                       required:
                         - application-name
-                        - application-release-number
-                        - application-address
-                        - application-port
+                        - release-number
+                        - protocol
+                        - address
+                        - port
                       properties:
                         application-name:
                           type: string
                           description: >
                             'Name of application that shall become part of the application layer topology representation
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
-                        application-release-number:
+                        release-number:
                           type: string
                           description: >
                             'Release of application that shall become part of the application layer topology representation
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-*/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
-                        application-address:
+                        protocol:
                           type: string
                           description: >
-                            'IP of application that shall become part of the application layer topology representation
-                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
-                        application-port:
+                            'Protocol to be used for addressing the application that shall become part of the application layer topology representation
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
+                        address:
+                          type: object
+                          properties:
+                            ip-address:
+                              type: object
+                              properties:
+                                ipv-4-address:
+                                  type: string
+                                  description: >
+                                    'IP of application that shall become part of the application layer topology representation
+                                    from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            domain-name:
+                              type: string
+                              description: >
+                                'Domain name of application that shall become part of the application layer topology representation
+                                from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
+                        port:
                           type: integer
                           description: >
                             'TCP port of application that shall become part of the application layer topology representation
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
                       example:
                         application-name: 'RegistryOffice'
-                        application-release-number: '2.0.0'
-                        application-address: '1.1.3.8'
-                        application-port: 3008
+                        release-number: '2.0.0'
+                        protocol: 'HTTP'
+                        address:
+                          ip-address:
+                            ipv-4-address: '1.1.3.8'
+                        port: 3008
               responses:
                 '204':
                   description: 'Application will be represented in the application layer topology'
@@ -213,8 +233,7 @@ paths:
                           - 'UNKNOWN'
                           - 'NOT_YET_DEFINED'
                         example: 'EXPERIMENTAL'
-                      description: >
-                          'Life cycle state of the consumed service'
+                      description: 'Life cycle state of the consumed service'
                 '400':
                   $ref: '#/components/responses/responseForErroredServiceRequests'
                 '401':
@@ -246,14 +265,15 @@ paths:
                         - subscriber-application
                         - subscriber-release-number
                         - subscriber-operation
+                        - subscriber-protocol
                         - subscriber-address
                         - subscriber-port
                       properties:
                         subscriber-application:
                           type: string
                           description: >
-                            'Own application name
-                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            'Future application name
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                         subscriber-release-number:
                           type: string
                           description: >
@@ -264,22 +284,42 @@ paths:
                           description: >
                             'Names of the operation that shall be addressed by notifications about new approvals
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                        subscriber-address:
+                        subscriber-protocol:
                           type: string
                           description: >
-                            'Future IP address
-                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            'Protocol to be used for addressing the application that wants to receive notifications about new approvals
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
+                        subscriber-address:
+                          type: object
+                          properties:
+                            ip-address:
+                              type: object
+                              properties:
+                                ipv-4-address:
+                                  type: string
+                                  description: >
+                                    'IPv4 address of application that wants to receive notifications about new approvals
+                                    from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            domain-name:
+                              type: string
+                              pattern: '^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$'
+                              description: >
+                                'Domain name of application that wants to receive notifications about new approvals
+                                from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
                         subscriber-port:
                           type: integer
                           description: >
-                            'Future port
+                            'TCP port of application that wants to receive notifications about new approvals
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
                       example:
-                        subscriber-application: 'ExecutionAndTraceLog'
-                        subscriber-release-number: '1.0.0'
+                        subscriber-application: 'ApplicationLayerTopology'
+                        subscriber-release-number: '2.0.0'
                         subscriber-operation: '/v1/regard-application'
-                        subscriber-address: '1.1.3.3'
-                        subscriber-port: 3003
+                        subscriber-protocol: 'HTTP'
+                        subscriber-address:
+                          ip-address:
+                            ipv-4-address: '1.1.3.13'
+                        subscriber-port: 3013
               responses:
                 '204':
                   description: 'Subscribed for notifications about new approvals'
@@ -342,14 +382,15 @@ paths:
                         - subscriber-application
                         - subscriber-release-number
                         - subscriber-operation
+                        - subscriber-protocol
                         - subscriber-address
                         - subscriber-port
                       properties:
                         subscriber-application:
                           type: string
                           description: >
-                            'Own application name
-                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                            'Future application name
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                         subscriber-release-number:
                           type: string
                           description: >
@@ -360,22 +401,42 @@ paths:
                           description: >
                             'Names of the operation that shall be addressed by notifications about withdrawn approvals
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                        subscriber-address:
+                        subscriber-protocol:
                           type: string
                           description: >
-                            'Future IP address
-                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            'Protocol to be used for addressing the application that wants to receive notifications about withdrawn approvals
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
+                        subscriber-address:
+                          type: object
+                          properties:
+                            ip-address:
+                              type: object
+                              properties:
+                                ipv-4-address:
+                                  type: string
+                                  description: >
+                                    'IPv4 address of application that wants to receive notifications about withdrawn approvals
+                                    from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
+                            domain-name:
+                              type: string
+                              pattern: '^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$'
+                              description: >
+                                'Domain name of application that wants to receive notifications about withdrawn approvals
+                                from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
                         subscriber-port:
                           type: integer
                           description: >
-                            'Future port
+                            'TCP port of application that wants to receive notifications about withdrawn approvals
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
                       example:
-                        subscriber-application: 'ExecutionAndTraceLog'
-                        subscriber-release-number: '1.0.0'
+                        subscriber-application: 'ApplicationLayerTopology'
+                        subscriber-release-number: '2.0.0'
                         subscriber-operation: '/v1/disregard-application'
-                        subscriber-address: '1.1.3.3'
-                        subscriber-port: 3003
+                        subscriber-protocol: 'HTTP'
+                        subscriber-address:
+                          ip-address:
+                            ipv-4-address: '1.1.3.13'
+                        subscriber-port: 3013
               responses:
                 '204':
                   description: 'Subscribed for notifications about withdrawn approvals'
@@ -447,17 +508,18 @@ paths:
                         subscriber-release-number:
                           type: string
                           description: >
-                            'Old release number
-                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-or-1-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
+                            'Own release number
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                         subscription:
                           type: string
                           description: >
                             'Name of operation that had been addressed for starting getting notifications
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
                             and
-                            from  [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]'
+                            from  [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+                            in two separate, sequential requests.'
                       example:
-                        subscriber-application: 'ExecutionAndTraceLog'
+                        subscriber-application: 'ApplicationLayerTopology'
                         subscriber-release-number: '1.0.0'
                         subscription: '/v1/notify-approvals'
               responses:
@@ -504,7 +566,7 @@ paths:
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
         PromptForBequeathingDataCausesRequestForBroadcastingInfoAboutServerReplacement:
-          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-bm-ro-2-0-0-001/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -519,68 +581,70 @@ paths:
                     schema:
                       type: object
                       required:
-                        - application-name
-                        - old-application-release-number
-                        - new-application-release-number
-                        - new-application-protocol
-                        - new-application-address
-                        - new-application-port
+                        - current-application-name
+                        - current-release-number
+                        - future-application-name
+                        - future-release-number
+                        - future-protocol
+                        - future-address
+                        - future-port
                       properties:
-                        application-name:
+                        current-application-name:
                           type: string
                           description: >
                             'Own application name
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
-                        old-application-release-number:
+                        current-release-number:
                           type: string
                           description: >
-                            'Old release number
-                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-or-1-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
-                        new-application-release-number:
+                            'Own release number
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                        future-application-name:
                           type: string
                           description: >
-                            'Future release number
+                            'Future name of the application that has updated connection data
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                        future-release-number:
+                          type: string
+                          description: >
+                            'Future release number of the application that has updated connection data
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-c-nr-2-0-0-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/release-number]'
-                        new-application-protocol:
+                        future-protocol:
                           type: string
                           description: >
-                            'Future protocol to be used
+                            'Protocol to be used in future for addressing the application that has updated connection data
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
-                        new-application-address:
+                        future-address:
                           type: object
-                          minProperties: 1
-                          maxProperties: 1
-                          additionalProperties: false
                           properties:
                             ip-address:
                               type: object
-                              minProperties: 1
-                              additionalProperties: false
                               properties:
                                 ipv-4-address:
                                   type: string
                                   description: >
-                                    'Future IPv4 address
+                                    'Future IPv4 address of the application that has updated connection data
                                     from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]'
                             domain-name:
                               type: string
                               description: >
-                                'Future domain name
+                                'Future domain name of the application that has updated connection data
                                 from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
-                        new-application-port:
+                        future-port:
                           type: integer
                           description: >
-                            'Future port
+                            'Future port of the application that has updated connection data
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-nr-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port]'
                       example:
-                        application-name: 'RegistryOffice'
-                        old-application-release-number: '1.0.0'
-                        new-application-release-number: '2.0.0'
-                        new-application-protocol: 'HTTP'
-                        new-application-address:
+                        current-application-name: 'ApplicationLayerTopology'
+                        current-release-number: '1.0.0'
+                        future-application-name: 'ApplicationLayerTopology'
+                        future-release-number: '2.0.0'
+                        future-protocol: 'HTTP'
+                        future-address:
                           ip-address:
-                            ipv-4-address: '1.1.3.8'
-                        new-application-port: 3008
+                            ipv-4-address: '1.1.3.12'
+                        future-port: 3012
               responses:
                 '204':
                   description: 'Will broadcast server replacement'
@@ -641,21 +705,21 @@ paths:
                       type: object
                       required:
                         - application-name
-                        - application-release-number
+                        - release-number
                       properties:
                         application-name:
                           type: string
                           description: >
                             'Own application name
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
-                        application-release-number:
+                        release-number:
                           type: string
                           description: >
                             'Own release number
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
                       example:
                         application-name: 'BadApplication'
-                        application-release-number: '1.0.0'
+                        release-number: '1.0.0'
               responses:
                 '204':
                   description: 'Application deregistered'
@@ -700,7 +764,7 @@ paths:
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
         PromptingNewReleaseForUpdatingServerCausesRequestForBroadcastingInfoAboutBackwardCompatibleUpdateOfOperation:
-          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-im-ro-2-0-0-003/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-ro-2-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-bm-ro-2-0-0-003/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             description: >
               'This callback belongs to the sequence of actions that have to be done during the bequeath-your-data-and-die process, despite the forwarding gets neither managed nor directly initiated by the /v1/bequeath-your-data-and-die request.
               After consuming applications have been redirected to the new release, the new release is triggered (this callback) to request the RegistryOffice for broadcasting information about backward compatible replacements of services.'
@@ -719,7 +783,7 @@ paths:
                       type: object
                       required:
                         - application-name
-                        - application-release-number
+                        - release-number
                         - old-operation-name
                         - new-operation-name
                       properties:
@@ -728,7 +792,7 @@ paths:
                           description: >
                             'Own application name
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
-                        application-release-number:
+                        release-number:
                           type: string
                           description: >
                             'Own release number
@@ -744,8 +808,8 @@ paths:
                             'Name of the replacing operation
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-*/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                       example:
-                        application-name: 'AdministratorAdministration'
-                        application-release-number: '1.0.0'
+                        application-name: 'ApplicationLayerTopology'
+                        release-number: '2.0.0'
                         old-operation-name: '/v1/regard-application'
                         new-operation-name: '/v2/regard-application'
               responses:
@@ -837,7 +901,7 @@ paths:
                     - 'HTTP'
                     - 'HTTPS'
                   description: >
-                    'Protocol to be used for requesting service request notifications
+                    'Protocol to be used for addressing the application that shall become part of the application layer topology representation
                     update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
                 address:
                   type: object
@@ -860,7 +924,7 @@ paths:
                       type: string
                       pattern: '^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$'
                       description: >
-                        'Domain name of application that shall be requested for service request notifications
+                        'Domain name of application that shall become part of the application layer topology representation
                         update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
                 port:
                   type: integer
@@ -946,6 +1010,7 @@ paths:
                         - topology-operation-fc-update
                         - topology-operation-fc-port-update
                         - topology-operation-fc-port-deletion
+                        - topology-application-protocol
                         - topology-application-address
                         - topology-application-port
                       properties:
@@ -984,15 +1049,31 @@ paths:
                           description: >
                             'Operation for deleting an FC port
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-015/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
-                        topology-application-address:
+                        topology-application-protocol:
                           type: string
                           description: >
-                            'IP address of application that shall record the service requests
-                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address]'
+                            'Protocol to be used for addresing the application that shall document the application layer topology
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/remote-protocol]'
+                        topology-application-address:
+                          type: object
+                          properties:
+                            ip-address:
+                              type: object
+                              properties:
+                                ipv-4-address:
+                                  type: string
+                                  description: >
+                                    'IPv4 address of application that shall document the application layer topology
+                                    from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address]'
+                            domain-name:
+                              type: string
+                              description: >
+                                'Domain name of application that shall document the application layer topology
+                                from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/remote-address/domain-name]'
                         topology-application-port:
                           type: integer
                           description: >
-                            'Port of application that shall record the service requests
+                            'Port of application that shall document the application layer topology
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port]'
                       example:
                         topology-application: 'ApplicationLayerTopology'
@@ -1002,7 +1083,10 @@ paths:
                         topology-operation-fc-update: '/v1/update-fc'
                         topology-operation-fc-port-update: '/v1/update-fc-port'
                         topology-operation-fc-port-deletion: '/v1/delete-fc-port'
-                        topology-application-address: '1.1.3.13'
+                        topology-application-protocol: 'HTTP'
+                        topology-application-address:
+                          ip-address:
+                            ipv-4-address: '1.1.3.13'
                         topology-application-port: 3013
               responses:
                 '204':
@@ -2579,7 +2663,7 @@ paths:
                       type: object
                       required:
                         - application-name
-                        - application-release-number
+                        - release-number
                         - operation-uuid
                         - ltp-direction
                       properties:
@@ -2588,7 +2672,7 @@ paths:
                           description: >
                             'Name of application that holds the link end point (operationServer or operationClient)
                             from [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/application-name]'
-                        application-release-number:
+                        release-number:
                           type: string
                           description: >
                             'Release of application that holds the link end point (operationServer or operationClient)
@@ -2609,11 +2693,11 @@ paths:
                 example:
                   link-end-point-list:
                     - application-name: 'RegistryOffice'
-                      application-release-number: '2.0.0'
+                      release-number: '2.0.0'
                       operation-uuid: 'ro-2-0-0-op-c-2070'
                       ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SINK'
                     - application-name: 'ApplicationLayerTopology'
-                      application-release-number: '2.0.0'
+                      release-number: '2.0.0'
                       operation-uuid: 'alt-2-0-0-op-s-bm-001'
                       ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
           headers:
