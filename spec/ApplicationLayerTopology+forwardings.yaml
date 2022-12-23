@@ -507,8 +507,53 @@ forwardings:
       - client-name: CurrentController:://v1/redirect-topology-change-information
         uuid: alt-2-0-0-op-c-im-cc-1-0-0-004
 
-  - forwarding-name: LinkChangeNotification
+  - forwarding-name: LtpUpdateMightCauseOperationClientBeingAddedToLink
     uuid: alt-2-0-0-op-fc-is-002
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - service-name: /v1/update-ltp
+        uuid: alt-2-0-0-op-s-is-005
+    consequent-requests:
+      - service-name: ApplicationLayerTopology://v1/add-operation-client-to-link
+        uuid: alt-2-0-0-op-c-is-alt-2-0-0-000
+
+  - forwarding-name: LtpUpdateMightCauseOperationClientBeingRemovedFromLink
+    uuid: alt-2-0-0-op-fc-is-003
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - service-name: /v1/update-ltp
+        uuid: alt-2-0-0-op-s-is-005
+    consequent-requests:
+      - service-name: ApplicationLayerTopology://v1/remove-operation-client-from-link
+        uuid: alt-2-0-0-op-c-is-alt-2-0-0-001
+
+  - forwarding-name: LtpDeletionCausesOperationClientBeingRemovedFromLink
+    uuid: alt-2-0-0-op-fc-is-004
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - service-name: /v1/delete-ltp-and-dependents
+        uuid: alt-2-0-0-op-s-is-006
+    consequent-requests:
+      - service-name: ApplicationLayerTopology://v1/remove-operation-client-from-link
+        uuid: alt-2-0-0-op-c-is-alt-2-0-0-001
+
+  - forwarding-name: LinkChangeNotification
+    uuid: alt-2-0-0-op-fc-is-005
     forwarding-type: Subscription
     management-requests:
       operation-client-update:
