@@ -293,6 +293,10 @@ clients:
       service:
         basic:
         individual:
+          - service-name: /v1/add-operation-client-to-link
+            uuid: alt-2-0-0-op-c-is-alt-2-0-0-000
+          - service-name: /v1/remove-operation-client-from-link
+            uuid: alt-2-0-0-op-c-is-alt-2-0-0-001
 
   - http-client:
       application-name: OperationKeyManagement
