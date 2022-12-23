@@ -1,38 +1,22 @@
 # ApplicationLayerTopology
-- Consolidates interface and forwarding information of the application layer
-- Thorsten Heinze (Thorsten.Heinze@openBackhaul.com)
 
-### ServiceList
-- [ApplicationLayerTopology+services](./ApplicationLayerTopology+services.yaml)
+### Location
+The ApplicationLayerTopology is part of the TinyApplicationController.  
+The TinyApplicationController is for managing the REST microservices of the application layer.  
 
-### ProfileList and ProfileInstanceList
-- to be provided
-- to be provided
+### Description
+The ApplicationLayerTopology documents the resource and service inventory of the application layer.
+It holds real-time information about all applications, their interfaces and internal connections.
+Every documented connection between applications represents an approved service consumption.
+It supports several requests for topology analysis and notifications about topology changes.
 
-### ForwardingList
-- [ApplicationLayerTopology+forwardings](./ApplicationLayerTopology+forwardings.yaml)
+### Relevance
+The ApplicationLayerTopology is core element of the application layer running in the live network at Telefonica Germany.
 
-### Open API specification (Swagger)
-- [ApplicationLayerTopology](ApplicationLayerTopology.yaml)
-
-### CONFIGfile (JSON)
-- to be provided
-
-### Test Cases (Postman Export) and Data File
-- [ApplicationLayerTopology+testcases](./ApplicationLayerTopology%2Btestcases.json)
-- [ApplicationLayerTopology+data](./ApplicationLayerTopology+data.json)
-
-### NodeJS Implementation
-- to be provided
-
-### Publication
-- No official publication planned
-
-### Aspired Classification
-- Live Network
-
-### Open Issue List
-- [ApplicationLayerTopology/issues](../../issues)
+### Resources
+- [Specification](./spec/)
+- [TestSuite](./testing/)
+- [Implementation](./server/)
 
 ### Comments
-This application is part of the TinyApplicationController for managing the REST applications forming the MBH SDN application layer at Telefonica Germany.
+./.
