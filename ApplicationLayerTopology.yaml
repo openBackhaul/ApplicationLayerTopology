@@ -1222,7 +1222,7 @@ paths:
       - $ref: '#/components/parameters/customer-journey'
     post:
       operationId: disregardApplication
-      summary: 'Removes application from application layer topology representation'
+      summary: 'Removes application from ApplicationLayerTopologys configuration'
       tags:
         - IndividualServices
       security:
