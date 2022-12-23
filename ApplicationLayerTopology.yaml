@@ -1032,12 +1032,12 @@ paths:
                         topology-operation-ltp-deletion:
                           type: string
                           description: >
-                            'Operation for deleting an LTP
+                            'Operation for deleting an LTP and it's dependents like FC port and Link (if applicable)
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-006/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         topology-operation-fc-update:
                           type: string
                           description: >
-                            'Operation for updating an FC port
+                            'Operation for updating a ForwardingConstruct instance
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-s-is-013/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
                         topology-operation-fc-port-update:
                           type: string
@@ -1089,8 +1089,90 @@ paths:
                             ipv-4-address: '1.1.3.13'
                         topology-application-port: 3013
               responses:
-                '204':
-                  description: 'Client side for sending information about topology changes has been updated'
+                '200':
+                  description: 'Client side for sending information about topology changes has been updated and current data tree has been provided'
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        required:
+                          - core-model-1-4:control-construct
+                        properties:
+                          core-model-1-4:control-construct:
+                            type: object
+                            description: >
+                              'Entire internal datatree
+                              update [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/]'
+                            required:
+                              - uuid
+                              - logical-termination-point
+                              - forwarding-domain
+                            properties:
+                              uuid:
+                                type: string
+                              logical-termination-point:
+                                type: array
+                                uniqueItems: true
+                                items:
+                                  $ref: '#/components/schemas/logicalTerminationPoint'
+                                example:
+                                  - uuid: 'ro-2-0-0-op-s-bm-000'
+                                    ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
+                                    client-ltp: []
+                                    server-ltp: ['ro-2-0-0-http-s-000']
+                                    layer-protocol:
+                                      - local-id: '0'
+                                        layer-protocol-name: 'operation-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER'
+                                        operation-server-interface-1-0:operation-server-interface-pac:
+                                          operation-server-interface-capability:
+                                            operation-name: '/v1/register-yourself'
+                                          operation-server-interface-configuration:
+                                            life-cycle-state: 'operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL'
+                                  - uuid: 'ro-2-0-0-http-s-000'
+                                    ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
+                                    client-ltp: ['ro-2-0-0-op-s-bm-000']
+                                    server-ltp: []
+                                    layer-protocol:
+                                      - local-id: '0'
+                                        layer-protocol-name: 'http-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_HTTP_LAYER'
+                                        http-server-interface-1-0:http-server-interface-pac:
+                                          http-server-interface-capability:
+                                            application-name: 'RegistryOffice'
+                                            release-number: '2.0.0'
+                                            data-update-period: 'http-server-interface-1-0:DATA_UPDATE_PERIOD_TYPE_REAL_TIME'
+                              forwarding-domain:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/forwardingDomain'
+                                example:
+                                  - uuid: 'ro-2-0-0-op-fd-000'
+                                    forwarding-construct:
+                                      - uuid: 'ro-2-0-0-op-fc-bm-000'
+                                        name:
+                                          - value-name: 'ForwardingKind'
+                                            value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
+                                          - value-name: 'ForwardingName'
+                                            value: 'PromptForRegisteringCausesRegistrationRequest'
+                                        fc-port:
+                                          - local-id: '000'
+                                            port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
+                                            logical-termination-point: 'ro-2-0-0-op-s-bm-000'
+                                          - local-id: '100'
+                                            port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
+                                            logical-termination-point: 'ro-2-0-0-op-s-bm-000'
+                                      - uuid: 'ro-2-0-0-op-fc-bm-001'
+                                        name:
+                                          - value-name: 'ForwardingKind'
+                                            value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
+                                          - value-name: 'ForwardingName'
+                                            value: 'PromptForEmbeddingCausesRequestForBequeathingData'
+                                        fc-port:
+                                          - local-id: '100'
+                                            port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
+                                            logical-termination-point: 'ro-2-0-0-op-s-bm-001'
+                                          - local-id: '200'
+                                            port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
+                                            logical-termination-point: 'ro-2-0-0-op-c-bm-ro-2-0-0-000'
                   headers:
                     x-correlator:
                       schema:
@@ -1355,7 +1437,7 @@ paths:
               type: object
               description: >
                 'Documentation of all interfaces and internal connections of an application
-                replace [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/]'
+                update [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/]'
               required:
                 - core-model-1-4:control-construct
               properties:
@@ -1669,14 +1751,14 @@ paths:
               type: object
               required:
                 - application-name
-                - application-release-number
+                - release-number
               properties:
                 application-name:
                   type: string
                   description: >
                     'Name of application that holds the OperationServers
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
-                application-release-number:
+                release-number:
                   type: string
                   pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
@@ -1684,7 +1766,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
-                application-release-number: '2.0.0'
+                release-number: '2.0.0'
       responses:
         '200':
           description: 'List of names of operations, which are supported by the given application, provided'
@@ -1771,14 +1853,14 @@ paths:
               type: object
               required:
                 - application-name
-                - application-release-number
+                - release-number
               properties:
                 application-name:
                   type: string
                   description: >
                     'Name of application that has the OperationClients
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
-                application-release-number:
+                release-number:
                   type: string
                   pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
@@ -1786,7 +1868,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
-                application-release-number: '2.0.0'
+                release-number: '2.0.0'
       responses:
         '200':
           description: 'List of applications and names of operations, which are consumed by the given application, provided'
@@ -2768,14 +2850,14 @@ paths:
               type: object
               required:
                 - application-name
-                - application-release-number
+                - release-number
               properties:
                 application-name:
                   type: string
                   description: >
                     'Name of application that is connected to other applications by links
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
-                application-release-number:
+                release-number:
                   type: string
                   pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
                   description: >
@@ -2783,7 +2865,7 @@ paths:
                     find [ElasticSearch://core-model-1-4:network-control-domain/control-construct=*/logical-termination-point=*-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
               example:
                 application-name: 'RegistryOffice'
-                application-release-number: '2.0.0'
+                release-number: '2.0.0'
       responses:
         '200':
           description: 'List of applications and names of operations, which are connected by links to the given application, provided'
@@ -2920,7 +3002,7 @@ paths:
                     - 'HTTP'
                     - 'HTTPS'
                   description: >
-                    'Protocol to be used for addressing the application that wants to receive notifications about new approvals
+                    'Protocol to be used for addressing the application that wants to receive notifications about updates of Links
                     update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]'
                 subscriber-address:
                   type: object
@@ -2943,7 +3025,7 @@ paths:
                       type: string
                       pattern: '^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$'
                       description: >
-                        'Domain name of application that wants to receive notifications about new approvals
+                        'Domain name of application that wants to receive notifications about updates of Links
                         update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-tcp-c-*/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name]'
                 subscriber-port:
                   type: integer
@@ -3031,7 +3113,7 @@ paths:
                         link-uuid: 'alt-2-0-0-op-link-001'
               responses:
                 '204':
-                  description: 'OKM will update OperationKeys on updated Link'
+                  description: 'UUID of changed Link has been received'
                   headers:
                     x-correlator:
                       schema:
