@@ -1090,7 +1090,7 @@ paths:
                         topology-application-port: 3013
               responses:
                 '200':
-                  description: 'Client side for sending information about topology changes has been updated and current data tree has been provided'
+                  description: 'Client side for sending information about topology changes has been updated and current data tree has been provided. Links shall be complemented for the OperationServers.'
                   content:
                     application/json:
                       schema:
