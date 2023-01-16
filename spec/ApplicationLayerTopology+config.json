@@ -2351,7 +2351,7 @@
             ]
           },
           {
-            "uuid": "alt-2-0-0-op-c-is-okm-1-0-0-000",
+            "uuid": "alt-2-0-0-op-c-is-okm-1-0-0-002",
             "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
             "client-ltp": [
             ],
@@ -2380,7 +2380,7 @@
             "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
             "client-ltp": [
               "alt-2-0-0-op-c-im-okm-1-0-0-004",
-              "alt-2-0-0-op-c-is-okm-1-0-0-000"
+              "alt-2-0-0-op-c-is-okm-1-0-0-002"
             ],
             "server-ltp": [
               "alt-2-0-0-tcp-c-okm-1-0-0-000"
@@ -3493,7 +3493,7 @@
                   {
                     "local-id": "200",
                     "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
-                    "logical-termination-point": "alt-2-0-0-op-c-is-okm-1-0-0-000"
+                    "logical-termination-point": "alt-2-0-0-op-c-is-okm-1-0-0-002"
                   }
                 ]
               }
