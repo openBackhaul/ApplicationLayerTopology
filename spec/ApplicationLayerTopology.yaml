@@ -3285,7 +3285,7 @@ paths:
                   minLength: 6
                   description: >
                     'Name of the operation that shall be addressed by notifications about updates of Links
-                    update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-*-*-*-*-002/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]'
+                    update or create [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-0-op-c-is-*-*-*-*-002/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]'
                 subscriber-protocol:
                   type: string
                   enum:
