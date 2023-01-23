@@ -317,7 +317,7 @@ clients:
         basic:
         individual:
           - service-name: /v1/regard-updated-link
-            uuid: alt-2-0-0-op-c-is-okm-1-0-0-000
+            uuid: alt-2-0-0-op-c-is-okm-1-0-0-002
 
   - http-client:
       application-name: CurrentController
