@@ -943,7 +943,6 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
       let applicationReleaseNumber = body["application-release-number"];
       let applicationAddress = body["application-address"];
       let applicationPort = body["application-port"];
-      let listLTPsFCsOperation = "/v1/list-ltps-and-fcs";
       let redirectTopologyInformationOperation = "/v1/redirect-topology-change-information";
 
       /****************************************************************************************
@@ -952,7 +951,6 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
        ****************************************************************************************/
 
       let operationList = [
-        listLTPsFCsOperation,
         redirectTopologyInformationOperation
       ];
       let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
@@ -980,7 +978,6 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
         if (operationClientConfigurationStatusList) {
           forwardingConfigurationInputList = await prepareForwardingConfiguration.regardApplication(
             operationClientConfigurationStatusList,
-            listLTPsFCsOperation,
             redirectTopologyInformationOperation
           );
           forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
