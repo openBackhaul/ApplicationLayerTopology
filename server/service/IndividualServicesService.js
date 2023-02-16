@@ -37,6 +37,7 @@ const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtoc
 const LinkPort = require('../applicationPattern/onfModel/models/LinkPort');
 const Link = require('../applicationPattern/onfModel/models/Link');
 const TcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -999,7 +1000,7 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           applicationName,
           applicationReleaseNumber
         );
-        ForwardingAutomationService.automateForwardingConstructAsync(
+        let response = ForwardingAutomationService.automateForwardingConstructAsync(
           operationServerName,
           forwardingAutomationInputList,
           user,
@@ -1007,6 +1008,39 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           traceIndicator,
           customerJourney
         );
+
+        if (response === undefined || Object.keys(response).length === 0) {
+          resolve();
+        }
+        // response is full control construct of regarded application
+        let uuid = response["core-model-1-4:control-construct"]["uuid"];
+
+        let client = await elasticsearchService.getClient();
+        let indexAlias = await getIndexAliasAsync();
+        let res = await client.search({
+          index: indexAlias,
+          filter_path: 'hits.hits._id',
+          body: {
+            "query": {
+              "term": {
+                "uuid": uuid
+              }
+            }
+          }
+        });
+        if (Object.keys(res.body).length === 0) {
+          await client.index({
+            index: indexAlias,
+            body: response["core-model-1-4:control-construct"]
+          });
+        } else {
+          let documentId = res.body.hits.hits[0]._id;
+          await client.index({
+            index: indexAlias,
+            id: documentId,
+            body: response["core-model-1-4:control-construct"]
+          });
+        }
       }
       resolve();
     } catch (error) {
