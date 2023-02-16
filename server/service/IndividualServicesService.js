@@ -1013,34 +1013,7 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           resolve();
         }
         // response is full control construct of regarded application
-        let uuid = response["core-model-1-4:control-construct"]["uuid"];
-
-        let client = await elasticsearchService.getClient();
-        let indexAlias = await getIndexAliasAsync();
-        let res = await client.search({
-          index: indexAlias,
-          filter_path: 'hits.hits._id',
-          body: {
-            "query": {
-              "term": {
-                "uuid": uuid
-              }
-            }
-          }
-        });
-        if (Object.keys(res.body).length === 0) {
-          await client.index({
-            index: indexAlias,
-            body: response["core-model-1-4:control-construct"]
-          });
-        } else {
-          let documentId = res.body.hits.hits[0]._id;
-          await client.index({
-            index: indexAlias,
-            id: documentId,
-            body: response["core-model-1-4:control-construct"]
-          });
-        }
+        await createOrUpdateControlConstructInES(response);
       }
       resolve();
     } catch (error) {
@@ -1416,6 +1389,49 @@ exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicato
 /****************************************************************************************
  * Functions utilized by individual services
  ****************************************************************************************/
+
+/**
+ * Creates or updates control-construct document in ES.
+ *
+ * The existence of document is determined by control-construct UUID.
+ * If a document with such UUID already exists under configured index alias,
+ * it will be replaced, otherwise, it will be inserted as a new document.
+ *
+ * @param {Object} construct Full control-construct
+ * @returns response from Elasticsearch index operation
+ */
+async function createOrUpdateControlConstructInES(construct) {
+  let uuid = construct["core-model-1-4:control-construct"]["uuid"];
+
+  let client = await elasticsearchService.getClient();
+  let indexAlias = await getIndexAliasAsync();
+  let res = await client.search({
+    index: indexAlias,
+    filter_path: 'hits.hits._id',
+    body: {
+      "query": {
+        "term": {
+          "uuid": uuid
+        }
+      }
+    }
+  });
+  let response = {};
+  if (Object.keys(res.body).length === 0) {
+    response = await client.index({
+      index: indexAlias,
+      body: construct["core-model-1-4:control-construct"]
+    });
+  } else {
+    let documentId = res.body.hits.hits[0]._id;
+    response = await client.index({
+      index: indexAlias,
+      id: documentId,
+      body: construct["core-model-1-4:control-construct"]
+    });
+  }
+  return response;
+}
 
 /**
  * @description This function returns list of registered application information application-name , release-number.
