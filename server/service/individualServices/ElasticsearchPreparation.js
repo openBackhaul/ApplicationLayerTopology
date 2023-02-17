@@ -1,5 +1,10 @@
 const { elasticsearchService, getIndexAliasAsync, operationalStateEnum } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 
+const ELASTICSEARCH_CLIENT_CC_UUID = "alt-2-0-1-es-c-es-1-0-0-000";
+const ELASTICSEARCH_CLIENT_LINKS_UUID = "alt-2-0-1-es-c-es-1-0-0-001";
+
+const ELASTICSEARCH_CLIENT_UUIDS = [ELASTICSEARCH_CLIENT_CC_UUID, ELASTICSEARCH_CLIENT_LINKS_UUID];
+
 /**
  * @description Elasticsearch preparation. Checks if ES instance is configured properly.
  * As first step, tries pinging the ES instance. If this doesn't work, ES
@@ -15,18 +20,24 @@ const { elasticsearchService, getIndexAliasAsync, operationalStateEnum } = requi
  */
 module.exports = async function prepareElasticsearch() {
     console.log("Configuring Elasticsearch...");
-    let ping = await elasticsearchService.getElasticsearchClientOperationalStateAsync();
-    if (ping === operationalStateEnum.UNAVAILABLE) {
-        console.error(`Elasticsearch unavailable. Skipping Elasticsearch configuration.`);
-        return;
+    for (let uuid of ELASTICSEARCH_CLIENT_UUIDS) {
+        let ping = await elasticsearchService.getElasticsearchClientOperationalStateAsync(uuid);
+        if (ping === operationalStateEnum.UNAVAILABLE) {
+            console.error(`Elasticsearch unavailable. Skipping Elasticsearch configuration.`);
+            return;
+        }
+        if (uuid === ELASTICSEARCH_CLIENT_CC_UUID) {
+            await configureControlConstructIndexTemplate(uuid);
+        } else if (uuid === ELASTICSEARCH_CLIENT_LINKS_UUID) {
+            await configureLinksIndexTemplate(uuid);
+        }
+        await createAlias(uuid);
     }
-    await createIndexTemplate();
-    await createAlias();
     console.log('Elasticsearch is properly configured!');
 }
 
 /**
- * @description Creates/updates index-template.
+ * @description Creates/updates index-template for control-construct index.
  *
  * ALT stores entire control-construct objects for all applications. The design
  * here is to have one document (control-construct) per application. The top
@@ -39,21 +50,17 @@ module.exports = async function prepareElasticsearch() {
  * not searchable, therefore 'flattened' will be used as type. This allows for
  * nested UUID search, which will return the entire control-construct.
  *
- * This template serves as binding between service policy and index.
  * If index-alias is changed, this index-template will be rewritten to reflect
- * the change, as we do not wish to continue applying service policy on an
- * index-alias that does not exist.
+ * the change.
  *
- * Service policy is not set at this point in the index-template.
- * 
  * @returns {Promise<void>}
  */
-async function createIndexTemplate() {
-    let indexAlias = await getIndexAliasAsync();
-    let client = await elasticsearchService.getClient(false);
-    let found = await elasticsearchService.getExistingIndexTemplate();
+async function configureControlConstructIndexTemplate(uuid) {
+    let indexAlias = await getIndexAliasAsync(uuid);
+    let client = await elasticsearchService.getClient(false, uuid);
+    let found = await elasticsearchService.getExistingIndexTemplate(uuid);
     let iTemplate = found ? found : {
-        name: 'alt-index-template',
+        name: 'alt-cc-index-template',
         body: {
             index_patterns: `${indexAlias}-*`,
             template: {
@@ -64,7 +71,7 @@ async function createIndexTemplate() {
         }
     }
     await client.cluster.putComponentTemplate({
-        name: 'alt-mappings',
+        name: 'alt-cc-mappings',
         body: {
             template: {
                 mappings: {
@@ -78,19 +85,75 @@ async function createIndexTemplate() {
             }
         }
     });
-    iTemplate.body.composed_of = ['alt-mappings'];
+    iTemplate.body.composed_of = ['alt-cc-mappings'];
+    await client.indices.putIndexTemplate(iTemplate);
+}
+
+/**
+ * @description Creates/updates index-template for links index.
+ *
+ * In this index ALT will store links (point to multi-point). The design
+ * here is to have one document per link.
+ *
+ * UUID field is a structured one and ES would split it by '-' if stored
+ * as text, therefore we will store it as keyword.
+ * The 'link-port' field will ES store as object by default, but object is
+ * not searchable and the inner relationship could be lost, therefore 'nested'
+ * will be used as type. This allows for nested UUID search, which will return
+ * the entire link. Also all inner fields are mapped explicitly, since we also
+ * need logical-termination-point to be mapped as keyword too.
+ *
+ * If index-alias is changed, this index-template will be rewritten to reflect
+ * the change.
+ *
+ * @returns {Promise<void>}
+ */
+async function configureLinksIndexTemplate(uuid) {
+    let indexAlias = await getIndexAliasAsync(uuid);
+    let client = await elasticsearchService.getClient(false, uuid);
+    let found = await elasticsearchService.getExistingIndexTemplate(uuid);
+    let iTemplate = found ? found : {
+        name: 'alt-links-index-template',
+        body: {
+            index_patterns: `${indexAlias}-*`,
+            template: {
+                settings: {
+                    'index.lifecycle.rollover_alias': indexAlias
+                }
+            }
+        }
+    }
+    await client.cluster.putComponentTemplate({
+        name: 'alt-links-mappings',
+        body: {
+            template: {
+                mappings: {
+                    properties: {
+                        uuid: { type: 'keyword' },
+                        'link-port': {
+                            type: 'nested',
+                            properties: {
+                                'local-id': { type: 'short' },
+                                'port-direction': { type: 'keyword' },
+                                'logical-termination-point': { type: 'keyword' }
+                              }
+                        }
+                    }
+                }
+            }
+        }
+    });
+    iTemplate.body.composed_of = ['alt-links-mappings'];
     await client.indices.putIndexTemplate(iTemplate);
 }
 
 /**
  * @description Creates index-alias with first index serving
- * as write_index (if such alias does not exist yet). Such
- * index will always end with '-000001' to allow for automated
- * rollover.
+ * as write_index (if such alias does not exist yet).
  */
-async function createAlias() {
-    let indexAlias = await getIndexAliasAsync();
-    let client = await elasticsearchService.getClient(false);
+async function createAlias(uuid) {
+    let indexAlias = await getIndexAliasAsync(uuid);
+    let client = await elasticsearchService.getClient(false, uuid);
     let alias = await client.indices.existsAlias({
         name: indexAlias
     });

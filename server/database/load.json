@@ -1176,10 +1176,37 @@
                 ]
             },
             {
+                "uuid": "alt-2-0-1-es-c-es-1-0-0-001",
+                "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
+                "client-ltp": [],
+                "server-ltp": [
+                    "alt-2-0-1-http-c-es-1-0-0-000"
+                ],
+                "layer-protocol": [
+                    {
+                        "local-id": "0",
+                        "layer-protocol-name": "elasticsearch-client-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_ELASTICSEARCH_LAYER",
+                        "elasticsearch-client-interface-1-0:elasticsearch-client-interface-pac": {
+                            "elasticsearch-client-interface-configuration": {
+                                "auth": {
+                                    "api-key": "c3F4UmdZVUJfQjZNQmJ5RU5KR3c6YWJqV09vUmRUQlNYMGp4amJ2YVlpUQ=="
+                                },
+                                "index-alias": "alt-links-2-0-1"
+                            },
+                            "elasticsearch-client-interface-status": {
+                                "operational-state": "elasticsearch-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
+                                "life-cycle-state": "elasticsearch-client-interface-1-0:LIFE_CYCLE_STATE_TYPE_NOT_YET_DEFINED"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
                 "uuid": "alt-2-0-1-http-c-es-1-0-0-000",
                 "ltp-direction": "core-model-1-4:TERMINATION_DIRECTION_SINK",
                 "client-ltp": [
-                    "alt-2-0-1-es-c-es-1-0-0-000"
+                    "alt-2-0-1-es-c-es-1-0-0-000",
+                    "alt-2-0-1-es-c-es-1-0-0-001"
                 ],
                 "server-ltp": [
                     "alt-2-0-1-tcp-c-es-1-0-0-000"
