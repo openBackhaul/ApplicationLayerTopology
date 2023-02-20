@@ -37,6 +37,7 @@ const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtoc
 const LinkPort = require('../applicationPattern/onfModel/models/LinkPort');
 const Link = require('../applicationPattern/onfModel/models/Link');
 const TcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -999,7 +1000,7 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           applicationName,
           applicationReleaseNumber
         );
-        ForwardingAutomationService.automateForwardingConstructAsync(
+        let response = ForwardingAutomationService.automateForwardingConstructAsync(
           operationServerName,
           forwardingAutomationInputList,
           user,
@@ -1007,6 +1008,24 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           traceIndicator,
           customerJourney
         );
+        if (response === undefined || Object.keys(response).length === 0) {
+          resolve();
+        }
+        // response is full control construct of regarded application
+        await createOrUpdateControlConstructInES(response);
+
+        let logicalTerminationPoints = response["core-model-1-4:control-construct"]["logical-termination-point"];
+        let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
+        for (let operationServerName of operationServerNames) {
+          let endPointDetails = {
+            'serving-application-name': applicationName,
+            'serving-application-release-number': applicationReleaseNumber,
+            'operationServerName': operationServerName,
+            'consuming-application-name': ownApplicationName,
+            'consuming-application-release-number': ownApplicationReleaseNumber
+          }
+          await LinkServices.findOrCreateLinkForTheEndPointsAsync(endPointDetails);
+        }
       }
       resolve();
     } catch (error) {
@@ -1384,6 +1403,49 @@ exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicato
  ****************************************************************************************/
 
 /**
+ * Creates or updates control-construct document in ES.
+ *
+ * The existence of document is determined by control-construct UUID.
+ * If a document with such UUID already exists under configured index alias,
+ * it will be replaced, otherwise, it will be inserted as a new document.
+ *
+ * @param {Object} construct Full control-construct
+ * @returns response from Elasticsearch index operation
+ */
+async function createOrUpdateControlConstructInES(construct) {
+  let uuid = construct["core-model-1-4:control-construct"]["uuid"];
+
+  let client = await elasticsearchService.getClient();
+  let indexAlias = await getIndexAliasAsync();
+  let res = await client.search({
+    index: indexAlias,
+    filter_path: 'hits.hits._id',
+    body: {
+      "query": {
+        "term": {
+          "uuid": uuid
+        }
+      }
+    }
+  });
+  let response = {};
+  if (Object.keys(res.body).length === 0) {
+    response = await client.index({
+      index: indexAlias,
+      body: construct["core-model-1-4:control-construct"]
+    });
+  } else {
+    let documentId = res.body.hits.hits[0]._id;
+    response = await client.index({
+      index: indexAlias,
+      id: documentId,
+      body: construct["core-model-1-4:control-construct"]
+    });
+  }
+  return response;
+}
+
+/**
  * @description This function returns list of registered application information application-name , release-number.
  * @return {Promise} return the list of application information
  **/
@@ -1579,6 +1641,26 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
 /***************************************************************************************************************
  ****************** Funtions that are specific to the addOperationClientToLink ************
  ***************************************************************************************************************/
+
+ /**
+  * Extracts operation server names from given list of LTPs.
+  * @param {List} logicalTerminationPoints LTPs from which the operation server names should be extracted
+  * @returns {List} of operation server names
+  */
+function getAllOperationServerNameAsync(logicalTerminationPoints) {
+  let operationServerNames = [];
+  for (let logicalTerminationPoint of logicalTerminationPoints) {
+    let protocols = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
+    let protocol = protocols[0];
+    let protocolName = protocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+    if (LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER === protocolName) {
+      let operationServerPac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+      let operationServerCapability = operationServerPac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+      operationServerNames.push(operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME]);
+    }
+  }
+  return operationServerNames;
+}
 
 /**
  * Provides operationClientUuid for the operationClientName
