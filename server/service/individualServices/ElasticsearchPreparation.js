@@ -77,7 +77,6 @@ async function configureControlConstructIndexTemplate(uuid) {
                 mappings: {
                     properties: {
                         'uuid': { type: 'keyword' },
-                        'profile-collection': { type: 'flattened' },
                         'logical-termination-point': { type: 'flattened' },
                         'forwarding-domain': { type: 'flattened' }
                     }
