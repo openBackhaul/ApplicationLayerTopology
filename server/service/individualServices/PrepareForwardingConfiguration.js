@@ -8,7 +8,7 @@ const logicalTerminationPoint = require('../../applicationPattern/onfModel/model
 
 
 
-exports.regardApplication = function (operationClientConfigurationStatusList, listLTPsFCsOperation,
+exports.regardApplication = function (operationClientConfigurationStatusList,
     redirectTopologyInformationOperation) {
     return new Promise(async function (resolve, reject) {
         let forwardingConfigurationInputList = [];
@@ -27,14 +27,7 @@ exports.regardApplication = function (operationClientConfigurationStatusList, li
                         forwardingName,
                         operationClientUuid
                     );
-                } else if (operationClientName == listLTPsFCsOperation) {
-                    forwardingName =
-                        "NewApplicationCausesRequestForLatestTopologyInformation";
-                    forwardingConfigurationInput = new forwardingConstructConfigurationInput(
-                        forwardingName,
-                        operationClientUuid
-                    );
-                } 
+                }
                 forwardingConfigurationInputList.push(
                     forwardingConfigurationInput
                 );
