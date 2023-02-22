@@ -984,7 +984,7 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
        ****************************************************************************************/
       let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
       let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-      if (!(applicationName == ownApplicationName && applicationReleaseNumber == ownApplicationReleaseNumber)) {
+      if (!(applicationName == ownApplicationName && releaseNumber == ownApplicationReleaseNumber)) {
         let forwardingConfigurationInputList = [];
         let forwardingConstructConfigurationStatus;
         let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
