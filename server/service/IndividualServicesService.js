@@ -1,16 +1,21 @@
 'use strict';
 
-const LogicalTerminatinPointConfigurationInput = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInput');
-const LogicalTerminationPointService = require('../applicationPattern/onfModel/services/LogicalTerminationPointServices');
+const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
+const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
 const LogicalTerminationPointConfigurationStatus = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
 const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 
 const LinkServices = require('../applicationPattern/onfModel/services/LinkServices');
 
-const ForwardingConfigurationService = require('../applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
-const ForwardingAutomationService = require('../applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
+const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
+const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
+const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
 const prepareForwardingAutomation = require('./individualServices/PrepareForwardingAutomation');
+
+const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
+const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+
 const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
 const ConfigurationStatus = require('../applicationPattern/onfModel/services/models/ConfigurationStatus');
 
@@ -940,27 +945,36 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
-      let applicationAddress = body["application-address"];
-      let applicationPort = body["application-port"];
+      let releaseNumber = body["release-number"];
+      let tcpServerList = [
+        {
+          protocol: body["protocol"],
+          address: body["address"],
+          port: body["port"]
+        }
+      ];
+
+
       let redirectTopologyInformationOperation = "/v1/redirect-topology-change-information";
+
+      let operationNamesByAttributes = new Map();
+
+      operationNamesByAttributes.set("redirect-topology-change-information", redirectTopologyInformationOperation);
 
       /****************************************************************************************
        * Prepare logicalTerminatinPointConfigurationInput object to 
        * configure logical-termination-point
        ****************************************************************************************/
 
-      let operationList = [
-        redirectTopologyInformationOperation
-      ];
       let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
         applicationName,
-        applicationReleaseNumber,
-        applicationAddress,
-        applicationPort,
-        operationList
+        releaseNumber,
+        tcpServerList,
+        operationServerName,
+        operationNamesByAttributes,
+        individualServicesOperationsMapping.individualServicesOperationsMapping
       );
-      let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationInformationAsync(
+      let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.findOrCreateApplicationInformationAsync(
         logicalTerminatinPointConfigurationInput
       );
 
@@ -994,7 +1008,7 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           logicalTerminationPointconfigurationStatus,
           forwardingConstructConfigurationStatus,
           applicationName,
-          applicationReleaseNumber
+          releaseNumber
         );
         ForwardingAutomationService.automateForwardingConstructAsync(
           operationServerName,
