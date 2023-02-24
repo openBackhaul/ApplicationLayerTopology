@@ -6,7 +6,7 @@ const LogicalTerminationPointConfigurationStatus = require('../applicationPatter
 const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 
 const LinkServices = require('../applicationPattern/onfModel/services/LinkServices');
-
+const FcPort = require("onf-core-model-ap/applicationPattern/onfModel/models/FcPort"); 
 const ForwardingConfigurationService = require('../applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('../applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
@@ -14,24 +14,25 @@ const prepareForwardingAutomation = require('./individualServices/PrepareForward
 const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
 const ConfigurationStatus = require('../applicationPattern/onfModel/services/models/ConfigurationStatus');
 
-const logicalTerminationPoint = require('../applicationPattern/onfModel/models/LogicalTerminationPoint');
+const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
+const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
+
+const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
+const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
+const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
 const httpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
-const tcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
 const operationServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
 const operationClientInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
-const httpClientInterface = require('../applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
-
-const onfAttributeFormatter = require('../applicationPattern/onfModel/utility/OnfAttributeFormatter');
 const consequentAction = require('../applicationPattern/rest/server/responseBody/ConsequentAction');
 const responseValue = require('../applicationPattern/rest/server/responseBody/ResponseValue');
 
-const onfPaths = require('../applicationPattern/onfModel/constants/OnfPaths');
-const onfAttributes = require('../applicationPattern/onfModel/constants/OnfAttributes');
-
+const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
+const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 
 const fileOperation = require('../applicationPattern/databaseDriver/JSONDriver');
 const NetworkControlDomain = require('../applicationPattern/onfModel/models/NetworkControlDomain');
-const FcPort = require('../applicationPattern/onfModel/models/FcPort');
+
 const ForwardingConstruct = require('../applicationPattern/onfModel/models/ForwardingConstruct');
 const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('../applicationPattern/onfModel/models/LinkPort');
@@ -1387,54 +1388,51 @@ exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicato
 function getAllClientApplicationList() {
   return new Promise(async function (resolve, reject) {
     let clientApplicationList = [];
+    let httpClientUuidList = [];
+    let LogicalTerminationPointlist;
+    const forwardingName = 'NewApplicationCausesRequestForTopologyChangeInformation';
     try {
 
-      /** 
-       * This class instantiate objects that holds the application name , release number 
-       * of the client applications
-       */
-      let clientApplicationInformation = class ClientApplicationInformation {
-        applicationName;
-        applicationReleaseNumber;
 
-        /**
-         * @constructor 
-         * @param {String} applicationName name of the client application.
-         * @param {String} applicationReleaseNumber release number of the application.
-         **/
-        constructor(applicationName, applicationReleaseNumber) {
-          this.applicationName = applicationName;
-          this.applicationReleaseNumber = applicationReleaseNumber;
+      let ForwardConstructName = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(forwardingName)
+      let ForwardConstructUuid = ForwardConstructName[onfAttributes.GLOBAL_CLASS.UUID]
+
+      let ListofUuid = await ForwardingConstruct.getFcPortListAsync(ForwardConstructUuid)
+      for (let i = 0; i < ListofUuid.length; i++) {
+        let PortDirection = ListofUuid[i][[onfAttributes.FC_PORT.PORT_DIRECTION]]
+
+        if (PortDirection === FcPort.portDirectionEnum.OUTPUT) {
+          LogicalTerminationPointlist = ListofUuid[i][onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT]
+          let httpClientUuid = await logicalTerminationPoint.getServerLtpListAsync(LogicalTerminationPointlist)
+          httpClientUuidList.push(httpClientUuid[0]);
         }
-      };
-      let controlConstructList = await NetworkControlDomain.getControlConstructListAsync();
-      for (let i = 0; i < controlConstructList.length; i++) {
-        let controlConstruct = controlConstructList[i];
-        try {
-          let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-          for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
-              let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
-              let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
-              let applicationName = httpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
-              let applicationReleaseNumber = httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
-              let clientApplication = new clientApplicationInformation(applicationName, applicationReleaseNumber);
-              clientApplicationList.push(clientApplication);
-            }
-          }
-        } catch (error) {
-          console.log(error)
-        }
+      }
+      for (let j = 0; j < httpClientUuidList.length; j++) {
+        let httpClientUuid = httpClientUuidList[j];
+        let applicationName = await httpClientInterface.getApplicationNameAsync(httpClientUuid);
+        let applicationReleaseNumber = await httpClientInterface.getReleaseNumberAsync(httpClientUuid);
+        let serverLtp = await logicalTerminationPoint.getServerLtpListAsync(httpClientUuid);
+        let tcpClientUuid = serverLtp[0];
+        let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(tcpClientUuid);
+        let applicationPort = await tcpClientInterface.getRemotePortAsync(tcpClientUuid);
+        let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(tcpClientUuid);
+
+        let application = {};
+          application.applicationName = applicationName,
+          application.releaseNumber = applicationReleaseNumber,
+          application.protocol = applicationProtocol,
+          application.address = applicationAddress,
+          application.port = applicationPort,
+
+          clientApplicationList.push(application);
       }
       resolve(clientApplicationList);
     } catch (error) {
-      reject(error);
+      reject();
     }
   });
 }
+
 
 async function getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid) {
   return new Promise(async function (resolve, reject) {
