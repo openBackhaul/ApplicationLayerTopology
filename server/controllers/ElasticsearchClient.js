@@ -57,14 +57,6 @@ module.exports.getElasticsearchClientOperationalState = function getElasticsearc
   oamLogService.recordOamRequest(req.url, req.body, responseCode, req.headers.authorization, req.method);
 };
 
-module.exports.getElasticsearchClientServiceRecordsPolicy = function getElasticsearchClientServiceRecordsPolicy (req, res, next, uuid) {
-  let responseCode = responseCodeEnum.code.BAD_REQUEST;
-  let response = {
-    "message": "Service policy is not supported for ApplicationLayerTopology."
-  }
-  responseBuilder.buildResponse(res, responseCode, response);
-};
-
 module.exports.putElasticsearchClientApiKey = function putElasticsearchClientApiKey (req, res, next, body, uuid) {
   let responseCode = responseCodeEnum.code.NO_CONTENT;
   ElasticsearchClient.putElasticsearchClientApiKey(req.url, body, uuid)
@@ -91,10 +83,3 @@ module.exports.putElasticsearchClientIndexAlias = function putElasticsearchClien
   oamLogService.recordOamRequest(req.url, req.body, responseCode, req.headers.authorization, req.method);
 };
 
-module.exports.putElasticsearchClientServiceRecordsPolicy = function putElasticsearchClientServiceRecordsPolicy (req, res, next, body, uuid) {
-  let responseCode = responseCodeEnum.code.BAD_REQUEST;
-  let response = {
-    "message": "Service policy is not supported for ApplicationLayerTopology."
-  }
-  responseBuilder.buildResponse(res, responseCode, response);
-};

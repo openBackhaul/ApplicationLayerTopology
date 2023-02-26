@@ -1189,7 +1189,7 @@
                         "elasticsearch-client-interface-1-0:elasticsearch-client-interface-pac": {
                             "elasticsearch-client-interface-configuration": {
                                 "auth": {
-                                    "api-key": "c3F4UmdZVUJfQjZNQmJ5RU5KR3c6YWJqV09vUmRUQlNYMGp4amJ2YVlpUQ=="
+                                    "api-key": "API key not yet defined."
                                 },
                                 "index-alias": "alt-links-2-0-1"
                             },
