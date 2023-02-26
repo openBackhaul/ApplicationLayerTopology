@@ -30,7 +30,6 @@ const FcPort = require('../models/FcPort');
 exports.automateForwardingConstructAsync = function (operationServerName, forwardingAutomationInputList, user,
     xCorrelator, traceIndicator, customerJourney) {
     return new Promise(async function (resolve, reject) {
-        let response;
         try {
             let operationServerUuid = await OperationServerInterface.getOperationServerUuidAsync(operationServerName);
             for (let i = 0; i < forwardingAutomationInputList.length; i++) {
@@ -39,7 +38,7 @@ exports.automateForwardingConstructAsync = function (operationServerName, forwar
                 let attributeList = forwardingAutomationInput.attributeList;
                 let context = forwardingAutomationInput.context;
                 traceIndicator = traceIndicator + "." + (i + 1);
-                response = await automateForwardingsAsync(forwardingName,
+                await automateForwardingsAsync(forwardingName,
                     attributeList,
                     context,
                     operationServerUuid,
@@ -49,7 +48,7 @@ exports.automateForwardingConstructAsync = function (operationServerName, forwar
                     customerJourney
                 );
             }
-            resolve(response);
+            resolve();
         } catch (error) {
             reject(error);
         }
@@ -70,7 +69,6 @@ function automateForwardingsAsync(forwardingName, attributeList, context, operat
     xCorrelator, traceIndicator, customerJourney) {
     return new Promise(async function (resolve, reject) {
         try {
-            let response;
             let forwardingConstruct = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(
                 forwardingName);
             let _isOperationServerIsInputFcPort = isOperationServerIsInputFcPort(
@@ -81,7 +79,7 @@ function automateForwardingsAsync(forwardingName, attributeList, context, operat
                 let _isForwardingConstructIsProcessSnippet = isForwardingConstructIsProcessSnippet(
                     forwardingConstruct);
                 if (_isForwardingConstructIsProcessSnippet) {
-                    response = automateProcessSnippetAsync(forwardingConstruct,
+                    automateProcessSnippetAsync(forwardingConstruct,
                         attributeList,
                         context,
                         user,
@@ -90,7 +88,7 @@ function automateForwardingsAsync(forwardingName, attributeList, context, operat
                         customerJourney
                     );
                 } else {
-                    response = automateSubscriptionsAsync(forwardingConstruct,
+                    automateSubscriptionsAsync(forwardingConstruct,
                         attributeList,
                         user,
                         xCorrelator,
@@ -99,7 +97,7 @@ function automateForwardingsAsync(forwardingName, attributeList, context, operat
                     );
                 }
             }
-            resolve(response);
+            resolve();
         } catch (error) {
             reject(error);
         }
