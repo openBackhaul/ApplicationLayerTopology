@@ -1139,64 +1139,17 @@ exports.startApplicationInGenericRepresentation = function (user, originator, xC
 
 }
 
-
 /**
  * Existing documentation of all interfaces and internal connections will be replaced for the same CcUuid
  *
- * body V1_updateallltpsandfcs_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
+ * body V1_updateallltpsandfcs_body
+ * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-2-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
  * no response value expected for this operation
  **/
-exports.updateAllLtpsAndFcs = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      await checkApplicationExists(originator);
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let controlConstruct = body["core-model-1-4:control-construct"];
-      let controlConstructUuid = controlConstruct["uuid"];
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-
-      let existingControlConstruct = await NetworkControlDomain.getControlConstructAsync(controlConstructUuid);
-      if (existingControlConstruct) {
-        let existingControlConstructAsAString = JSON.stringify(existingControlConstruct);
-        let newControlConstructAsAString = JSON.stringify(controlConstruct);
-        if (existingControlConstructAsAString != newControlConstructAsAString) {
-          await NetworkControlDomain.deleteControlConstructAsync(controlConstructUuid);
-          await NetworkControlDomain.addControlConstructAsync(controlConstruct);
-        }
-      } else {
-        await NetworkControlDomain.addControlConstructAsync(controlConstruct);
-      }
-
-      /****************************************************************************************
-       * Prepare attributes to configure forwarding-construct
-       ****************************************************************************************/
-
-
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+exports.updateAllLtpsAndFcs = async function(body, originator) {
+  await checkApplicationExists(originator);
+  await createOrUpdateControlConstructInES(body);
 }
-
 
 /**
  * Existing documentation of an FC identified by FcUuid will be replaced
