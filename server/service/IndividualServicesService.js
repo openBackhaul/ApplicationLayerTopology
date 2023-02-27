@@ -38,6 +38,7 @@ const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtoc
 const LinkPort = require('../applicationPattern/onfModel/models/LinkPort');
 const Link = require('../applicationPattern/onfModel/models/Link');
 const TcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+const { elasticsearchService } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -997,7 +998,7 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           applicationName,
           applicationReleaseNumber
         );
-        ForwardingAutomationService.automateForwardingConstructAsync(
+        let response = ForwardingAutomationService.automateForwardingConstructAsync(
           operationServerName,
           forwardingAutomationInputList,
           user,
@@ -1005,6 +1006,12 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           traceIndicator,
           customerJourney
         );
+
+        if (response === undefined || Object.keys(response).length === 0) {
+          resolve();
+        }
+        // response is full control construct of regarded application
+        await elasticsearchService.createOrUpdateControlConstructInES(response[onfAttributes.CONTROL_CONSTRUCT]);
       }
       resolve();
     } catch (error) {
