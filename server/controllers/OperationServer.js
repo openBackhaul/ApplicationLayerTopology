@@ -59,7 +59,7 @@ module.exports.putOperationServerLifeCycleState = async function putOperationSer
 
 module.exports.putOperationServerOperationKey = async function putOperationServerOperationKey(req, res, next, body, uuid) {
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  await OperationServer.putOperationServerOperationKey(req.url, body, uuid)
+  await OperationServer.putOperationServerOperationKey(req.url, body)
     .then(function (response) {
       responseBuilder.buildResponse(res, responseCode, response);
     })

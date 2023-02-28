@@ -6,7 +6,6 @@ var responseCodeEnum = require('onf-core-model-ap/applicationPattern/rest/server
 var oamLogService = require('onf-core-model-ap/applicationPattern/services/OamLogService');
 
 
-
 module.exports.getTcpClientRemotePort = async function getTcpClientRemotePort(req, res, next, uuid) {
   let responseCode = responseCodeEnum.code.OK;
   await TcpClient.getTcpClientRemotePort(req.url)

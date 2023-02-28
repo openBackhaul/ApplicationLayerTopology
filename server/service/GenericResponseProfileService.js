@@ -1,5 +1,5 @@
 'use strict';
-var fileOperation = require('../node_modules/onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
+var fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
 
 /**
