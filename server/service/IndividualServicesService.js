@@ -1,18 +1,25 @@
 'use strict';
-
-const LogicalTerminatinPointConfigurationInput = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInput');
-const LogicalTerminationPointService = require('../applicationPattern/onfModel/services/LogicalTerminationPointServices');
+const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
+const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
 const LogicalTerminationPointConfigurationStatus = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
 const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 
 const LinkServices = require('../applicationPattern/onfModel/services/LinkServices');
+
+
+const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
+const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
+
 const FcPort = require("onf-core-model-ap/applicationPattern/onfModel/models/FcPort"); 
-const ForwardingConfigurationService = require('../applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
-const ForwardingAutomationService = require('../applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
+
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
 const prepareForwardingAutomation = require('./individualServices/PrepareForwardingAutomation');
 const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
 const ConfigurationStatus = require('../applicationPattern/onfModel/services/models/ConfigurationStatus');
+
+
+const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
+
 
 const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
 const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
@@ -21,7 +28,8 @@ const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfM
 const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
 const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
 const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
-const httpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
+
+
 const operationServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
 const operationClientInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
 const consequentAction = require('../applicationPattern/rest/server/responseBody/ConsequentAction');
@@ -294,7 +302,7 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+      let applicationReleaseNumber = body["release-number"];
 
       /****************************************************************************************
        * Prepare logicalTerminatinPointConfigurationInput object to 
@@ -326,19 +334,6 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
               operationServerName,
               forwardingConfigurationInputList
             );
-        }
-
-
-        /****************************************************************************************
-         * Prepare attributes to configure control-construct
-         ****************************************************************************************/
-        // remove the entry from control-construct
-        let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
-          applicationName,
-          applicationReleaseNumber);
-        if (controlConstruct) {
-          let controlConstructUuid = controlConstruct["uuid"];
-          await NetworkControlDomain.deleteControlConstructAsync(controlConstructUuid);
         }
 
         /****************************************************************************************
@@ -1006,10 +1001,12 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           traceIndicator,
           customerJourney
         );
+
         if (response === undefined || Object.keys(response).length === 0) {
           resolve();
         }
         // response is full control construct of regarded application
+
         await elasticsearchService.createOrUpdateControlConstructInES(response["core-model-1-4:control-construct"]);
 
         let logicalTerminationPoints = response["core-model-1-4:control-construct"]["logical-termination-point"];
@@ -1151,64 +1148,17 @@ exports.startApplicationInGenericRepresentation = function (user, originator, xC
 
 }
 
-
 /**
  * Existing documentation of all interfaces and internal connections will be replaced for the same CcUuid
  *
- * body V1_updateallltpsandfcs_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
+ * body V1_updateallltpsandfcs_body
+ * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-2-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
  * no response value expected for this operation
  **/
-exports.updateAllLtpsAndFcs = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      await checkApplicationExists(originator);
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let controlConstruct = body["core-model-1-4:control-construct"];
-      let controlConstructUuid = controlConstruct["uuid"];
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-
-      let existingControlConstruct = await NetworkControlDomain.getControlConstructAsync(controlConstructUuid);
-      if (existingControlConstruct) {
-        let existingControlConstructAsAString = JSON.stringify(existingControlConstruct);
-        let newControlConstructAsAString = JSON.stringify(controlConstruct);
-        if (existingControlConstructAsAString != newControlConstructAsAString) {
-          await NetworkControlDomain.deleteControlConstructAsync(controlConstructUuid);
-          await NetworkControlDomain.addControlConstructAsync(controlConstruct);
-        }
-      } else {
-        await NetworkControlDomain.addControlConstructAsync(controlConstruct);
-      }
-
-      /****************************************************************************************
-       * Prepare attributes to configure forwarding-construct
-       ****************************************************************************************/
-
-
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+exports.updateAllLtpsAndFcs = async function(body, originator) {
+  await checkApplicationExists(originator);
+  await createOrUpdateControlConstructInES(body);
 }
-
 
 /**
  * Existing documentation of an FC identified by FcUuid will be replaced
