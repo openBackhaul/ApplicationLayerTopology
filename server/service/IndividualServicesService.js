@@ -11,6 +11,7 @@ const individualServicesOperationsMapping = require('./individualServices/Indivi
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
 const FcPort = require("onf-core-model-ap/applicationPattern/onfModel/models/FcPort");
+
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
 const prepareForwardingAutomation = require('./individualServices/PrepareForwardingAutomation');
 const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
@@ -819,24 +820,33 @@ exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, trace
        ****************************************************************************************/
       let applicationName = body["subscriber-application"];
       let releaseNumber = body["subscriber-release-number"];
-      let applicationAddress = body["subscriber-address"];
-      let applicationPort = body["subscriber-port"];
       let subscriberOperation = body["subscriber-operation"];
 
+      let tcpServerList = [
+        {
+          protocol: body["subscriber-protocol"],
+          address: body["subscriber-address"],
+          port: body["subscriber-port"]
+        }
+      ];
+
+
+      let operationNamesByAttributes = new Map();
+      operationNamesByAttributes.set("regard-updated-link", subscriberOperation);
       /****************************************************************************************
        * Prepare logicalTerminatinPointConfigurationInput object to 
        * configure logical-termination-point
        ****************************************************************************************/
 
-      let operationList = [
-        subscriberOperation
-      ];
+
+
       let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
         applicationName,
         releaseNumber,
-        applicationAddress,
-        applicationPort,
-        operationList
+        tcpServerList,
+        operationServerName,
+        operationNamesByAttributes,
+        individualServicesOperationsMapping.individualServicesOperationsMapping
       );
       let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationInformationAsync(
         logicalTerminatinPointConfigurationInput
