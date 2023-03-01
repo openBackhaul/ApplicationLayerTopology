@@ -11,6 +11,7 @@ const forwardingService = require('./individualServices/ForwardingService');
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
+
 const FcPort = require("onf-core-model-ap/applicationPattern/onfModel/models/FcPort");
 
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
@@ -291,7 +292,7 @@ exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, 
           existingLogicalTerminationPoint,
           true);
         if (isdeleted && (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT ||
-          layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
+            layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
           await deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid);
           await deleteDependentLinkPorts(logicalTerminationPointUuid);
         }
@@ -352,10 +353,10 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
             operationClientConfigurationStatusList
           );
           forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-            unConfigureForwardingConstructAsync(
-              operationServerName,
-              forwardingConfigurationInputList
-            );
+          unConfigureForwardingConstructAsync(
+            operationServerName,
+            forwardingConfigurationInputList
+          );
         }
 
         /****************************************************************************************
@@ -891,10 +892,10 @@ exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, trace
           subscriberOperation
         );
         forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-          configureForwardingConstructAsync(
-            operationServerName,
-            forwardingConfigurationInputList
-          );
+        configureForwardingConstructAsync(
+          operationServerName,
+          forwardingConfigurationInputList
+        );
       }
 
       /****************************************************************************************
@@ -1016,10 +1017,10 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
             redirectTopologyInformationOperation
           );
           forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-            configureForwardingConstructAsync(
-              operationServerName,
-              forwardingConfigurationInputList
-            );
+          configureForwardingConstructAsync(
+            operationServerName,
+            forwardingConfigurationInputList
+          );
         }
 
         /****************************************************************************************
@@ -1298,7 +1299,9 @@ function getAllClientApplicationList() {
 
       let ListofUuid = await ForwardingConstruct.getFcPortListAsync(ForwardConstructUuid)
       for (let i = 0; i < ListofUuid.length; i++) {
-        let PortDirection = ListofUuid[i][[onfAttributes.FC_PORT.PORT_DIRECTION]]
+        let PortDirection = ListofUuid[i][
+          [onfAttributes.FC_PORT.PORT_DIRECTION]
+        ]
 
         if (PortDirection === FcPort.portDirectionEnum.OUTPUT) {
           LogicalTerminationPointlist = ListofUuid[i][onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT]
