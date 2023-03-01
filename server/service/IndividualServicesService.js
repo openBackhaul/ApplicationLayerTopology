@@ -1,4 +1,5 @@
 'use strict';
+
 const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
 const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
 const LogicalTerminationPointConfigurationStatus = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
@@ -6,21 +7,15 @@ const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtoc
 
 const LinkServices = require('../applicationPattern/onfModel/services/LinkServices');
 
-
+const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
-
-const FcPort = require("onf-core-model-ap/applicationPattern/onfModel/models/FcPort"); 
-
+const FcPort = require("onf-core-model-ap/applicationPattern/onfModel/models/FcPort");
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
 const prepareForwardingAutomation = require('./individualServices/PrepareForwardingAutomation');
 const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
 const ConfigurationStatus = require('../applicationPattern/onfModel/services/models/ConfigurationStatus');
-
-
 const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
-
-
 const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
 const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
 const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
@@ -937,27 +932,36 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
-      let applicationAddress = body["application-address"];
-      let applicationPort = body["application-port"];
+      let releaseNumber = body["release-number"];
+      let tcpServerList = [
+        {
+          protocol: body["protocol"],
+          address: body["address"],
+          port: body["port"]
+        }
+      ];
+
+
       let redirectTopologyInformationOperation = "/v1/redirect-topology-change-information";
+
+      let operationNamesByAttributes = new Map();
+
+      operationNamesByAttributes.set("redirect-topology-change-information", redirectTopologyInformationOperation);
 
       /****************************************************************************************
        * Prepare logicalTerminatinPointConfigurationInput object to 
        * configure logical-termination-point
        ****************************************************************************************/
 
-      let operationList = [
-        redirectTopologyInformationOperation
-      ];
       let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
         applicationName,
-        applicationReleaseNumber,
-        applicationAddress,
-        applicationPort,
-        operationList
+        releaseNumber,
+        tcpServerList,
+        operationServerName,
+        operationNamesByAttributes,
+        individualServicesOperationsMapping.individualServicesOperationsMapping
       );
-      let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationInformationAsync(
+      let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.findOrCreateApplicationInformationAsync(
         logicalTerminatinPointConfigurationInput
       );
 
@@ -967,7 +971,7 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
        ****************************************************************************************/
       let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
       let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-      if (!(applicationName == ownApplicationName && applicationReleaseNumber == ownApplicationReleaseNumber)) {
+      if (!(applicationName == ownApplicationName && releaseNumber == ownApplicationReleaseNumber)) {
         let forwardingConfigurationInputList = [];
         let forwardingConstructConfigurationStatus;
         let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
@@ -991,7 +995,7 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           logicalTerminationPointconfigurationStatus,
           forwardingConstructConfigurationStatus,
           applicationName,
-          applicationReleaseNumber
+          releaseNumber
         );
         let response = ForwardingAutomationService.automateForwardingConstructAsync(
           operationServerName,
@@ -1141,7 +1145,7 @@ exports.startApplicationInGenericRepresentation = function (user, originator, xC
  * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-2-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
  * no response value expected for this operation
  **/
-exports.updateAllLtpsAndFcs = async function(body, originator) {
+exports.updateAllLtpsAndFcs = async function (body, originator) {
   await checkApplicationExists(originator);
   await createOrUpdateControlConstructInES(body);
 }
@@ -1373,7 +1377,7 @@ function getAllClientApplicationList() {
         let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(tcpClientUuid);
 
         let application = {};
-          application.applicationName = applicationName,
+        application.applicationName = applicationName,
           application.releaseNumber = applicationReleaseNumber,
           application.protocol = applicationProtocol,
           application.address = applicationAddress,
