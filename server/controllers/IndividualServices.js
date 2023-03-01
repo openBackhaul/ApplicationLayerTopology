@@ -356,24 +356,19 @@ module.exports.startApplicationInGenericRepresentation = async function startApp
 };
 
 module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  try {
-    let startTime = process.hrtime();
-    let responseCode = responseCodeEnum.code.NO_CONTENT;
-    let responseBodyToDocument = {};
-    await IndividualServices.updateAllLtpsAndFcs(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
-      .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
-      })
-      .catch(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
-      });
-    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
-  } catch (error) {}
+  let startTime = process.hrtime();
+  let responseCode = responseCodeEnum.code.NO_CONTENT;
+  IndividualServices.updateAllLtpsAndFcs(body, originator)
+    .then(async function (response) {
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      restResponseBuilder.buildResponse(res, responseCode, response, responseHeader);
+    })
+    .catch(async function (response) {
+      responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      restResponseBuilder.buildResponse(res, responseCode, response, responseHeader);
+    });
+  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, response);
 };
 
 module.exports.updateFc = async function updateFc (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
