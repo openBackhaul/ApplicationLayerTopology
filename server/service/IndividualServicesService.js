@@ -7,26 +7,15 @@ const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtoc
 
 const LinkServices = require('../applicationPattern/onfModel/services/LinkServices');
 
-
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
-
-const FcPort = require("onf-core-model-ap/applicationPattern/onfModel/models/FcPort"); 
-
+const FcPort = require("onf-core-model-ap/applicationPattern/onfModel/models/FcPort");
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
 const prepareForwardingAutomation = require('./individualServices/PrepareForwardingAutomation');
-
-const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
-const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
-
 const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
 const ConfigurationStatus = require('../applicationPattern/onfModel/services/models/ConfigurationStatus');
-
-
 const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
-
-
 const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
 const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
 const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
@@ -1156,7 +1145,7 @@ exports.startApplicationInGenericRepresentation = function (user, originator, xC
  * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-2-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
  * no response value expected for this operation
  **/
-exports.updateAllLtpsAndFcs = async function(body, originator) {
+exports.updateAllLtpsAndFcs = async function (body, originator) {
   await checkApplicationExists(originator);
   await createOrUpdateControlConstructInES(body);
 }
@@ -1388,7 +1377,7 @@ function getAllClientApplicationList() {
         let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(tcpClientUuid);
 
         let application = {};
-          application.applicationName = applicationName,
+        application.applicationName = applicationName,
           application.releaseNumber = applicationReleaseNumber,
           application.protocol = applicationProtocol,
           application.address = applicationAddress,
