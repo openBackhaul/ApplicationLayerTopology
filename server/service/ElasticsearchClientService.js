@@ -60,20 +60,6 @@ exports.getElasticsearchClientOperationalState = async function(uuid) {
 }
 
 /**
- * Returns service records policy
- *
- * uuid String 
- * returns inline_response_200_44
- **/
-exports.getElasticsearchClientServiceRecordsPolicy = async function(uuid) {
-  let value = await elasticsearchService.getElasticsearchClientServiceRecordsPolicyAsync(uuid);
-  let response = {
-    'elasticsearch-client-interface-1-0:service-records-policy' : value
-  };
-  return response;
-}
-
-/**
  * Configures API key
  *
  * body Auth_apikey_body 
@@ -99,26 +85,8 @@ exports.putElasticsearchClientApiKey = async function(url, body, uuid) {
  **/
 exports.putElasticsearchClientIndexAlias = async function(url, body, uuid) {
   let oldValue = await getIndexAliasAsync(uuid);
-  let oldPolicy = await elasticsearchService.getElasticsearchClientServiceRecordsPolicyAsync(uuid);
   if (oldValue !== body['elasticsearch-client-interface-1-0:index-alias']) {
     await fileOperation.writeToDatabaseAsync(url, body, false);
     await prepareElasticsearch();
-    // we need to reassign policy associated with the old alias to the new
-    if (oldPolicy) {
-      await elasticsearchService.assignPolicyToIndexTemplate(oldPolicy['service-records-policy-name'], uuid);
-    }
   }
-}
-
-/**
- * Configures service records policy
- *
- * body Elasticsearchclientinterfaceconfiguration_servicerecordspolicy_body 
- * uuid String 
- * no response value expected for this operation
- **/
-exports.putElasticsearchClientServiceRecordsPolicy = async function(body, uuid) {
-  await elasticsearchService.putElasticsearchClientServiceRecordsPolicyAsync(uuid, body);
-  let policy = body['elasticsearch-client-interface-1-0:service-records-policy'];
-  await elasticsearchService.assignPolicyToIndexTemplate(policy['service-records-policy-name'], uuid);
 }
