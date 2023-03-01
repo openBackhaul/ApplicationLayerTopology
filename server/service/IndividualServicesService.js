@@ -472,7 +472,7 @@ exports.listLinkUuids = function (user, originator, xCorrelator, traceIndicator,
        ****************************************************************************************/
       let linkList = await NetworkControlDomain.getLinkListAsync();
       for (let i = 0; i < linkList.length; i++) {
-        let link = linkList[i];
+        let link = linkList[i]._source;
         let linkUuid = link[onfAttributes.GLOBAL_CLASS.UUID];
         linkUuidList.push(linkUuid);
       }
