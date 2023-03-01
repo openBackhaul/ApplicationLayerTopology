@@ -28,12 +28,13 @@ exports.regardApplication = function (logicalTerminationPointconfigurationStatus
             topologyChangeInformationRequestBody.topologyApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
             topologyChangeInformationRequestBody.topologyApplicationAddress = await tcpServerInterface.getLocalAddress();
             topologyChangeInformationRequestBody.topologyApplicationPort = await tcpServerInterface.getLocalPort();
-            topologyChangeInformationRequestBody.topologyOperationApplicationUpdate = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3004");
-            topologyChangeInformationRequestBody.topologyOperationLtpUpdate = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3005");
-            topologyChangeInformationRequestBody.topologyOperationLtpDeletion = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3006");
-            topologyChangeInformationRequestBody.topologyOperationFcUpdate = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3013");
-            topologyChangeInformationRequestBody.topologyOperationFcPortUpdate = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3014");
-            topologyChangeInformationRequestBody.topologyOperationFcPortDeletion = await operationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3015");
+            topologyChangeInformationRequestBody.topologyOperationApplicationUpdate = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-004");
+            topologyChangeInformationRequestBody.topologyOperationLtpUpdate = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-005");
+            topologyChangeInformationRequestBody.topologyOperationLtpDeletion = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-006");
+            topologyChangeInformationRequestBody.topologyOperationFcUpdate = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-013");
+            topologyChangeInformationRequestBody.topologyOperationFcPortUpdate = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-014");
+            topologyChangeInformationRequestBody.topologyOperationFcPortDeletion = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-015");
+            
 
             topologyChangeInformationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(topologyChangeInformationRequestBody);
             forwardingAutomation = new forwardingConstructAutomationInput(
