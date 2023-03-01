@@ -62,7 +62,7 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
  * @param {String} EndPoints : EndPoint details of the link
  * @return {Promise} boolean {true | false}
  **/
- exports.deleteOperationClientFromTheEndPointsAsync = function (EndPoints) {
+exports.deleteOperationClientFromTheEndPointsAsync = function (EndPoints) {
     return new Promise(async function (resolve, reject) {
         let linkUuid;
         try {
@@ -92,8 +92,8 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
                 );
                 if (servingOperationuuid && consumingOperationuuid) {
                     linkUuid = await Link.getLinkUuidOfTheServingOperationAsync(servingOperationuuid);
-                    if(linkUuid){
-                        await deleteLinkAsync(linkUuid,consumingOperationuuid);
+                    if (linkUuid) {
+                        await deleteLinkAsync(linkUuid, consumingOperationuuid);
                     }
                 }
             }
@@ -110,12 +110,12 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
  * @param {String} consumingOperationuuid : logical-termination-point of the link-port
  * @return {Promise} boolean {true|false}
  **/
- function deleteLinkAsync(linkUuid,consumingOperationuuid) {
+function deleteLinkAsync(linkUuid, consumingOperationuuid) {
     return new Promise(async function (resolve, reject) {
         try {
-            let localId = await Link.getLocalIdOfTheConsumingOperationAsync(linkUuid,consumingOperationuuid)
+            let localId = await Link.getLocalIdOfTheConsumingOperationAsync(linkUuid, consumingOperationuuid)
             if (localId) {
-                await Link.deleteLinkPortAsync(linkUuid,localId);
+                await Link.deleteLinkPortAsync(linkUuid, localId);
             }
             resolve(linkUuid);
         } catch (error) {
@@ -188,14 +188,14 @@ function createLinkAsync(consumingOperationuuid, servingOperationuuid) {
             let linkUuid = await Link.generateNextUuidAsync();
             let link = new Link(linkUuid, []);
             let isLinkCreated = await NetworkControlDomain.addLinkAsync(link);
-            if (isLinkCreated) {
+            if (isLinkCreated.body.result === "created") {
                 let consumingOperationLocalId = await LinkPort.generateNextLocalIdAsync(linkUuid);
                 let consumingOperationLinkPort = new LinkPort(
                     consumingOperationLocalId,
                     LinkPort.portDirectionEnum.INPUT,
                     consumingOperationuuid
                 );
-                let isConsumingOperationLinkPortCreated = await Link.addLinkPortAsync(linkUuid, consumingOperationLinkPort);
+                let isConsumingOperationLinkPortCreated = await Link.addLinkPortAsync(linkUuid, consumingOperationLinkPort, isLinkCreated);
                 if (isConsumingOperationLinkPortCreated) {
                     let servingOperationLocalId = await LinkPort.generateNextLocalIdAsync(linkUuid);
                     let servingOperationLinkPort = new LinkPort(
@@ -203,9 +203,9 @@ function createLinkAsync(consumingOperationuuid, servingOperationuuid) {
                         LinkPort.portDirectionEnum.OUTPUT,
                         servingOperationuuid
                     );
-                    let isServingOperationLinkPortCreated = await Link.addLinkPortAsync(linkUuid, servingOperationLinkPort);
-                    if(isServingOperationLinkPortCreated){
-                        resolve(linkUuid); 
+                    let isServingOperationLinkPortCreated = await Link.addLinkPortAsync(linkUuid, servingOperationLinkPort, isLinkCreated);
+                    if (isServingOperationLinkPortCreated) {
+                        resolve(linkUuid);
                     }
                 }
             }
@@ -288,55 +288,55 @@ function getOperationClientUuid(controlConstruct, operationClientName, consuming
  * @returns object in the form of {addressedApplicationName:"name",
  * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
  */
- function getApplicationName(logicalTerminationPointList,
+function getApplicationName(logicalTerminationPointList,
     operationClientUuid) {
     let applicationName;
     try {
-      for (let i = 0; i < logicalTerminationPointList.length; i++) {
-        let logicalTerminationPoint = logicalTerminationPointList[i];
-        let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-        let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-        if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
-          let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
-          if (clientLtpList.includes(operationClientUuid)) {
-            let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-            let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
-            applicationName = httpClientCapability[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
-          }
+        for (let i = 0; i < logicalTerminationPointList.length; i++) {
+            let logicalTerminationPoint = logicalTerminationPointList[i];
+            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+                let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
+                if (clientLtpList.includes(operationClientUuid)) {
+                    let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+                    let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+                    applicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+                }
+            }
         }
-      }
-      return applicationName;
+        return applicationName;
     } catch (error) {
-      console.log(error)
+        console.log(error)
     }
-  }
-  
-  /**
-   * This function returns the list of clients information reacting on the operation server 
-   * @param {*} controlConstruct 
-   * @param {*} operationClientsUuidsReactingOnOperationServerList 
-   * @returns object in the form of {addressedApplicationName:"name",
-   * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
-   */
-  function getReleaseNumber(logicalTerminationPointList,
+}
+
+/**
+ * This function returns the list of clients information reacting on the operation server 
+ * @param {*} controlConstruct 
+ * @param {*} operationClientsUuidsReactingOnOperationServerList 
+ * @returns object in the form of {addressedApplicationName:"name",
+ * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
+ */
+function getReleaseNumber(logicalTerminationPointList,
     operationClientUuid) {
     let releaseNumber;
     try {
-      for (let i = 0; i < logicalTerminationPointList.length; i++) {
-        let logicalTerminationPoint = logicalTerminationPointList[i];
-        let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-        let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-        if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
-          let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
-          if (clientLtpList.includes(operationClientUuid)) {
-            let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-            let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-            releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
-          }
+        for (let i = 0; i < logicalTerminationPointList.length; i++) {
+            let logicalTerminationPoint = logicalTerminationPointList[i];
+            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+                let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
+                if (clientLtpList.includes(operationClientUuid)) {
+                    let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+                    let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+                    releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+                }
+            }
         }
-      }
-      return releaseNumber;
+        return releaseNumber;
     } catch (error) {
-      console.log(error)
+        console.log(error)
     }
-  }
+}

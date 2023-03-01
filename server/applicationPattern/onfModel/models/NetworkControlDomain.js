@@ -12,6 +12,10 @@ const onfAttributes = require('../constants/OnfAttributes');
 const onfFormatter = require('../utility/OnfAttributeFormatter');
 const fileOperation = require('../../databaseDriver/JSONDriver');
 const LayerProtocol = require('./LayerProtocol');
+const {
+  elasticsearchService,
+  getIndexAliasAsync
+} = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 
 class NetworkControlDomain {
 
@@ -22,8 +26,19 @@ class NetworkControlDomain {
   static async getLinkListAsync() {
     return new Promise(async function (resolve, reject) {
       try {
-        let linkList = await fileOperation.readFromDatabaseAsync(onfPaths.LINK);
-        resolve(linkList);
+        let client = await elasticsearchService.getClient();
+        let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-001");
+        let res = await client.search({
+          index: indexAlias,
+          filter_path: "hits.hits",
+          body: {
+            "query": {
+              "match_all": {}
+            }
+          }
+
+        })
+        resolve(res.body.hits.hits);
       } catch (error) {
         reject(error);
       }
@@ -64,7 +79,7 @@ class NetworkControlDomain {
       try {
         let linkList = await NetworkControlDomain.getLinkListAsync();
         for (let i = 0; i < linkList.length; i++) {
-          let _link = linkList[i];
+          let _link = linkList[i]._source;
           let _linkUuid = _link[onfAttributes.GLOBAL_CLASS.UUID];
           if (_linkUuid == linkUuid) {
             link = _link;
@@ -99,9 +114,21 @@ class NetworkControlDomain {
   static async getControlConstructAsync(controlConstructUuid) {
     return new Promise(async function (resolve, reject) {
       try {
-        let controlConstructUuidPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let controlConstruct = await fileOperation.readFromDatabaseAsync(controlConstructUuidPath);
-        resolve(controlConstruct);
+        let client = await elasticsearchService.getClient();
+        let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-000");
+        let res = await client.search({
+          index: indexAlias,
+          filter_path: "hits.hits",
+          body: {
+            "query": {
+              "match": {
+                "uuid": controlConstructUuid
+              }
+            }
+          }
+
+        })
+        resolve(res.body.hits.hits[0]);
       } catch (error) {
         reject(error);
       }
@@ -118,10 +145,22 @@ class NetworkControlDomain {
     return new Promise(async function (resolve, reject) {
       let controlConstructInstance;
       try {
-        let controlConstructList = await NetworkControlDomain.getControlConstructListAsync()
+        let client = await elasticsearchService.getClient();
+        let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-000");
+        let res = await client.search({
+          index: indexAlias,
+          filter_path: "hits.hits",
+          body: {
+            "query": {
+              "match_all": {}
+            }
+          }
+
+        })
+        let controlConstructList = res.body.hits.hits;
         if (controlConstructList) {
           for (let i = 0; i < controlConstructList.length; i++) {
-            let controlConstruct = controlConstructList[i];
+            let controlConstruct = controlConstructList[i]._source;
             let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
             for (let j = 0; j < logicalTerminationPointList.length; j++) {
               let logicalTerminationPoint = logicalTerminationPointList[j];
@@ -199,16 +238,18 @@ class NetworkControlDomain {
    * @param {String} link an instance of the link
    * @returns {promise} returns {true|false}
    **/
-   static addLinkAsync(link) {
+  static addLinkAsync(link, consumingOperationLinkPort, servingOperationLinkPort) {
     return new Promise(async function (resolve, reject) {
       let isCreated = false;
       try {
         link = onfFormatter.modifyJsonObjectKeysToKebabCase(link);
-        isCreated = await fileOperation.writeToDatabaseAsync(
-          onfPaths.LINK,
-          link,
-          true);
-        resolve(isCreated);
+        let client = await elasticsearchService.getClient();
+        let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-001");
+        let response = await client.index({
+          index: indexAlias,
+          body: link
+        });
+        resolve(response);
       } catch (error) {
         reject(error);
       }
