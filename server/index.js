@@ -3,7 +3,7 @@
 
 var path = require('path');
 var http = require('http');
-var oas3Tools = require('oas3-tools');
+var oas3Tools = require('openbackhaul-oas3-tools');
 var appCommons = require('./applicationPattern/commons/AppCommons');
 var serverPort = 3005;
 
