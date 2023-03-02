@@ -1557,8 +1557,8 @@ function getAllOperationServerNameAsync(logicalTerminationPoints) {
     let protocolName = protocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
     if (LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER === protocolName) {
       let operationServerPac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-      let operationServerCapability = operationServerPac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-      operationServerNames.push(operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME]);
+      let operationServerConfiguration = operationServerPac[onfAttributes.OPERATION_SERVER.CONFIGURATION];
+      operationServerNames.push(operationServerConfiguration[onfAttributes.OPERATION_SERVER.OPERATION_NAME]);
     }
   }
   return operationServerNames;
