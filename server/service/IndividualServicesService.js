@@ -517,7 +517,7 @@ exports.listLinksToOperationClientsOfApplication = function (body, user, origina
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+      let applicationReleaseNumber = body["release-number"];
 
       /****************************************************************************************
        * Preparing response body
@@ -1754,11 +1754,10 @@ function getClientsReactingOnOperationServerList(controlConstruct,
           let clientLtp = clientLtpList[j];
           if (operationClientsUuidsReactingOnOperationServerList.includes(clientLtp)) {
             let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-            let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
             let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
             let operationName = getOperationNameOfTheOperationClient(logicalTerminationPointList,
               clientLtp);
-            let applicationName = httpClientCapability[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+            let applicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
             let releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
             let clientDetails = {};
             clientDetails.addressedApplicationName = applicationName;
