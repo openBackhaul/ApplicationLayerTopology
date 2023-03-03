@@ -596,7 +596,7 @@ exports.listOperationClientsAtApplication = function (body, user, originator, xC
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+      let applicationReleaseNumber = body["release-number"];
 
       /****************************************************************************************
        * Preparing response body
@@ -616,9 +616,8 @@ exports.listOperationClientsAtApplication = function (body, user, originator, xC
             let clientUuidList = logicalTerminationPoint["client-ltp"];
 
             let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-            let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
             let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-            let clientApplicationName = httpClientCapability[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+            let clientApplicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
             let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
 
             if (clientUuidList) {
