@@ -90,7 +90,7 @@ class Link {
             try {
                 let linkList = await NetworkControlDomain.getLinkListAsync();
                 for (let i = 0; i < linkList.length; i++) {
-                    let link = linkList[i]._source;
+                    let link = linkList[i];
                     let linkPortList = link[onfAttributes.LINK.LINK_PORT];
                     for (let j = 0; j < linkPortList.length; j++) {
                         let linkPort = linkPortList[j];
@@ -206,7 +206,7 @@ class Link {
                     index: indexAlias,
                     body: {
                         script: {
-                            source: "for (int i=0;i< ctx._source['link-port'].length;i++){ if (ctx._source['link-port'][i]['local-id'] == params['local-id']) {ctx._source['link-port'].remove(i)}}",
+                            source: "ctx._source['link-port'].removeIf(port -> port['local-id'] == params['local-id'])",
                             params: {
                                 "local-id": linkPortLocalId
                             }
@@ -243,7 +243,7 @@ class Link {
                 let linkList = await NetworkControlDomain.getLinkListAsync();
                 let linkUuidList = [];
                 for (let i = 0; i < linkList.length; i++) {
-                    let link = linkList[i]._source;
+                    let link = linkList[i];
                     let uuid = link[
                         onfAttributes.GLOBAL_CLASS.UUID];
                     linkUuidList.push(uuid);
