@@ -7,13 +7,13 @@
 
 'use strict';
 
-const onfPaths = require('../constants/OnfPaths');
-const onfAttributes = require('../constants/OnfAttributes');
-const onfFormatter = require('../utility/OnfAttributeFormatter');
-const fileOperation = require('../../databaseDriver/JSONDriver');
-const LayerProtocol = require('./LayerProtocol');
+const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
+const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
+const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
+const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
+const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 
-class NetworkControlDomain {
+class ControlConstrucService {
 
   /**
    * @description This function returns the link list entries from the core-model-1-4:control-construct
@@ -62,7 +62,7 @@ class NetworkControlDomain {
     return new Promise(async function (resolve, reject) {
       let link;
       try {
-        let linkList = await NetworkControlDomain.getLinkListAsync();
+        let linkList = await ControlConstrucService.getLinkListAsync();
         for (let i = 0; i < linkList.length; i++) {
           let _link = linkList[i];
           let _linkUuid = _link[onfAttributes.GLOBAL_CLASS.UUID];
@@ -118,7 +118,7 @@ class NetworkControlDomain {
     return new Promise(async function (resolve, reject) {
       let controlConstructInstance;
       try {
-        let controlConstructList = await NetworkControlDomain.getControlConstructListAsync()
+        let controlConstructList = await ControlConstrucService.getControlConstructListAsync()
         if (controlConstructList) {
           for (let i = 0; i < controlConstructList.length; i++) {
             let controlConstruct = controlConstructList[i];
@@ -239,4 +239,4 @@ class NetworkControlDomain {
 
 }
 
-module.exports = NetworkControlDomain;
+module.exports = ControlConstrucService;

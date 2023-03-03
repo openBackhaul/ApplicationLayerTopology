@@ -7,10 +7,10 @@
 
 'use strict';
 
-const LayerProtocol = require('../models/LayerProtocol');
+const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const Link = require('../models/Link');
-const NetworkControlDomain = require('../models/NetworkControlDomain');
-const onfAttributes = require('../constants/OnfAttributes');
+const ControlConstructService = require('./ControlConstructService');
+const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const LinkPort = require('../models/LinkPort');
 
 /**
@@ -29,10 +29,10 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
             let consumingApplicationName = EndPoints["consuming-application-name"];
             let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
 
-            let ServingApplicationControlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+            let ServingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
                 servingApplicationName,
                 servingApplicationReleaseNumber);
-            let consumingApplicationControlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+            let consumingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
                 consumingApplicationName,
                 consumingApplicationReleaseNumber);
 
@@ -73,10 +73,10 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
             let consumingApplicationName = EndPoints["consuming-application-name"];
             let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
 
-            let ServingApplicationControlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+            let ServingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
                 servingApplicationName,
                 servingApplicationReleaseNumber);
-            let consumingApplicationControlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+            let consumingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
                 consumingApplicationName,
                 consumingApplicationReleaseNumber);
 
@@ -187,7 +187,7 @@ function createLinkAsync(consumingOperationuuid, servingOperationuuid) {
         try {
             let linkUuid = await Link.generateNextUuidAsync();
             let link = new Link(linkUuid, []);
-            let isLinkCreated = await NetworkControlDomain.addLinkAsync(link);
+            let isLinkCreated = await ControlConstructService.addLinkAsync(link);
             if (isLinkCreated) {
                 let consumingOperationLocalId = await LinkPort.generateNextLocalIdAsync(linkUuid);
                 let consumingOperationLinkPort = new LinkPort(
