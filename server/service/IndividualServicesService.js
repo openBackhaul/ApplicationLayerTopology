@@ -424,7 +424,7 @@ exports.listEndPointsOfLink = function (body, user, originator, xCorrelator, tra
         let linkPort = linkPortList[i];
         let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
         let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPoint);
-        let controlConstruct = await NetworkControlDomain.getControlConstructAsync(controlConstructUuid);
+        let controlConstruct = (await NetworkControlDomain.getControlConstructAsync(controlConstructUuid))[0];
         linkEndPoint.operationUuid = logicalTerminationPoint;
         if (controlConstruct) {
           linkEndPoint.ltpDirection = getLtpDirection(controlConstruct, logicalTerminationPoint);
