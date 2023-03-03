@@ -758,7 +758,7 @@ exports.listOperationServersAtApplication = function (body, user, originator, xC
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+      let applicationReleaseNumber = body["release-number"];
 
       /****************************************************************************************
        * Preparing response body
@@ -797,7 +797,6 @@ exports.listOperationServersAtApplication = function (body, user, originator, xC
     }
   });
 }
-
 
 /**
  * Offers subscribing for notifications about updates of Links
