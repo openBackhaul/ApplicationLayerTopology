@@ -5,7 +5,7 @@ const LogicalTerminationPointService = require('onf-core-model-ap/applicationPat
 const LogicalTerminationPointConfigurationStatus = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
 const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 
-const LinkServices = require('../applicationPattern/onfModel/services/LinkServices');
+const LinkServices = require('./individualServices/LinkServices');
 
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
@@ -35,14 +35,14 @@ const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constant
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 
 const fileOperation = require('../applicationPattern/databaseDriver/JSONDriver');
-const NetworkControlDomain = require('../applicationPattern/onfModel/models/NetworkControlDomain');
 
 const ForwardingConstruct = require('../applicationPattern/onfModel/models/ForwardingConstruct');
 const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
-const LinkPort = require('../applicationPattern/onfModel/models/LinkPort');
-const Link = require('../applicationPattern/onfModel/models/Link');
 const TcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+const LinkPort = require('./models/LinkPort');
+const Link = require('./models/Link');
 const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const ControlConstructService = require('./individualServices/ControlConstructService');
 
 /**
  * Connects an OperationClient to an OperationServer
