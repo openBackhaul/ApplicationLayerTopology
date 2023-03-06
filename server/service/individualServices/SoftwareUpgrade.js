@@ -16,9 +16,9 @@ const onfAttributeFormatter = require('../../applicationPattern/onfModel/utility
 const eventDispatcher = require('../../applicationPattern/rest/client/eventDispatcher');
 const LayerProtocol = require('../../applicationPattern/onfModel/models/LayerProtocol');
 const OperationServerInterface = require('../../applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
-const NetworkControlDomain = require('../../applicationPattern/onfModel/models/NetworkControlDomain');
 const ControlConstruct = require('../../applicationPattern/onfModel/models/ControlConstruct');
-const LinkPort = require('../../applicationPattern/onfModel/models/LinkPort');
+const ControlConstructService = require('./ControlConstructService');
+const LinkPort = require('../models/LinkPort');
 
 /**
  * This method performs the set of procedure to transfer the data from this version to next version 
@@ -201,7 +201,7 @@ async function PromptForBequeathingDataCausesTransferOfLtpsAndFcs(user, xCorrela
              * Preparing requestBody and transfering the data one by one
              ************************************************************************************/
 
-            let controlConstructList = await NetworkControlDomain.getControlConstructListAsync();
+            let controlConstructList = await ControlConstructService.getControlConstructListAsync();
             let currentControlConstructUuid = await ControlConstruct.getUuidAsync();
 
             for (let i = 0; i < controlConstructList.length; i++) {
@@ -257,7 +257,7 @@ async function PromptForBequeathingDataCausesTransferOfLinkInformation(user, xCo
             /***********************************************************************************
              * Preparing requestBody and transfering the data one by one
              ************************************************************************************/
-            let linkList = await NetworkControlDomain.getLinkListAsync();
+            let linkList = await ControlConstructService.getLinkListAsync();
 
             for (let i = 0; i < linkList.length; i++) {
                 try {
@@ -266,7 +266,7 @@ async function PromptForBequeathingDataCausesTransferOfLinkInformation(user, xCo
                     let servingApplicationOperationServerUuid = outputLinkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
                     let servingApplicationControlConstructUuid = figureOutControlConstructUuid(
                         servingApplicationOperationServerUuid);
-                    let servingApplicationControlConstruct = await NetworkControlDomain.getControlConstructAsync(
+                    let servingApplicationControlConstruct = await ControlConstructService.getControlConstructAsync(
                         servingApplicationControlConstructUuid);
                     let servingApplicationName = getApplicationName(servingApplicationControlConstruct);
                     let servingApplicationReleaseNumber = getReleaseNumber(servingApplicationControlConstruct);
@@ -280,7 +280,7 @@ async function PromptForBequeathingDataCausesTransferOfLinkInformation(user, xCo
                         let servingApplicationOperationClientUuid = inputLinkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
                         let consumingApplicationControlConstructUuid = figureOutControlConstructUuid(
                             servingApplicationOperationClientUuid);
-                        let cosumingApplicationControlConstruct = await NetworkControlDomain.getControlConstructAsync(
+                        let cosumingApplicationControlConstruct = await ControlConstructService.getControlConstructAsync(
                             consumingApplicationControlConstructUuid);
                         consumingApplicationName = getApplicationName(cosumingApplicationControlConstruct);
                         consumingApplicationReleaseNumber = getReleaseNumber(cosumingApplicationControlConstruct);
