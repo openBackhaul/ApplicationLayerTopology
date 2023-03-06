@@ -1,11 +1,10 @@
 'use strict';
 
-var BasicServices = require('../basicServices/BasicServicesService');
-var responseCodeEnum = require('../applicationPattern/rest/server/ResponseCode');
-var restResponseHeader = require('../applicationPattern/rest/server/ResponseHeader');
-var restResponseBuilder = require('../applicationPattern/rest/server/ResponseBuilder');
-var executionAndTraceService = require('../applicationPattern/services/ExecutionAndTraceService');
-
+var BasicServices = require('onf-core-model-ap-bs/basicServices/BasicServicesService');
+var responseCodeEnum = require('onf-core-model-ap/applicationPattern/rest/server/ResponseCode');
+var restResponseHeader = require('onf-core-model-ap/applicationPattern/rest/server/ResponseHeader');
+var restResponseBuilder = require('onf-core-model-ap/applicationPattern/rest/server/ResponseBuilder');
+var executionAndTraceService = require('onf-core-model-ap/applicationPattern/services/ExecutionAndTraceService');
 
 module.exports.embedYourself = async function embedYourself(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
@@ -139,6 +138,27 @@ module.exports.informAboutReleaseHistoryInGenericRepresentation = async function
 
 };
 
+module.exports.startApplicationInGenericRepresentation = async function startApplicationInGenericRepresentation (req, res, next, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  try {
+    let startTime = process.hrtime();
+    let responseCode = responseCodeEnum.code.OK;
+    let responseBodyToDocument = {};
+    await BasicServices.startApplicationInGenericRepresentation(user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      .then(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      })
+      .catch(async function (responseBody) {
+        responseBodyToDocument = responseBody;
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      });
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  } catch (error) {}
+};
+
 module.exports.inquireOamRequestApprovals = async function inquireOamRequestApprovals(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
     let startTime = process.hrtime();
@@ -230,7 +250,7 @@ module.exports.redirectServiceRequestInformation = async function redirectServic
 module.exports.redirectTopologyChangeInformation = async function redirectTopologyChangeInformation(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
     let startTime = process.hrtime();
-    let responseCode = responseCodeEnum.code.NO_CONTENT;
+    let responseCode = responseCodeEnum.code.OK;
     let responseBodyToDocument = {};
     await BasicServices.redirectTopologyChangeInformation(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
       .then(async function (responseBody) {

@@ -10,6 +10,9 @@ const onfPaths = require('../../applicationPattern/onfModel/constants/OnfPaths')
 
 
 const fileOperation = require('../../applicationPattern/databaseDriver/JSONDriver');
+const ControlConstructService = require('./ControlConstructService');
+const LinkPort = require('../models/LinkPort');
+const Link = require('../models/Link');
 
 exports.regardApplication = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus, clientApplicationName,
     clientReleaseNumber) {

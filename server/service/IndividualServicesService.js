@@ -5,7 +5,7 @@ const LogicalTerminationPointService = require('onf-core-model-ap/applicationPat
 const LogicalTerminationPointConfigurationStatus = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
 const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 
-const LinkServices = require('../applicationPattern/onfModel/services/LinkServices');
+const LinkServices = require('./individualServices/LinkServices');
 
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
@@ -35,14 +35,14 @@ const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constant
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 
 const fileOperation = require('../applicationPattern/databaseDriver/JSONDriver');
-const NetworkControlDomain = require('../applicationPattern/onfModel/models/NetworkControlDomain');
 
 const ForwardingConstruct = require('../applicationPattern/onfModel/models/ForwardingConstruct');
 const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
-const LinkPort = require('../applicationPattern/onfModel/models/LinkPort');
-const Link = require('../applicationPattern/onfModel/models/Link');
 const TcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
-const { elasticsearchService } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const LinkPort = require('./models/LinkPort');
+const Link = require('./models/Link');
+const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const ControlConstructService = require('./individualServices/ControlConstructService');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -454,7 +454,7 @@ exports.listEndPointsOfLink = function (body, user, originator, xCorrelator, tra
         let linkPort = linkPortList[i];
         let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
         let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPoint);
-        let controlConstruct = await NetworkControlDomain.getControlConstructAsync(controlConstructUuid);
+        let controlConstruct = (await NetworkControlDomain.getControlConstructAsync(controlConstructUuid))[0];
         linkEndPoint.operationUuid = logicalTerminationPoint;
         if (controlConstruct) {
           linkEndPoint.ltpDirection = getLtpDirection(controlConstruct, logicalTerminationPoint);
@@ -547,7 +547,7 @@ exports.listLinksToOperationClientsOfApplication = function (body, user, origina
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+      let applicationReleaseNumber = body["release-number"];
 
       /****************************************************************************************
        * Preparing response body
@@ -626,7 +626,7 @@ exports.listOperationClientsAtApplication = function (body, user, originator, xC
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+      let applicationReleaseNumber = body["release-number"];
 
       /****************************************************************************************
        * Preparing response body
@@ -646,9 +646,8 @@ exports.listOperationClientsAtApplication = function (body, user, originator, xC
             let clientUuidList = logicalTerminationPoint["client-ltp"];
 
             let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-            let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
             let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-            let clientApplicationName = httpClientCapability[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+            let clientApplicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
             let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
 
             if (clientUuidList) {
@@ -789,7 +788,7 @@ exports.listOperationServersAtApplication = function (body, user, originator, xC
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+      let applicationReleaseNumber = body["release-number"];
 
       /****************************************************************************************
        * Preparing response body
@@ -828,7 +827,6 @@ exports.listOperationServersAtApplication = function (body, user, originator, xC
     }
   });
 }
-
 
 /**
  * Offers subscribing for notifications about updates of Links
@@ -1050,7 +1048,21 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           resolve();
         }
         // response is full control construct of regarded application
-        await elasticsearchService.createOrUpdateControlConstructInES(response[onfAttributes.CONTROL_CONSTRUCT]);
+
+        await elasticsearchService.createOrUpdateControlConstructInES(response["core-model-1-4:control-construct"]);
+
+        let logicalTerminationPoints = response["core-model-1-4:control-construct"]["logical-termination-point"];
+        let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
+        for (let operationServerName of operationServerNames) {
+          let endPointDetails = {
+            'serving-application-name': applicationName,
+            'serving-application-release-number': applicationReleaseNumber,
+            'operationServerName': operationServerName,
+            'consuming-application-name': ownApplicationName,
+            'consuming-application-release-number': ownApplicationReleaseNumber
+          }
+          await LinkServices.findOrCreateLinkForTheEndPointsAsync(endPointDetails);
+        }
       }
       resolve();
     } catch (error) {
@@ -1110,73 +1122,6 @@ exports.removeOperationClientFromLink = function (body, user, originator, xCorre
   });
 }
 
-/**
- * Starts application in generic representation
- *
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
- * returns inline_response_200
- **/
-exports.startApplicationInGenericRepresentation = function (user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    try {
-      /****************************************************************************************
-       * Preparing consequent-action-list for response body
-       ****************************************************************************************/
-      let consequentActionList = [];
-      let protocol = "http";
-
-      let localAddress = await tcpServerInterface.getLocalAddress();
-      let localPort = await tcpServerInterface.getLocalPort();
-      let baseUrl = protocol + "://" + localAddress + ":" + localPort
-
-      let informAboutApplicationOperationServerUuid = "alt-0-0-1-op-s-2002";
-      let informAboutApplicationOperationName = await operationServerInterface.getOperationNameAsync(
-        informAboutApplicationOperationServerUuid);
-
-      let LabelForInformAboutApplication = "Inform about Application";
-      let requestForInformAboutApplication = baseUrl + informAboutApplicationOperationName;
-      let consequentActionForInformAboutApplication = new consequentAction(
-        LabelForInformAboutApplication,
-        requestForInformAboutApplication,
-        false
-      );
-      consequentActionList.push(consequentActionForInformAboutApplication);
-      /****************************************************************************************
-       * Preparing response-value-list for response body
-       ****************************************************************************************/
-      let responseValueList = [];
-      let applicationName = await httpServerInterface.getApplicationNameAsync();
-      let reponseValue = new responseValue(
-        "applicationName",
-        applicationName,
-        typeof applicationName
-      );
-
-      responseValueList.push(reponseValue);
-
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase({
-        consequentActionList,
-        responseValueList
-      });
-    } catch (error) {
-      console.log(error);
-    }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
-    }
-  });
-
-}
 
 /**
  * Existing documentation of all interfaces and internal connections will be replaced for the same CcUuid
@@ -1574,6 +1519,26 @@ async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
  ****************** Funtions that are specific to the addOperationClientToLink ************
  ***************************************************************************************************************/
 
+ /**
+  * Extracts operation server names from given list of LTPs.
+  * @param {List} logicalTerminationPoints LTPs from which the operation server names should be extracted
+  * @returns {List} of operation server names
+  */
+function getAllOperationServerNameAsync(logicalTerminationPoints) {
+  let operationServerNames = [];
+  for (let logicalTerminationPoint of logicalTerminationPoints) {
+    let protocols = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
+    let protocol = protocols[0];
+    let protocolName = protocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+    if (LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER === protocolName) {
+      let operationServerPac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+      let operationServerConfiguration = operationServerPac[onfAttributes.OPERATION_SERVER.CONFIGURATION];
+      operationServerNames.push(operationServerConfiguration[onfAttributes.OPERATION_SERVER.OPERATION_NAME]);
+    }
+  }
+  return operationServerNames;
+}
+
 /**
  * Provides operationClientUuid for the operationClientName
  * @param {*} controlConstruct complete control-construct instance
@@ -1750,11 +1715,10 @@ function getClientsReactingOnOperationServerList(controlConstruct,
           let clientLtp = clientLtpList[j];
           if (operationClientsUuidsReactingOnOperationServerList.includes(clientLtp)) {
             let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-            let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
             let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
             let operationName = getOperationNameOfTheOperationClient(logicalTerminationPointList,
               clientLtp);
-            let applicationName = httpClientCapability[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+            let applicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
             let releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
             let clientDetails = {};
             clientDetails.addressedApplicationName = applicationName;

@@ -7,12 +7,12 @@
 
 'use strict';
 
-const onfPaths = require('../constants/OnfPaths');
-const onfAttributes = require('../constants/OnfAttributes');
-const fileOperation = require('../../databaseDriver/JSONDriver');
-const NetworkControlDomain = require('./NetworkControlDomain');
+const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
+const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
+const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
+const ControlConstructService = require('../individualServices/ControlConstructService');
 const LinkPort = require('./LinkPort');
-const onfFormatter = require('../utility/OnfAttributeFormatter');
+const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 
 class Link {
     uuid;
@@ -31,7 +31,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let isLinkExists = false;
             try {
-                let linkList = await NetworkControlDomain.getLinkListAsync();
+                let linkList = await ControlConstructService.getLinkListAsync();
                 for (let i = 0; i < linkList.length; i++) {
                     let isServingOperationUuidExists = false;
                     let isConsumingOperationuuid = false;
@@ -62,7 +62,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let isConsumingServiceExists = false;
             try {
-                let link = await NetworkControlDomain.getLinkAsync(linkUuid);
+                let link = await ControlConstructService.getLinkAsync(linkUuid);
                 let linkPortList = link["link-port"];
                 for (let j = 0; j < linkPortList.length; j++) {
                     let linkPort = linkPortList[j];
@@ -83,7 +83,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let linkUuidOfTheServingOperation;
             try {
-                let linkList = await NetworkControlDomain.getLinkListAsync();
+                let linkList = await ControlConstructService.getLinkListAsync();
                 for (let i = 0; i < linkList.length; i++) {
                     let link = linkList[i];
                     let linkPortList = link[onfAttributes.LINK.LINK_PORT];
@@ -107,7 +107,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let linkUuidOfTheConsumingOperation;
             try {
-                let linkList = await NetworkControlDomain.getLinkListAsync();
+                let linkList = await ControlConstructService.getLinkListAsync();
                 for (let i = 0; i < linkList.length; i++) {
                     let link = linkList[i];
                     let linkPortList = link[onfAttributes.LINK.LINK_PORT];
@@ -131,7 +131,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let linkPortLocalIdOfTheConsumingOperation;
             try {
-                let link = await NetworkControlDomain.getLinkAsync(linkUuid);
+                let link = await ControlConstructService.getLinkAsync(linkUuid);
                 let linkPortList = link[onfAttributes.LINK.LINK_PORT];
                 for (let i = 0; i < linkPortList.length; i++) {
                     let linkPort = linkPortList[i];
@@ -213,7 +213,7 @@ class Link {
             let nextUuidNumber = "0000";
             let nextUuid;
             try {
-                let linkList = await NetworkControlDomain.getLinkListAsync();
+                let linkList = await ControlConstructService.getLinkListAsync();
                 let linkUuidList = [];
                 for (let i = 0; i < linkList.length; i++) {
                     let link = linkList[i];

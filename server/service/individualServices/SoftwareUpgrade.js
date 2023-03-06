@@ -18,6 +18,9 @@ const eventDispatcher = require('onf-core-model-ap/applicationPattern/rest/clien
 const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
 
 
+const ControlConstructService = require('./ControlConstructService');
+
+
 /**
  * This method performs the set of procedure to transfer the data from this version to next version 
  * of the application and bring the new release official
