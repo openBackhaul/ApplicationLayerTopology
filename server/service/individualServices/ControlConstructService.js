@@ -12,8 +12,14 @@ const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/con
 const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
+const {
+  elasticsearchService,
+  getIndexAliasAsync,
+  createResultArray
+} = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
-class ControlConstrucService {
+class ControlConstructService {
 
   /**
    * @description This function returns the link list entries from the core-model-1-4:control-construct
@@ -62,7 +68,7 @@ class ControlConstrucService {
     return new Promise(async function (resolve, reject) {
       let link;
       try {
-        let linkList = await ControlConstrucService.getLinkListAsync();
+        let linkList = await ControlConstructService.getLinkListAsync();
         for (let i = 0; i < linkList.length; i++) {
           let _link = linkList[i];
           let _linkUuid = _link[onfAttributes.GLOBAL_CLASS.UUID];
@@ -93,19 +99,83 @@ class ControlConstrucService {
   }
 
   /**
-   * @description This function returns the forwarding-domain list entries from the core-model-1-4:control-construct
-   * @returns {promise} returns ForwardingDomain List.
+   * @description This function returns the control-construct from Elasticsearch.
+   * @param {String} controlConstructUuid
+   * @returns {Promise<Object>} control-construct
    **/
   static async getControlConstructAsync(controlConstructUuid) {
-    return new Promise(async function (resolve, reject) {
-      try {
-        let controlConstructUuidPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let controlConstruct = await fileOperation.readFromDatabaseAsync(controlConstructUuidPath);
-        resolve(controlConstruct);
-      } catch (error) {
-        reject(error);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+      index: indexAlias,
+      filter_path: "hits.hits",
+      body: {
+        "query": {
+          "term": {
+            "uuid": controlConstructUuid
+          }
+        }
+      }
+    })
+    if (Object.keys(res.body).length === 0) {
+      throw new Error(`Could not find existing control-construct with UUID ${controlConstructUuid}`);
+    }
+    let controlConstruct = createResultArray(res);
+    return controlConstruct[0];
+  }
+
+  /**
+   * @description Given any LTP UUID, return its full control-construct.
+   * @param {String} ltpUuid
+   * @returns {Promise<String>} control-construct
+   */
+  static async getControlConstructFromLtpUuidAsync(ltpUuid) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+      index: indexAlias,
+      filter_path: "hits.hits._source",
+      body: {
+        "query": {
+          "term": {
+            "logical-termination-point.uuid": ltpUuid
+          }
+        }
+      }
+    })
+    if (Object.keys(res.body).length === 0) {
+      throw new Error(`Could not find existing control-construct with LTP UUID ${ltpUuid}`);
+    }
+    let controlConstruct = createResultArray(res);
+    return controlConstruct[0];
+  }
+
+  /**
+   * @description Retrieves Elasticsearch document ID for a specific control-construct.
+   * @param {String} controlConstructUuid
+   * @returns {Promise<String>} Elasticsearch document ID
+   */
+  static async getDocumentId(controlConstructUuid) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+      index: indexAlias,
+      filter_path: 'hits.hits._id',
+      body: {
+        "query": {
+          "term": {
+            "uuid": controlConstructUuid
+          }
+        }
       }
     });
+    if (Object.keys(res.body).length === 0) {
+      return undefined;
+    }
+    return res.body.hits.hits[0]._id;
   }
 
   /**
@@ -118,7 +188,7 @@ class ControlConstrucService {
     return new Promise(async function (resolve, reject) {
       let controlConstructInstance;
       try {
-        let controlConstructList = await ControlConstrucService.getControlConstructListAsync()
+        let controlConstructList = await ControlConstructService.getControlConstructListAsync()
         if (controlConstructList) {
           for (let i = 0; i < controlConstructList.length; i++) {
             let controlConstruct = controlConstructList[i];
@@ -149,26 +219,31 @@ class ControlConstrucService {
     });
   }
 
-
   /**
-   * @description This function adds a logical-termination-point instance to the core-model-1-4:control-construct/logical-termination-point
-   * @param {String} logicalTerminationPoint an instance of the LogicalTerminationPoint
-   * @returns {promise} returns {true|false}
+   * @description Creates or updates full control-construct in ES.
+   * @param {Object} controlConstruct full control-construct
+   * @returns {Promise<boolean>} true if create/update succeeded, false if not
    **/
-  static addControlConstructAsync(controlConstruct) {
-    return new Promise(async function (resolve, reject) {
-      let isCreated = false;
-      try {
-        controlConstruct = onfFormatter.modifyJsonObjectKeysToKebabCase(controlConstruct);
-        isCreated = await fileOperation.writeToDatabaseAsync(
-          onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT,
-          controlConstruct,
-          true);
-        resolve(isCreated);
-      } catch (error) {
-        reject(error);
-      }
-    });
+  static async createOrUpdateControlConstructAsync(controlConstruct) {
+    let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
+    let documentId = await ControlConstructService.getDocumentId(controlConstructUuid);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res;
+    if (documentId) {
+      res = await client.index({
+        index: indexAlias,
+        id: documentId,
+        body: controlConstruct
+      });
+    } else {
+      res = await client.index({
+        index: indexAlias,
+        body: controlConstruct
+      });
+    }
+    return Object.keys(res).length !== 0 && (res.result === 'created' || res.result === 'updated');
   }
 
   /**
@@ -237,6 +312,37 @@ class ControlConstrucService {
     });
   }
 
+  /**
+   * @description Given any LTP uuid from any control-construct, find proper control-construct
+   * and extract http-server-capability (this contains application-name and release-number).
+   * @param {String} ltpUuid
+   * @returns {Promise<Object>} http-server-capability
+   */
+  static async findHttpServerCapabilityFromLtpUuid(ltpUuid) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+        index: indexAlias,
+        filter_path: '**.http-server-interface-capability.application-name,' +
+        '**.http-server-interface-capability.release-number',
+        body: {
+            "query": {
+            "term": {"logical-termination-point.uuid": ltpUuid}
+            }
+        }
+    });
+    if (Object.keys(res.body).length === 0) {
+        throw new Error('Http server capability not found!');
+    }
+    let filteredLtps = res.body.hits.hits[0]._source['logical-termination-point'];
+    for (let ltp of filteredLtps) {
+        let layerProtocol = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+        if (onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC in layerProtocol) {
+            return layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC][onfAttributes.HTTP_SERVER.CAPABILITY];
+        }
+    };
+  }
 }
 
-module.exports = ControlConstrucService;
+module.exports = ControlConstructService;

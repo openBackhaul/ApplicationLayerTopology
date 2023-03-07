@@ -12,6 +12,11 @@ const Link = require('../models/Link');
 const ControlConstructService = require('./ControlConstructService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const LinkPort = require('../models/LinkPort');
+const {
+    elasticsearchService,
+    getIndexAliasAsync
+  } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
 /**
  * @description This function find or create a link
@@ -339,4 +344,36 @@ function getOperationClientUuid(controlConstruct, operationClientName, consuming
     } catch (error) {
       console.log(error)
     }
-  }
+}
+
+/**
+ * @description Retrieves output link-port object from link, where
+ * where input link-ports contain given operation-client UUID.
+ * @param {String} operationClientUuid
+ * @returns {Promise<Object>} output link-port
+ */
+exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function(operationClientUuid) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+        index: indexAlias,
+        filter_path: 'hits.hits._source.uuid,hits.hits._source.link-port',
+        body: {
+            "query": {
+                "nested": {
+                    "path": "link-port",
+                    "query": {
+                        "term": { "link-port.logical-termination-point": operationClientUuid }
+                    }
+                }
+            }
+        }
+    });
+    if (Object.keys(res.body).length === 0) {
+        return {};
+    }
+    let correctLink = res.body.hits.hits[0]._source;
+    let linkPorts = correctLink['link-port'];
+    return linkPorts.find(item => item['port-direction'] === LinkPort.portDirectionEnum.OUTPUT);
+}
