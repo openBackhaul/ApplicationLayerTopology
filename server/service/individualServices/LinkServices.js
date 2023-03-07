@@ -13,6 +13,8 @@ const ControlConstructService = require('./ControlConstructService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const LinkPort = require('../models/LinkPort');
 
+const ELASTICSEARCH_CLIENT_LINKS_UUID = "alt-2-0-1-es-c-es-1-0-0-001";
+
 /**
  * @description This function find or create a link
  * @param {object} EndPoints : EndPoint details of the link
@@ -105,24 +107,49 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
 }
 
 /**
- * @description This function deletes a link-port
- * @param {String} linkUuid : uuid of the link
- * @param {String} consumingOperationuuid : logical-termination-point of the link-port
- * @return {Promise} boolean {true|false}
+ * @description This function deletes a link from Elasticsearch
+ * @param {String} linkId : documentId for the link
+ * @return {Promise<Object>} Elastincsearch response
  **/
- function deleteLinkAsync(linkUuid,consumingOperationuuid) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            let localId = await Link.getLocalIdOfTheConsumingOperationAsync(linkUuid,consumingOperationuuid)
-            if (localId) {
-                await Link.deleteLinkPortAsync(linkUuid,localId);
-            }
-            resolve(linkUuid);
-        } catch (error) {
-            reject(error);
-        }
-    });
+ async function deleteLinkAsync(linkId) {
+  let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_LINKS_UUID);
+  let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_LINKS_UUID);
+  let response = await client.delete({
+    id: linkId,
+    index: indexAlias,
+    refresh: 'true'
+  });
+  return response;
 }
+
+  /**
+   * @description This function deletes the linkPort instance that matches the localId argument from its corresponding
+   * link
+   * @param {String} linkUuid : uuid of the link
+   * @param {String} linkPortLocalId : local-id of an existing link-port
+   * @returns {promise} boolean {true|false}
+   **/
+  async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
+    let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_LINKS_UUID);
+    let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_LINKS_UUID);
+    let response = await client.updateByQuery({
+        index: indexAlias,
+        body: {
+            script: {
+                source: "ctx._source['link-port'].removeIf(port -> port['local-id'] == params['local-id'])",
+                params: {
+                    "local-id": linkPortLocalId
+                }
+            },
+            query: {
+                match: {
+                    "uuid": linkUuid
+                }
+            }
+        },
+    });
+    return response;
+  }
 
 /**
  * @description This function creates or updates a link
@@ -339,4 +366,34 @@ function getOperationClientUuid(controlConstruct, operationClientName, consuming
     } catch (error) {
       console.log(error)
     }
+
+  exports.deleteDependentLinkPorts = async function(uuid) {
+    let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_LINKS_UUID);
+    let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_LINKS_UUID);
+    let res = await client.search({
+      index: indexAlias,
+      filter_path: 'hits.hits._id,hits.hits._source.link-port',
+      body: {
+        "query": {
+          "nested": {
+            "path": "link-port",
+            "query": {
+              "term": { "link-port.logical-termination-point": uuid }
+            }
+          }
+        }
+      }
+    });
+    if (Object.keys(res.body).length === 0) {
+      return;
+    }
+    let linkPorts = res.body.hits.hits[0]._source[onfAttributes.LINK.LINK_PORT];
+    let found = linkPorts.find(linkPort => linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT] === uuid);
+    let linkId = res.body.hits.hits[0]._id;
+    if (LinkPort.portDirectionEnum.INPUT === found[onfAttributes.LINK.PORT_DIRECTION]) {
+      deleteLinkPortAsync(linkId, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
+    } else {
+      deleteLinkAsync(linkId);
+    }
   }
+}
