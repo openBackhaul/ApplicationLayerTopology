@@ -44,6 +44,9 @@ const Link = require('./models/Link');
 const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ControlConstructService = require('./individualServices/ControlConstructService');
 
+const ELASTICSEARCH_CLIENT_CC_UUID = "alt-2-0-1-es-c-es-1-0-0-000";
+const ELASTICSEARCH_CLIENT_LINKS_UUID = "alt-2-0-1-es-c-es-1-0-0-001";
+
 /**
  * Connects an OperationClient to an OperationServer
  *
@@ -1161,14 +1164,14 @@ exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator
       /****************************************************************************************
        * Get the forwarding construct list to be updated
        ****************************************************************************************/
-       let forwardingConstructListToBeUpdated = await getForwardingConstructListToUpdateFc(controlConstructUuid, forwardingConstructUuid, forwardingConstruct);
-     
-       let response = await updateForwardingConstrutList(forwardingConstructListToBeUpdated,forwardingConstructUuid) 
-      
-      if(response && response.body.result === 'updated') {
+      let forwardingConstructListToBeUpdated = await getForwardingConstructListToUpdateFc(controlConstructUuid, forwardingConstructUuid, forwardingConstruct);
+
+      let response = await updateForwardingConstrutList(forwardingConstructListToBeUpdated, forwardingConstructUuid)
+
+      if (response && response.body.result === 'updated') {
         resolve();
       } else {
-        throw new Error ('fc is not updated')
+        throw new Error('fc is not updated')
       }
     } catch (error) {
       reject(error);
@@ -1358,27 +1361,27 @@ function getAllClientApplicationList() {
   });
 }
 
-async function updateForwardingConstrutList(forwardingConstructToBeUpdated, forwardingConstructUuid) {
+async function updateForwardingConstrutList(forwardingConstructListToBeUpdated, forwardingConstructUuid) {
   return new Promise(async function (resolve, reject) {
     try {
-    let client = await elasticsearchService.getClient(false, "alt-2-0-1-es-c-es-1-0-0-000");
-        let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-000");
-       let response;
-        if (Object.keys(forwardingConstructToBeUpdated).length >= 2) {
+      let client = await elasticsearchService.getClient(false, "ELASTICSEARCH_CLIENT_CC_UUID");
+      let indexAlias = await getIndexAliasAsync("ELASTICSEARCH_CLIENT_CC_UUID");
+      let response;
+      if (Object.keys(forwardingConstructListToBeUpdated).length >= 2) {
 
-           response = await client.update({
-            index: indexAlias,
-            id: forwardingConstructToBeUpdated.documentId,
-            body : {
+        response = await client.update({
+          index: indexAlias,
+          id: forwardingConstructToBeUpdated.documentId,
+          body: {
             script: {
-                source : "ctx._source['forwarding-domain'][0]['forwarding-construct'] = params['forwardingConstructList']",
-                params : {
-                  "uuid": forwardingConstructUuid,
-                  "forwardingConstructList" : forwardingConstructToBeUpdated.forwardingConstructList
-                }
-              },
+              source: "ctx._source['forwarding-domain'][0]['forwarding-construct'] = params['forwardingConstructList']",
+              params: {
+                "uuid": forwardingConstructUuid,
+                "forwardingConstructList": forwardingConstructToBeUpdated.forwardingConstructList
+              }
             },
-        }); 
+          },
+        });
       }
       resolve(response);
     } catch (error) {
@@ -1391,27 +1394,27 @@ async function getForwardingDomainFromControlConstruct(controlConstructUuid) {
   return new Promise(async function (resolve, reject) {
     let forwardingDomainOfControlConstruct = {}
     try {
-      let client = await elasticsearchService.getClient(false, "alt-2-0-1-es-c-es-1-0-0-000");
-      let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-000");
+      let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
+      let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
       let res = await client.search({
         index: indexAlias,
-        filter_path : "hits.hits._id,hits.hits._source.forwarding-domain",
+        filter_path: "hits.hits._id,hits.hits._source.forwarding-domain",
         body: {
-          "query" : {
-              "match":{
-                "uuid" : controlConstructUuid
-             }
-            
-           }
-          
+          "query": {
+            "match": {
+              "uuid": controlConstructUuid
+            }
+
+          }
+
         }
-      
+
       })
-      
-      if(Object.keys(res.body).length != 0) {
+
+      if (Object.keys(res.body).length != 0) {
         forwardingDomainOfControlConstruct.forwardingDomainList = res.body.hits.hits[0]._source['forwarding-domain'];
         forwardingDomainOfControlConstruct.id = res.body.hits.hits[0]._id;
-      } 
+      }
       resolve(forwardingDomainOfControlConstruct);
     } catch (error) {
       reject(error);
@@ -1423,30 +1426,31 @@ async function getForwardingConstructListToUpdateFc(controlConstructUuid, forwar
   return new Promise(async function (resolve, reject) {
     let forwardingConstruct = {};
     let forwardingConstructList;
-    try {  
-      
+    try {
+
       let forwardingDomainOfControlConstruct = await getForwardingDomainFromControlConstruct(controlConstructUuid);
-     
+
       let forwardingDomainList = forwardingDomainOfControlConstruct.forwardingDomainList;
       let documentId = forwardingDomainOfControlConstruct.id;
       /*************************************************************************************
        * configure forwarding construct list based on the incoming forwardingConstructUuid
        *************************************************************************************/
       if (Object.keys(forwardingDomainOfControlConstruct).length != 0) {
-           let forwardingDomain = forwardingDomainList[0];
-           forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
-          let indexOfIncomingForwardingConstructUuid = forwardingConstructList.map(forwardingConstruct => forwardingConstruct.uuid).indexOf(forwardingConstructUuid);
-          if(indexOfIncomingForwardingConstructUuid == -1){
-              forwardingConstructList.push(forwardingConstructFromRequest)
-          } else {
-             let forwardingConstruct = forwardingConstructList.at(indexOfIncomingForwardingConstructUuid);
-              if(JSON.stringify(forwardingConstruct) != JSON.stringify(forwardingConstructFromRequest)){
-                forwardingConstructList.splice(indexOfIncomingForwardingConstructUuid,1,forwardingConstructFromRequest)
-              }
-            }forwardingConstruct.documentId = documentId;
-            forwardingConstruct.forwardingConstructList = forwardingConstructList;
+        let forwardingDomain = forwardingDomainList[0];
+        forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+        let indexOfIncomingForwardingConstructUuid = forwardingConstructList.map(forwardingConstruct => forwardingConstruct.uuid).indexOf(forwardingConstructUuid);
+        if (indexOfIncomingForwardingConstructUuid == -1) {
+          forwardingConstructList.push(forwardingConstructFromRequest)
+        } else {
+          let forwardingConstruct = forwardingConstructList.at(indexOfIncomingForwardingConstructUuid);
+          if (JSON.stringify(forwardingConstruct) != JSON.stringify(forwardingConstructFromRequest)) {
+            forwardingConstructList.splice(indexOfIncomingForwardingConstructUuid, 1, forwardingConstructFromRequest)
           }
-      
+        }
+        forwardingConstruct.documentId = documentId;
+        forwardingConstruct.forwardingConstructList = forwardingConstructList;
+      }
+
       resolve(forwardingConstruct);
     } catch (error) {
       reject(error);
