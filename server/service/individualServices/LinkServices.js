@@ -12,6 +12,7 @@ const Link = require('../models/Link');
 const ControlConstructService = require('./ControlConstructService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const LinkPort = require('../models/LinkPort');
+const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 
 const ELASTICSEARCH_CLIENT_LINKS_UUID = "alt-2-0-1-es-c-es-1-0-0-001";
 
@@ -366,13 +367,14 @@ function getOperationClientUuid(controlConstruct, operationClientName, consuming
     } catch (error) {
       console.log(error)
     }
+  }
 
   exports.deleteDependentLinkPorts = async function(uuid) {
     let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_LINKS_UUID);
     let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_LINKS_UUID);
     let res = await client.search({
       index: indexAlias,
-      filter_path: 'hits.hits._id,hits.hits._source.link-port',
+      filter_path: 'hits.hits._id,hits.hits._source',
       body: {
         "query": {
           "nested": {
@@ -389,11 +391,11 @@ function getOperationClientUuid(controlConstruct, operationClientName, consuming
     }
     let linkPorts = res.body.hits.hits[0]._source[onfAttributes.LINK.LINK_PORT];
     let found = linkPorts.find(linkPort => linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT] === uuid);
-    let linkId = res.body.hits.hits[0]._id;
+    let linkUuid = res.body.hits.hits[0]._source[onfAttributes.GLOBAL_CLASS.UUID];
     if (LinkPort.portDirectionEnum.INPUT === found[onfAttributes.LINK.PORT_DIRECTION]) {
-      deleteLinkPortAsync(linkId, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
+      deleteLinkPortAsync(linkUuid, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
     } else {
-      deleteLinkAsync(linkId);
+      deleteLinkAsync(res.body.hits.hits[0]._id);
     }
   }
-}
+

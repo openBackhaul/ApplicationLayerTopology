@@ -262,11 +262,11 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.deleteLtpAndDependents = async function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+exports.deleteLtpAndDependents = async function (body) {
   let ltpToBeRemovedUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
   let controlConstruct = await ControlConstructService.getControlConstructFromLtpUuidAsync(ltpToBeRemovedUuid);
 
-  let ltps = controlConstruct[onfAttributes.LOGICAL_TERMINATION_POINT];
+  let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
   let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid)
 
   // do removal based on layerProtocol
@@ -274,10 +274,6 @@ exports.deleteLtpAndDependents = async function (body, user, originator, xCorrel
   let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
   switch (layerProtocolName) {
     case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT:
-      await deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
-      await LinkServices.deleteDependentLinkPorts(ltpToBeRemovedUuid);
-      break;
-    case LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER:
       await deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
       await LinkServices.deleteDependentLinkPorts(ltpToBeRemovedUuid);
       break;
@@ -292,18 +288,19 @@ exports.deleteLtpAndDependents = async function (body, user, originator, xCorrel
       });
       break;
     case LayerProtocol.layerProtocolNameEnum.TCP_CLIENT:
-      let httpClient = ControlConstructService.getHttpClientForTcpClient(ltpToBeRemovedUuid);
+      let httpClientUuid = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP][0];
+      let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
       if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
-        ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
+        httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
           await deleteDependentFcPorts(controlConstruct, clientUUID);
           await LinkServices.deleteDependentLinkPorts(clientUUID);
           ControlConstructService.deleteLtp(controlConstruct, clientUUID);
         });
-        ControlConstructService.deleteLtp(controlConstruct, httpClient[onfAttributes.GLOBAL_CLASS.UUID]);
+        ControlConstructService.deleteLtp(controlConstruct, httpClientUuid);
       }
       break;
     default:
-      // don't do anything if LTP is of type http-s or tcp-s
+      // don't do anything if LTP is of type http-s, tcp-s or op-s
       return;
   }
 
