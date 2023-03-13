@@ -1159,36 +1159,17 @@ exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator
       let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
 
       /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
+       * Get the forwarding construct list to be updated
        ****************************************************************************************/
-      let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
-      if (forwardingDomainUuid != undefined) {
-        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-        let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
-        let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
-
-        let existingForwardingConstruct = await fileOperation.readFromDatabaseAsync(forwardingConstructPathForTheUuid);
-
-        if (existingForwardingConstruct) {
-          let existingForwardingConstructAsAString = JSON.stringify(existingForwardingConstruct);
-          let newForwardingConstructAsAString = JSON.stringify(forwardingConstruct);
-          if (existingForwardingConstructAsAString != newForwardingConstructAsAString) {
-            await fileOperation.deletefromDatabaseAsync(forwardingConstructPathForTheUuid,
-              existingForwardingConstruct,
-              true);
-            await fileOperation.writeToDatabaseAsync(forardingConstructPath,
-              forwardingConstruct,
-              true);
-          }
-        } else {
-          await fileOperation.writeToDatabaseAsync(forardingConstructPath,
-            forwardingConstruct,
-            true);
-        }
+       let forwardingConstructListToBeUpdated = await getForwardingConstructListToUpdateFc(controlConstructUuid, forwardingConstructUuid, forwardingConstruct);
+     
+       let response = await updateForwardingConstrutList(forwardingConstructListToBeUpdated,forwardingConstructUuid) 
+      
+      if(response && response.body.result === 'updated') {
+        resolve();
+      } else {
+        throw new Error ('fc is not updated')
       }
-      resolve();
     } catch (error) {
       reject(error);
     }
@@ -1377,6 +1358,101 @@ function getAllClientApplicationList() {
   });
 }
 
+async function updateForwardingConstrutList(forwardingConstructToBeUpdated, forwardingConstructUuid) {
+  return new Promise(async function (resolve, reject) {
+    try {
+    let client = await elasticsearchService.getClient(false, "alt-2-0-1-es-c-es-1-0-0-000");
+        let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-000");
+       let response;
+        if (Object.keys(forwardingConstructToBeUpdated).length >= 2) {
+
+           response = await client.update({
+            index: indexAlias,
+            id: forwardingConstructToBeUpdated.documentId,
+            body : {
+            script: {
+                source : "ctx._source['forwarding-domain'][0]['forwarding-construct'] = params['forwardingConstructList']",
+                params : {
+                  "uuid": forwardingConstructUuid,
+                  "forwardingConstructList" : forwardingConstructToBeUpdated.forwardingConstructList
+                }
+              },
+            },
+        }); 
+      }
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+async function getForwardingDomainFromControlConstruct(controlConstructUuid) {
+  return new Promise(async function (resolve, reject) {
+    let forwardingDomainOfControlConstruct = {}
+    try {
+      let client = await elasticsearchService.getClient(false, "alt-2-0-1-es-c-es-1-0-0-000");
+      let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-000");
+      let res = await client.search({
+        index: indexAlias,
+        filter_path : "hits.hits._id,hits.hits._source.forwarding-domain",
+        body: {
+          "query" : {
+              "match":{
+                "uuid" : controlConstructUuid
+             }
+            
+           }
+          
+        }
+      
+      })
+      
+      if(Object.keys(res.body).length != 0) {
+        forwardingDomainOfControlConstruct.forwardingDomainList = res.body.hits.hits[0]._source['forwarding-domain'];
+        forwardingDomainOfControlConstruct.id = res.body.hits.hits[0]._id;
+      } 
+      resolve(forwardingDomainOfControlConstruct);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+async function getForwardingConstructListToUpdateFc(controlConstructUuid, forwardingConstructUuid, forwardingConstructFromRequest) {
+  return new Promise(async function (resolve, reject) {
+    let forwardingConstruct = {};
+    let forwardingConstructList;
+    try {  
+      
+      let forwardingDomainOfControlConstruct = await getForwardingDomainFromControlConstruct(controlConstructUuid);
+     
+      let forwardingDomainList = forwardingDomainOfControlConstruct.forwardingDomainList;
+      let documentId = forwardingDomainOfControlConstruct.id;
+      /*************************************************************************************
+       * configure forwarding construct list based on the incoming forwardingConstructUuid
+       *************************************************************************************/
+      if (Object.keys(forwardingDomainOfControlConstruct).length != 0) {
+           let forwardingDomain = forwardingDomainList[0];
+           forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+          let indexOfIncomingForwardingConstructUuid = forwardingConstructList.map(forwardingConstruct => forwardingConstruct.uuid).indexOf(forwardingConstructUuid);
+          if(indexOfIncomingForwardingConstructUuid == -1){
+              forwardingConstructList.push(forwardingConstructFromRequest)
+          } else {
+             let forwardingConstruct = forwardingConstructList.at(indexOfIncomingForwardingConstructUuid);
+              if(JSON.stringify(forwardingConstruct) != JSON.stringify(forwardingConstructFromRequest)){
+                forwardingConstructList.splice(indexOfIncomingForwardingConstructUuid,1,forwardingConstructFromRequest)
+              }
+            }forwardingConstruct.documentId = documentId;
+            forwardingConstruct.forwardingConstructList = forwardingConstructList;
+          }
+      
+      resolve(forwardingConstruct);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
 
 async function getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid) {
   return new Promise(async function (resolve, reject) {
