@@ -2,14 +2,14 @@ module.exports.individualServicesOperationsMapping =
 {
   "/v1/notify-link-updates": {
     "regard-updated-link": {
-      "api-segment": "im",
-      "sequence": "000"
+      "api-segment": "is",
+      "sequence": "002"
     }
   },
   "/v1/regard-application": {
     "redirect-topology-change-information": {
       "api-segment": "im",
-      "sequence": "005"
+      "sequence": "004"
     }
   }
 }
