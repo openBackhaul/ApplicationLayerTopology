@@ -1200,42 +1200,20 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
        ****************************************************************************************/
       let forwardingConstructUuid = body["fc-uuid"];
       let fcPort = body["fc-port"];
-      let fcPortLocalId = fcPort["local-id"];
       let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
 
       /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
+       * Get the forwarding construct list to be updated
        ****************************************************************************************/
-      let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
-      if (forwardingDomainUuid != undefined) {
-        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-        let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
-        let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
-        let fcPortPath = forwardingConstructPathForTheUuid + "/fc-port";
-        let fcPortPathForTheUuid = fcPortPath + "=" + fcPortLocalId
+      let forwardingConstructListToBeUpdated = await forwardingService.getForwardingConstructListToUpdateFcPort(controlConstructUuid, forwardingConstructUuid, fcPort);
 
-        let existingFcPort = await fileOperation.readFromDatabaseAsync(fcPortPathForTheUuid);
+      let response = await forwardingService.updateForwardingConstructList(forwardingConstructListToBeUpdated)
 
-        if (existingFcPort) {
-          let existingFcPortAsAString = JSON.stringify(existingFcPort);
-          let newFcPortAsAString = JSON.stringify(fcPort);
-          if (existingFcPortAsAString != newFcPortAsAString) {
-            await fileOperation.deletefromDatabaseAsync(fcPortPathForTheUuid,
-              existingFcPort,
-              true);
-            await fileOperation.writeToDatabaseAsync(fcPortPath,
-              fcPort,
-              true);
-          }
-        } else {
-          await fileOperation.writeToDatabaseAsync(fcPortPath,
-            fcPort,
-            true);
-        }
+      if (response && response.body.result === 'updated') {
+        resolve();
+      } else {
+        throw new Error('fc is not updated')
       }
-      resolve();
     } catch (error) {
       reject(error);
     }
