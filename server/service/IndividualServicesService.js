@@ -1212,7 +1212,7 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
       if (response && response.body.result === 'updated') {
         resolve();
       } else {
-        throw new Error('fc is not updated')
+        throw new Error('fc-port is not updated')
       }
     } catch (error) {
       reject(error);
