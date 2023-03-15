@@ -1332,41 +1332,6 @@ function getAllClientApplicationList() {
   });
 }
 
-
-
-async function getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid) {
-  return new Promise(async function (resolve, reject) {
-    let forwardingDomainUuid;
-    try {
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-      let forwardingConstructPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN;
-
-      let forwardingDomainList = await fileOperation.readFromDatabaseAsync(
-        forwardingConstructPath);
-      /*************************************************************************************
-       ****************delete dependents , if a fc-port exist for them***********************
-       *************************************************************************************/
-      if (forwardingDomainList != undefined) {
-        for (let i = 0; i < forwardingDomainList.length; i++) {
-          let forwardingDomain = forwardingDomainList[i];
-          let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
-
-          for (let j = 0; j < forwardingConstructList.length; j++) {
-            let forwardingConstruct = forwardingConstructList[j];
-            let _forwardingConstructUuid = forwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-            if (_forwardingConstructUuid == forwardingConstructUuid) {
-              forwardingDomainUuid = forwardingDomain[onfAttributes.GLOBAL_CLASS.UUID];
-            }
-          }
-        }
-      }
-      resolve(forwardingDomainUuid);
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
 async function deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid) {
   return new Promise(async function (resolve, reject) {
     try {
