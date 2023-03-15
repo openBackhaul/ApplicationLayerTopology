@@ -58,8 +58,28 @@ async function getForwardingDomainFromControlConstruct(controlConstructUuid) {
             if (Object.keys(res.body).length != 0) {
                 forwardingDomainOfControlConstruct.forwardingDomainList = res.body.hits.hits[0]._source['forwarding-domain'];
                 forwardingDomainOfControlConstruct.id = res.body.hits.hits[0]._id;
+            } else {
+                throw new Error('constrol construct is not present in Elastic Search')
             }
             resolve(forwardingDomainOfControlConstruct);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+async function getForwardingConstructList(forwardingDomainOfControlConstruct, forwardingConstructUuid) {
+    return new Promise(async function (resolve, reject) {
+        let forwardingConstructList = {}
+        try {
+            let forwardingDomainList = forwardingDomainOfControlConstruct.forwardingDomainList;
+
+            if (Object.keys(forwardingDomainOfControlConstruct).length != 0) {
+                let forwardingDomain = forwardingDomainList[0];
+                forwardingConstructList.forwardingConstruct = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+                forwardingConstructList.indexOfIncomingForwardingConstructUuid = forwardingConstructList.forwardingConstruct.map(forwardingConstruct => forwardingConstruct.uuid).indexOf(forwardingConstructUuid);
+            }
+            resolve(forwardingConstructList);
         } catch (error) {
             reject(error);
         }
@@ -73,16 +93,13 @@ exports.getForwardingConstructListToUpdateFc = function (controlConstructUuid, f
         try {
 
             let forwardingDomainOfControlConstruct = await getForwardingDomainFromControlConstruct(controlConstructUuid);
-
-            let forwardingDomainList = forwardingDomainOfControlConstruct.forwardingDomainList;
             let documentId = forwardingDomainOfControlConstruct.id;
-            /*************************************************************************************
-             ****************delete dependents , if a fc-port exist for them***********************
-             *************************************************************************************/
-            if (Object.keys(forwardingDomainOfControlConstruct).length != 0) {
-                let forwardingDomain = forwardingDomainList[0];
-                forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
-                let indexOfIncomingForwardingConstructUuid = forwardingConstructList.map(forwardingConstruct => forwardingConstruct.uuid).indexOf(forwardingConstructUuid);
+
+            let forwardingControlConstructList = await getForwardingConstructList(forwardingDomainOfControlConstruct, forwardingConstructUuid);
+            let indexOfIncomingForwardingConstructUuid = forwardingControlConstructList.indexOfIncomingForwardingConstructUuid;
+            forwardingConstructList = forwardingControlConstructList.forwardingConstruct
+
+            if (forwardingConstructList) {
                 if (indexOfIncomingForwardingConstructUuid == -1) {
                     forwardingConstructList.push(forwardingConstructFromRequest)
                 } else {
@@ -96,6 +113,47 @@ exports.getForwardingConstructListToUpdateFc = function (controlConstructUuid, f
             }
 
             resolve(forwardingConstruct);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+exports.getForwardingConstructListToUpdateFcPort = function (controlConstructUuid, forwardingConstructUuid, fcPortFromRequest) {
+    return new Promise(async function (resolve, reject) {
+        let forwardingConstructListToBeUpdated = {};
+        let forwardingConstructList;
+        try {
+
+            let forwardingDomainOfControlConstruct = await getForwardingDomainFromControlConstruct(controlConstructUuid);
+            let documentId = forwardingDomainOfControlConstruct.id;
+
+            let forwardingControlConstructList = await getForwardingConstructList(forwardingDomainOfControlConstruct, forwardingConstructUuid);
+            let indexOfIncomingForwardingConstructUuid = forwardingControlConstructList.indexOfIncomingForwardingConstructUuid;
+            forwardingConstructList = forwardingControlConstructList.forwardingConstruct
+
+            if (forwardingConstructList) {
+                if (indexOfIncomingForwardingConstructUuid != -1) {
+                    let forwardingConstruct = forwardingConstructList.at(indexOfIncomingForwardingConstructUuid);
+                    let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT]
+                    let fcPortLocalId = fcPortFromRequest["local-id"];
+                    let indexOfIncomingFcPortLocalId = fcPortList.map(fcPort => fcPort["local-id"]).indexOf(fcPortLocalId);
+                    if (indexOfIncomingFcPortLocalId != -1) {
+                        let existingFcPort = fcPortList.at(indexOfIncomingFcPortLocalId);
+                        if (JSON.stringify(existingFcPort) != JSON.stringify(fcPortFromRequest)) {
+                            fcPortList.splice(indexOfIncomingFcPortLocalId, 1, fcPortFromRequest)
+                        }
+                    } else {
+                        fcPortList.push(fcPortFromRequest);
+                    }
+                    forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT] = fcPortList;
+                    forwardingConstructList.splice(indexOfIncomingForwardingConstructUuid, 1, forwardingConstruct);
+                    forwardingConstructListToBeUpdated.documentId = documentId;
+                    forwardingConstructListToBeUpdated.forwardingConstructList = forwardingConstructList;
+                }
+            }
+            resolve(forwardingConstructListToBeUpdated);
         } catch (error) {
             reject(error);
         }
