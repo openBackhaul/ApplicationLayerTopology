@@ -232,26 +232,20 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
        * Prepare input object to 
        * configure control-construct list
        ****************************************************************************************/
-      let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
-      if (forwardingDomainUuid != undefined) {
-        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-        let forwardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT + "=" + forwardingConstructUuid;
-        let fcPortPath = forwardingConstructPath + "/" + onfAttributes.FORWARDING_CONSTRUCT.FC_PORT + "=" + fcPortLocalId;
-        let isFcPortExists = await fileOperation.readFromDatabaseAsync(fcPortPath)
-        if (isFcPortExists) {
-          await fileOperation.deletefromDatabaseAsync(fcPortPath,
-            fcPortPath,
-            true);
-        }
+      let forwardingConstructListToBeUpdated = await forwardingService.getForwardingConstructListToDeleteFcPort(controlConstructUuid, forwardingConstructUuid ,fcPortLocalId);
+      
+      let response = await forwardingService.updateForwardingConstructList(forwardingConstructListToBeUpdated,forwardingConstructUuid) 
+      
+      if(response && response.body.result === 'updated' || Object.keys(forwardingConstructListToBeUpdated).length === 0) {
+        resolve();
+      } else {
+        throw new Error ('fc-port is not deleted')
       }
-      resolve();
     } catch (error) {
       reject(error);
     }
   });
 }
-
 
 /**
  * An OperationClient identified by LtpUuid and all its entries in FCs and Links gets deleted
