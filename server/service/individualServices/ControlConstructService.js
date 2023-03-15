@@ -12,6 +12,9 @@ const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/con
 const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
+const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+
+const ELASTICSEARCH_CLIENT_CC_UUID = "alt-2-0-1-es-c-es-1-0-0-000";
 
 class ControlConstrucService {
 
@@ -93,20 +96,30 @@ class ControlConstrucService {
   }
 
   /**
-   * @description This function returns the forwarding-domain list entries from the core-model-1-4:control-construct
-   * @returns {promise} returns ForwardingDomain List.
-   **/
-  static async getControlConstructAsync(controlConstructUuid) {
-    return new Promise(async function (resolve, reject) {
-      try {
-        let controlConstructUuidPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let controlConstruct = await fileOperation.readFromDatabaseAsync(controlConstructUuidPath);
-        resolve(controlConstruct);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
+  * @description This function returns the control-construct from Elasticsearch.
+  * @param {String} controlConstructUuid
+  * @returns {Promise<Object>} control-construct
+  **/
+ static async getControlConstructAsync(controlConstructUuid) {
+   let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
+   let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+   let res = await client.search({
+     index: indexAlias,
+     filter_path: "hits.hits",
+     body: {
+       "query": {
+         "term": {
+           "uuid": controlConstructUuid
+         }
+       }
+     }
+   })
+   if (Object.keys(res.body.hits.hits).length === 0) {
+     throw new Error(`Could not find existing control-construct with UUID ${controlConstructUuid}`);
+   }
+   let controlConstruct = createResultArray(res);
+   return controlConstruct[0];
+ }
 
   /**
    * @description This function returns the logical-termination-point list entries from the core-model-1-4:control-construct that 

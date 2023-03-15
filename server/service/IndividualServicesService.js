@@ -219,14 +219,14 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
 exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
-      await checkApplicationExists(originator);
-
       /****************************************************************************************
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let forwardingConstructUuid = body["fc-uuid"];
       let fcPortLocalId = body["fc-port-local-id"];
       let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+
+      await checkApplicationExists(controlConstructUuid);
 
       /****************************************************************************************
        * Prepare input object to 
@@ -261,13 +261,13 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
 exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
-      await checkApplicationExists(originator);
-
       /****************************************************************************************
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let logicalTerminationPointUuid = body["uuid"];
       let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
+
+      await checkApplicationExists(controlConstructUuid);
 
       /****************************************************************************************
        * Prepare input object to 
@@ -1127,7 +1127,7 @@ exports.removeOperationClientFromLink = function (body, user, originator, xCorre
  * no response value expected for this operation
  **/
 exports.updateAllLtpsAndFcs = async function (body, originator) {
-  await checkApplicationExists(originator);
+  await checkIfApplicationExists(body["core-model-1-4:control-construct"]);
   await createOrUpdateControlConstructInES(body);
 }
 
@@ -1145,14 +1145,14 @@ exports.updateAllLtpsAndFcs = async function (body, originator) {
 exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
-      await checkApplicationExists(originator);
-
       /****************************************************************************************
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let forwardingConstruct = body;
       let forwardingConstructUuid = forwardingConstruct["uuid"];
       let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+
+      await checkApplicationExists(controlConstructUuid);
 
       /****************************************************************************************
        * Get the forwarding construct list to be updated
@@ -1187,7 +1187,6 @@ exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator
 exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
-      await checkApplicationExists(originator);
 
       /****************************************************************************************
        * Setting up required local variables from the request body
@@ -1195,6 +1194,8 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
       let forwardingConstructUuid = body["fc-uuid"];
       let fcPort = body["fc-port"];
       let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+
+      await checkApplicationExists(controlConstructUuid);
 
       /****************************************************************************************
        * Get the forwarding construct list to be updated
@@ -1229,7 +1230,6 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
 exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
-      await checkApplicationExists(originator);
 
       /****************************************************************************************
        * Setting up required local variables from the request body
@@ -1237,6 +1237,8 @@ exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicato
       let logicalTerminationPoint = body;
       let logicalTerminationPointUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
       let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
+
+      await checkApplicationExists(controlConstructUuid);
 
       /****************************************************************************************
        * Prepare input object to 
@@ -1798,15 +1800,41 @@ function getValueFromKey(nameList, key) {
 }
 
 /**
- * Checks if http-client LTP with the given application name exists. Throws Error if not. 
- * @param {string} applicationName
+ * Checks if application exists with the given uuid. Throws Error if not. 
+ * @param {string} uuid
  * @throws {Error} Will throw an error if the application does not exist.
  */
-async function checkApplicationExists(applicationName) {
-  const applicationExists = await httpClientInterface.isApplicationExists(applicationName);
-  if (!applicationExists) {
-    throw new Error(`Application ${applicationName} is not in the list of known applications.`);
+async function checkApplicationExists(uuid) {
+  try {
+    await ControlConstructService.getControlConstructAsync(uuid);
+  } catch (error) {
+    throw new Error('Application with uuid ${uuid} is not in the list of known applications.');
   }
+}
+
+/**
+ * Checks if http-c ltp exists by fetching applicationName and releaseNumber from given controlConstruc. Throws Error if not. 
+ * @param {Object} controlConstruct
+ * @throws {Error} Will throw an error if the application does not exist.
+ */
+async function checkIfApplicationExists(controlConstruct) {
+  return new Promise(async function (resolve, reject) {
+    let isApplicationExists = false;
+    try {
+      let applicationName = await getApplicationName(controlConstruct);
+      let releaseNumber = await getReleaseNumber(controlConstruct);
+      let httpClientUuid = await httpClientInterface.getHttpClientUuidAsync(applicationName, releaseNumber);
+      if (httpClientUuid != undefined) {
+        isApplicationExists = true;
+      }
+      if (!isApplicationExists) {
+        throw new Error(`Application ${applicationName} is not in the list of known applications.`);
+      }
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 
