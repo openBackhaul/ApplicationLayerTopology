@@ -1,9 +1,21 @@
 const { elasticsearchService, getIndexAliasAsync, operationalStateEnum } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
+const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 
-const ELASTICSEARCH_CLIENT_CC_UUID = "alt-2-0-1-es-c-es-1-0-0-000";
-const ELASTICSEARCH_CLIENT_LINKS_UUID = "alt-2-0-1-es-c-es-1-0-0-001";
+module.exports = {
+    prepareElasticsearch,
+    getCorrectEsUuid
+}
 
-const ELASTICSEARCH_CLIENT_UUIDS = [ELASTICSEARCH_CLIENT_CC_UUID, ELASTICSEARCH_CLIENT_LINKS_UUID];
+/**
+ * Returns Elasticsearch client UUID (decision made upon links param). CC UUID ends with '000', LINKS UUID ends with '001'.
+ * @param {boolean} links if true, return LINKS ES UUID, if false, return CC ES UUID
+ * @returns LINKS ES UUID or CC ES UUID
+ */
+async function getCorrectEsUuid(links) {
+    let uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
+    return links ? uuids.find(uuid => uuid.endsWith('001')) : uuids.find(uuid => uuid.endsWith('000'));
+};
 
 /**
  * @description Elasticsearch preparation. Checks if ES instance is configured properly.
@@ -18,17 +30,18 @@ const ELASTICSEARCH_CLIENT_UUIDS = [ELASTICSEARCH_CLIENT_CC_UUID, ELASTICSEARCH_
  *
  * @returns {Promise<void>}
  */
-module.exports = async function prepareElasticsearch() {
+async function prepareElasticsearch() {
     console.log("Configuring Elasticsearch...");
-    for (let uuid of ELASTICSEARCH_CLIENT_UUIDS) {
+    let uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
+    for (let uuid of uuids) {
         let ping = await elasticsearchService.getElasticsearchClientOperationalStateAsync(uuid);
         if (ping === operationalStateEnum.UNAVAILABLE) {
             console.error(`Elasticsearch unavailable. Skipping Elasticsearch configuration.`);
             return;
         }
-        if (uuid === ELASTICSEARCH_CLIENT_CC_UUID) {
+        if (uuid === await getCorrectEsUuid(false)) {
             await configureControlConstructIndexTemplate(uuid);
-        } else if (uuid === ELASTICSEARCH_CLIENT_LINKS_UUID) {
+        } else if (uuid === await getCorrectEsUuid(true)) {
             await configureLinksIndexTemplate(uuid);
         }
         await createAlias(uuid);
