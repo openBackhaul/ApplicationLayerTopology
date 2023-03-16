@@ -3,14 +3,14 @@ const {
     getIndexAliasAsync
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
-
-const ELASTICSEARCH_CLIENT_CC_UUID = "alt-2-0-1-es-c-es-1-0-0-000";
+const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
 exports.updateForwardingConstructList = function (forwardingConstructListToBeUpdated) {
     return new Promise(async function (resolve, reject) {
         try {
-            let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
-            let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+            let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+            let client = await elasticsearchService.getClient(false, esUuid);
+            let indexAlias = await getIndexAliasAsync(false, esUuid);
             let response;
             if (Object.keys(forwardingConstructListToBeUpdated).length >= 2) {
 
@@ -38,8 +38,9 @@ async function getForwardingDomainFromControlConstruct(controlConstructUuid) {
     return new Promise(async function (resolve, reject) {
         let forwardingDomainOfControlConstruct = {}
         try {
-            let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
-            let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+            let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+            let client = await elasticsearchService.getClient(false, esUuid);
+            let indexAlias = await getIndexAliasAsync(esUuid);
             let res = await client.search({
                 index: indexAlias,
                 filter_path: "hits.hits._id,hits.hits._source.forwarding-domain",
