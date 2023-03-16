@@ -226,8 +226,6 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
       let fcPortLocalId = body["fc-port-local-id"];
       let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
 
-      await checkApplicationExists(controlConstructUuid);
-
       /****************************************************************************************
        * Prepare input object to 
        * configure control-construct list
@@ -266,8 +264,6 @@ exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, 
        ****************************************************************************************/
       let logicalTerminationPointUuid = body["uuid"];
       let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
-
-      await checkApplicationExists(controlConstructUuid);
 
       /****************************************************************************************
        * Prepare input object to 
@@ -1152,8 +1148,6 @@ exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator
       let forwardingConstructUuid = forwardingConstruct["uuid"];
       let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
 
-      await checkApplicationExists(controlConstructUuid);
-
       /****************************************************************************************
        * Get the forwarding construct list to be updated
        ****************************************************************************************/
@@ -1195,8 +1189,6 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
       let fcPort = body["fc-port"];
       let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
 
-      await checkApplicationExists(controlConstructUuid);
-
       /****************************************************************************************
        * Get the forwarding construct list to be updated
        ****************************************************************************************/
@@ -1237,8 +1229,6 @@ exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicato
       let logicalTerminationPoint = body;
       let logicalTerminationPointUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
       let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
-
-      await checkApplicationExists(controlConstructUuid);
 
       /****************************************************************************************
        * Prepare input object to 
@@ -1799,18 +1789,6 @@ function getValueFromKey(nameList, key) {
   return undefined;
 }
 
-/**
- * Checks if application exists with the given uuid. Throws Error if not. 
- * @param {string} uuid
- * @throws {Error} Will throw an error if the application does not exist.
- */
-async function checkApplicationExists(uuid) {
-  try {
-    await ControlConstructService.getControlConstructAsync(uuid);
-  } catch (error) {
-    throw new Error('Application with uuid ${uuid} is not in the list of known applications.');
-  }
-}
 
 /**
  * Checks if http-c ltp exists by fetching applicationName and releaseNumber from given controlConstruc. Throws Error if not. 
