@@ -1,11 +1,10 @@
 'use strict';
 
 var utils = require('../utils/writer.js');
-var IndividualServices = require('../service/IndividualServicesService');
-var responseCodeEnum = require('../applicationPattern/rest/server/ResponseCode');
-var restResponseHeader = require('../applicationPattern/rest/server/ResponseHeader');
-var restResponseBuilder = require('../applicationPattern/rest/server/ResponseBuilder');
-var executionAndTraceService = require('../applicationPattern/services/ExecutionAndTraceService');
+var responseCodeEnum = require('onf-core-model-ap/applicationPattern/rest/server/ResponseCode');
+var restResponseHeader = require('onf-core-model-ap/applicationPattern/rest/server/ResponseHeader');
+var restResponseBuilder = require('onf-core-model-ap/applicationPattern/rest/server/ResponseBuilder');
+var executionAndTraceService = require('onf-core-model-ap/applicationPattern/services/ExecutionAndTraceService');
 
 module.exports.addOperationClientToLink = async function addOperationClientToLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {

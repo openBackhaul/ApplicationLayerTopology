@@ -2,8 +2,6 @@
 
 const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
 const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
-const LogicalTerminationPointConfigurationStatus = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
-const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 
 const LinkServices = require('./individualServices/LinkServices');
 const forwardingService = require('./individualServices/ForwardingService');
@@ -26,22 +24,14 @@ const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/on
 const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
 const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
 
-
-const operationServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
-const operationClientInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
-const consequentAction = require('../applicationPattern/rest/server/responseBody/ConsequentAction');
-const responseValue = require('../applicationPattern/rest/server/responseBody/ResponseValue');
-
 const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 
-const fileOperation = require('../applicationPattern/databaseDriver/JSONDriver');
+const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 
-const ForwardingConstruct = require('../applicationPattern/onfModel/models/ForwardingConstruct');
-const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
-const TcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
+const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
-const Link = require('./models/Link');
 const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ControlConstructService = require('./individualServices/ControlConstructService');
 
