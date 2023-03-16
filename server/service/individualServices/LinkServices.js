@@ -13,8 +13,7 @@ const ControlConstructService = require('./ControlConstructService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const LinkPort = require('../models/LinkPort');
 const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
-
-const ELASTICSEARCH_CLIENT_LINKS_UUID = "alt-2-0-1-es-c-es-1-0-0-001";
+const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
 /**
  * @description This function find or create a link
@@ -113,8 +112,9 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
  * @return {Promise<Object>} Elastincsearch response
  **/
  async function deleteLinkAsync(linkId) {
-  let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_LINKS_UUID);
-  let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_LINKS_UUID);
+  let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+  let client = await elasticsearchService.getClient(false, esUuid);
+  let indexAlias = await getIndexAliasAsync(esUuid);
   let response = await client.delete({
     id: linkId,
     index: indexAlias,
@@ -131,8 +131,9 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
    * @returns {promise} boolean {true|false}
    **/
   async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
-    let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_LINKS_UUID);
-    let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_LINKS_UUID);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
     let response = await client.updateByQuery({
         index: indexAlias,
         body: {
@@ -370,8 +371,9 @@ function getOperationClientUuid(controlConstruct, operationClientName, consuming
   }
 
   exports.deleteDependentLinkPorts = async function(uuid) {
-    let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_LINKS_UUID);
-    let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_LINKS_UUID);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
       index: indexAlias,
       filter_path: 'hits.hits._id,hits.hits._source',
@@ -394,8 +396,6 @@ function getOperationClientUuid(controlConstruct, operationClientName, consuming
     let linkUuid = res.body.hits.hits[0]._source[onfAttributes.GLOBAL_CLASS.UUID];
     if (LinkPort.portDirectionEnum.INPUT === found[onfAttributes.LINK.PORT_DIRECTION]) {
       deleteLinkPortAsync(linkUuid, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
-    } else {
-      deleteLinkAsync(res.body.hits.hits[0]._id);
     }
   }
 

@@ -17,8 +17,7 @@ const {
   getIndexAliasAsync,
   createResultArray
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
-
-const ELASTICSEARCH_CLIENT_CC_UUID = "alt-2-0-1-es-c-es-1-0-0-000";
+const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
 class ControlConstructService {
 
@@ -81,8 +80,9 @@ class ControlConstructService {
    * @returns {Promise<Object>} control-construct
    **/
   static async getControlConstructAsync(controlConstructUuid) {
-    let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
-    let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
       index: indexAlias,
       filter_path: "hits.hits",
@@ -107,8 +107,9 @@ class ControlConstructService {
    * @returns {Promise<String>} control-construct
    */
   static async getControlConstructFromLtpUuidAsync(ltpUuid) {
-    let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
-    let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
       index: indexAlias,
       filter_path: "hits.hits._source",
@@ -133,8 +134,9 @@ class ControlConstructService {
    * @returns {Promise<String>} Elasticsearch document ID
    */
   static async getDocumentId(controlConstructUuid) {
-    let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
-    let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
       index: indexAlias,
       filter_path: 'hits.hits._id',
@@ -201,8 +203,9 @@ class ControlConstructService {
   static async createOrUpdateControlConstructAsync(controlConstruct) {
     let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
     let documentId = await ControlConstructService.getDocumentId(controlConstructUuid);
-    let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
-    let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
     let res;
     if (documentId) {
       res = await client.index({
@@ -295,8 +298,9 @@ class ControlConstructService {
    * @returns {Promise<Object>} http-server-capability
    */
   static async findHttpServerCapabilityFromLtpUuid(ltpUuid) {
-    let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
-    let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
         index: indexAlias,
         filter_path: '**.http-server-interface-capability.application-name,' +
