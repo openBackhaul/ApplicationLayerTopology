@@ -1,8 +1,8 @@
-const forwardingConstructAutomationInput = require('../../applicationPattern/onfModel/services/models/forwardingConstruct/AutomationInput');
-const onfFormatter = require('../../applicationPattern/onfModel/utility/OnfAttributeFormatter');
-const controlConstruct = require('../../applicationPattern/onfModel/models/ControlConstruct');
-const forwardingDomain = require('../../applicationPattern/onfModel/models/ForwardingDomain');
-const forwardingConstruct = require('../../applicationPattern/onfModel/models/ForwardingConstruct');
+const forwardingConstructAutomationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/forwardingConstruct/AutomationInput');
+const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
+const controlConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ControlConstruct');
+const forwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
+const forwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
 
 exports.getALTForwardingAutomationInputAsync = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus) {
     return new Promise(async function (resolve, reject) {
