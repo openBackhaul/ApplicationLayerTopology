@@ -1,18 +1,16 @@
-const forwardingConstructAutomationInput = require('../../applicationPattern/onfModel/services/models/forwardingConstruct/AutomationInput');
-const httpServerInterface = require('../../applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
-const tcpServerInterface = require('../../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
-const onfFormatter = require('../../applicationPattern/onfModel/utility/OnfAttributeFormatter');
+const forwardingConstructAutomationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/forwardingConstruct/AutomationInput');
+const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
+const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
+const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 const prepareALTForwardingAutomation = require('onf-core-model-ap-bs/basicServices/services/PrepareALTForwardingAutomation');
-const logicalTerminationPoint = require('../../applicationPattern/onfModel/models/LogicalTerminationPoint');
-const LayerProtocol = require('../../applicationPattern/onfModel/models/LayerProtocol');
-const operationServerInterface = require('../../applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
-const onfPaths = require('../../applicationPattern/onfModel/constants/OnfPaths');
+const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
+const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
+const operationServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
+const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
 
-
-const fileOperation = require('../../applicationPattern/databaseDriver/JSONDriver');
+const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const ControlConstructService = require('./ControlConstructService');
-const LinkPort = require('../models/LinkPort');
-const Link = require('../models/Link');
 
 exports.regardApplication = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus, clientApplicationName,
     clientReleaseNumber) {
