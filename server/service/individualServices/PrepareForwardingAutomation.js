@@ -30,12 +30,12 @@ exports.regardApplication = function (logicalTerminationPointconfigurationStatus
             topologyChangeInformationRequestBody.topologyApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
             topologyChangeInformationRequestBody.topologyApplicationAddress = await tcpServerInterface.getLocalAddress();
             topologyChangeInformationRequestBody.topologyApplicationPort = await tcpServerInterface.getLocalPort();
-            topologyChangeInformationRequestBody.topologyOperationApplicationUpdate = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-004");
-            topologyChangeInformationRequestBody.topologyOperationLtpUpdate = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-005");
-            topologyChangeInformationRequestBody.topologyOperationLtpDeletion = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-006");
-            topologyChangeInformationRequestBody.topologyOperationFcUpdate = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-013");
-            topologyChangeInformationRequestBody.topologyOperationFcPortUpdate = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-014");
-            topologyChangeInformationRequestBody.topologyOperationFcPortDeletion = await operationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-015");
+            topologyChangeInformationRequestBody.topologyOperationApplicationUpdate = "/v1/update-all-ltps-and-fcs";
+            topologyChangeInformationRequestBody.topologyOperationLtpUpdate = "/v1/update-ltp";
+            topologyChangeInformationRequestBody.topologyOperationLtpDeletion = "/v1/delete-ltp-and-dependents";
+            topologyChangeInformationRequestBody.topologyOperationFcUpdate = "/v1/update-fc";
+            topologyChangeInformationRequestBody.topologyOperationFcPortUpdate = "/v1/update-fc-port";
+            topologyChangeInformationRequestBody.topologyOperationFcPortDeletion = "/v1/delete-fc-port";
             
 
             topologyChangeInformationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(topologyChangeInformationRequestBody);

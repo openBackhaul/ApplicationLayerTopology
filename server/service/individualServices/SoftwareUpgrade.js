@@ -208,7 +208,7 @@ async function PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOf
 
                 let applicationName = await httpServerInterface.getApplicationNameAsync();
                 let releaseNumber = await httpClientInterface.getReleaseNumberAsync(newReleaseHttpClientUuid);
-                let regardApplicationOperation = await OperationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-001");
+                let regardApplicationOperation = "/v1/regard-application";
                 let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(newReleaseTcpClientUuid);
                 let applicationPort = await tcpClientInterface.getRemotePortAsync(newReleaseTcpClientUuid);
                 let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(newReleaseTcpClientUuid); 
@@ -273,7 +273,7 @@ async function PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnAp
 
                 let applicationName = await httpServerInterface.getApplicationNameAsync();
                 let releaseNumber = await httpClientInterface.getReleaseNumberAsync(newReleaseHttpClientUuid);
-                let disregardApplicationOperation = await OperationServerInterface.getOperationNameAsync("alt-2-0-1-op-s-is-002");
+                let disregardApplicationOperation = "/v1/disregard-application";
                 let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(newReleaseTcpClientUuid);
                 let applicationPort = await tcpClientInterface.getRemotePortAsync(newReleaseTcpClientUuid);
                 let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(newReleaseTcpClientUuid); 
