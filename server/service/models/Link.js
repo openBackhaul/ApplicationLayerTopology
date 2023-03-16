@@ -13,6 +13,10 @@ const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriv
 const ControlConstructService = require('../individualServices/ControlConstructService');
 const LinkPort = require('./LinkPort');
 const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
+const {
+    elasticsearchService,
+    getIndexAliasAsync
+} = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 
 class Link {
     uuid;
@@ -62,7 +66,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let isConsumingServiceExists = false;
             try {
-                let link = await ControlConstructService.getLinkAsync(linkUuid);
+                let link = await NetworkControlDomain.getLinkAsync(linkUuid);
                 let linkPortList = link["link-port"];
                 for (let j = 0; j < linkPortList.length; j++) {
                     let linkPort = linkPortList[j];
@@ -107,7 +111,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let linkUuidOfTheConsumingOperation;
             try {
-                let linkList = await ControlConstructService.getLinkListAsync();
+                let linkList = await NetworkControlDomain.getLinkListAsync();
                 for (let i = 0; i < linkList.length; i++) {
                     let link = linkList[i];
                     let linkPortList = link[onfAttributes.LINK.LINK_PORT];
@@ -158,16 +162,26 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let isCreated = false;
             try {
-                let linkPortPath = onfPaths.LINK +
-                    "=" +
-                    linkUuid +
-                    "/link-port";
                 linkPort = onfFormatter.modifyJsonObjectKeysToKebabCase(linkPort);
-                isCreated = await fileOperation.writeToDatabaseAsync(
-                    linkPortPath,
-                    linkPort,
-                    true);
-                resolve(isCreated);
+                let client = await elasticsearchService.getClient();
+                let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-001");
+                let response = await client.updateByQuery({
+                    index: indexAlias,
+                    body: {
+                        script: {
+                            source: "ctx._source['link-port'].add(params['link-port'])",
+                            params: {
+                                "link-port": linkPort
+                            }
+                        },
+                        query: {
+                            match: {
+                                "uuid": linkUuid
+                            }
+                        }
+                    },
+                });
+                resolve(response);
             } catch (error) {
                 reject(error);
             }
@@ -185,17 +199,28 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let isDeleted = false;
             try {
-                let linkPortPath = onfPaths.LINK +
-                    "=" +
-                    linkUuid +
-                    "/link-port" + "=" + linkPortLocalId;
-                isDeleted = await fileOperation.deletefromDatabaseAsync(
-                    linkPortPath,
-                    linkPortLocalId,
-                    true);
-                resolve(isDeleted);
+                let client = await elasticsearchService.getClient();
+                let indexAlias = await getIndexAliasAsync("alt-2-0-1-es-c-es-1-0-0-001");
+                let response = await client.updateByQuery({
+                    index: indexAlias,
+                    body: {
+                        script: {
+                            source: "ctx._source['link-port'].removeIf(port -> port['local-id'] == params['local-id'])",
+                            params: {
+                                "local-id": linkPortLocalId
+                            }
+                        },
+                        query: {
+                            match: {
+                                "uuid": linkUuid
+                            }
+                        }
+                    },
+                });
+
+                resolve(response);
             } catch (error) {
-                reject(false);
+                reject(error);
             }
         });
     }
@@ -209,8 +234,9 @@ class Link {
      **/
     static generateNextUuidAsync() {
         return new Promise(async function (resolve, reject) {
-            let uuidPrefix = "alt-0-0-1-op-link-";
-            let nextUuidNumber = "0000";
+            let uuid = await fileOperation.readFromDatabaseAsync(onfPaths.CONTROL_CONSTRUCT_UUID);
+            let uuidPrefix = uuid + "-op-link-";
+            let nextUuidNumber = "000";
             let nextUuid;
             try {
                 let linkList = await ControlConstructService.getLinkListAsync();

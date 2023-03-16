@@ -12,6 +12,14 @@ const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/con
 const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
+const {
+  elasticsearchService,
+  getIndexAliasAsync,
+  createResultArray
+} = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+
+const ELASTICSEARCH_CLIENT_CC_UUID = "alt-2-0-1-es-c-es-1-0-0-000";
+const ELASTICSEARCH_CLIENT_LINKS_UUID = "alt-2-0-1-es-c-es-1-0-0-001";
 
 class ControlConstrucService {
 
@@ -22,7 +30,19 @@ class ControlConstrucService {
   static async getLinkListAsync() {
     return new Promise(async function (resolve, reject) {
       try {
-        let linkList = await fileOperation.readFromDatabaseAsync(onfPaths.LINK);
+        let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_LINKS_UUID);
+        let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_LINKS_UUID);
+        let res = await client.search({
+          index: indexAlias,
+          filter_path: "hits.hits",
+          body: {
+            "query": {
+              "match_all": {}
+            }
+          }
+
+        })
+        let linkList = await createResultArray(res);
         resolve(linkList);
       } catch (error) {
         reject(error);
@@ -99,8 +119,21 @@ class ControlConstrucService {
   static async getControlConstructAsync(controlConstructUuid) {
     return new Promise(async function (resolve, reject) {
       try {
-        let controlConstructUuidPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let controlConstruct = await fileOperation.readFromDatabaseAsync(controlConstructUuidPath);
+        let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
+        let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+        let res = await client.search({
+          index: indexAlias,
+          filter_path: "hits.hits",
+          body: {
+            "query": {
+              "match": {
+                "uuid": controlConstructUuid
+              }
+            }
+          }
+
+        })
+        let controlConstruct = await createResultArray(res);
         resolve(controlConstruct);
       } catch (error) {
         reject(error);
@@ -118,7 +151,19 @@ class ControlConstrucService {
     return new Promise(async function (resolve, reject) {
       let controlConstructInstance;
       try {
-        let controlConstructList = await ControlConstrucService.getControlConstructListAsync()
+        let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_CC_UUID);
+        let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_CC_UUID);
+        let res = await client.search({
+          index: indexAlias,
+          filter_path: "hits.hits",
+          body: {
+            "query": {
+              "match_all": {}
+            }
+          }
+
+        })
+        let controlConstructList = await createResultArray(res);
         if (controlConstructList) {
           for (let i = 0; i < controlConstructList.length; i++) {
             let controlConstruct = controlConstructList[i];
@@ -199,16 +244,18 @@ class ControlConstrucService {
    * @param {String} link an instance of the link
    * @returns {promise} returns {true|false}
    **/
-   static addLinkAsync(link) {
+  static addLinkAsync(link) {
     return new Promise(async function (resolve, reject) {
       let isCreated = false;
       try {
-        link = onfFormatter.modifyJsonObjectKeysToKebabCase(link);
-        isCreated = await fileOperation.writeToDatabaseAsync(
-          onfPaths.LINK,
-          link,
-          true);
-        resolve(isCreated);
+        link = onfFormatter.modifyJsonObjectKeysToKebabCase(link)
+        let client = await elasticsearchService.getClient(false, ELASTICSEARCH_CLIENT_LINKS_UUID);
+        let indexAlias = await getIndexAliasAsync(ELASTICSEARCH_CLIENT_LINKS_UUID);
+        let response = await client.index({
+          index: indexAlias,
+          body: link
+        });
+        resolve(response);
       } catch (error) {
         reject(error);
       }
