@@ -12,7 +12,10 @@ const Link = require('../models/Link');
 const ControlConstructService = require('./ControlConstructService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const LinkPort = require('../models/LinkPort');
-const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const {
+    elasticsearchService,
+    getIndexAliasAsync
+  } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
 /**
@@ -365,33 +368,66 @@ function getOperationClientUuid(controlConstruct, operationClientName, consuming
       console.log(error)
     }
   }
+}
 
-  exports.deleteDependentLinkPorts = async function(uuid) {
+/**
+ * @description Retrieves output link-port object from link, where
+ * where input link-ports contain given operation-client UUID.
+ * @param {String} operationClientUuid
+ * @returns {Promise<Object>} output link-port
+ */
+exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function(operationClientUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
-      index: indexAlias,
-      filter_path: 'hits.hits._id,hits.hits._source',
-      body: {
-        "query": {
-          "nested": {
-            "path": "link-port",
+        index: indexAlias,
+        filter_path: 'hits.hits._source.uuid,hits.hits._source.link-port',
+        body: {
             "query": {
-              "term": { "link-port.logical-termination-point": uuid }
+                "nested": {
+                    "path": "link-port",
+                    "query": {
+                        "term": { "link-port.logical-termination-point": operationClientUuid }
+                    }
+                }
             }
+        }
+    });
+    if (Object.keys(res.body).length === 0) {
+        return {};
+    }
+    let correctLink = res.body.hits.hits[0]._source;
+    let linkPorts = correctLink['link-port'];
+    return linkPorts.find(item => item['port-direction'] === LinkPort.portDirectionEnum.OUTPUT);
+}
+
+exports.deleteDependentLinkPorts = async function(uuid) {
+  let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+  let client = await elasticsearchService.getClient(false, esUuid);
+  let indexAlias = await getIndexAliasAsync(esUuid);
+  let res = await client.search({
+    index: indexAlias,
+    filter_path: 'hits.hits._id,hits.hits._source',
+    body: {
+      "query": {
+        "nested": {
+          "path": "link-port",
+          "query": {
+            "term": { "link-port.logical-termination-point": uuid }
           }
         }
       }
-    });
-    if (Object.keys(res.body).length === 0) {
-      return;
     }
-    let linkPorts = res.body.hits.hits[0]._source[onfAttributes.LINK.LINK_PORT];
-    let found = linkPorts.find(linkPort => linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT] === uuid);
-    let linkUuid = res.body.hits.hits[0]._source[onfAttributes.GLOBAL_CLASS.UUID];
-    if (LinkPort.portDirectionEnum.INPUT === found[onfAttributes.LINK.PORT_DIRECTION]) {
-      deleteLinkPortAsync(linkUuid, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
-    }
+  });
+  if (Object.keys(res.body).length === 0) {
+    return;
   }
+  let linkPorts = res.body.hits.hits[0]._source[onfAttributes.LINK.LINK_PORT];
+  let found = linkPorts.find(linkPort => linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT] === uuid);
+  let linkUuid = res.body.hits.hits[0]._source[onfAttributes.GLOBAL_CLASS.UUID];
+  if (LinkPort.portDirectionEnum.INPUT === found[onfAttributes.LINK.PORT_DIRECTION]) {
+    deleteLinkPortAsync(linkUuid, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
+  }
+}
 
