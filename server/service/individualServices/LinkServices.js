@@ -108,19 +108,15 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
 
 /**
  * @description This function deletes a link from Elasticsearch
- * @param {String} linkId : documentId for the link
- * @return {Promise<Object>} Elastincsearch response
+ * @param {String} linkUuid : uuid of the link
+ * @param {String} consumingOperationuuid : logical-termination-point of the link-port
+ * @return {Promise<void>}
  **/
- async function deleteLinkAsync(linkId) {
-  let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
-  let client = await elasticsearchService.getClient(false, esUuid);
-  let indexAlias = await getIndexAliasAsync(esUuid);
-  let response = await client.delete({
-    id: linkId,
-    index: indexAlias,
-    refresh: 'true'
-  });
-  return response;
+ async function deleteLinkAsync(linkUuid, consumingOperationuuid) {
+    let localId = await Link.getLocalIdOfTheConsumingOperationAsync(linkUuid, consumingOperationuuid)
+    if (localId) {
+        await Link.deleteLinkPortAsync(linkUuid,localId);
+    }
 }
 
   /**

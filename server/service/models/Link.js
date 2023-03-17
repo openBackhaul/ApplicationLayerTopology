@@ -175,6 +175,32 @@ class Link {
     }
 
     /**
+     * @description This function deletes the linkPort instance that matches the localId argument from its corresponding 
+     * link
+     * @param {String} linkUuid : uuid of the link
+     * @param {String} linkPortLocalId : local-id of an existing link-port
+     * @returns {promise} boolean {true|false}
+     **/
+    static async deleteLinkPortAsync(linkUuid, linkPortLocalId) {
+        return new Promise(async function (resolve, reject) {
+            let isDeleted = false;
+            try {
+                let linkPortPath = onfPaths.LINK +
+                    "=" +
+                    linkUuid +
+                    "/link-port" + "=" + linkPortLocalId;
+                isDeleted = await fileOperation.deletefromDatabaseAsync(
+                    linkPortPath,
+                    linkPortLocalId,
+                    true);
+                resolve(isDeleted);
+            } catch (error) {
+                reject(false);
+            }
+        });
+    }
+
+    /**
      * @description This function returns the next available localId for the link-port list in a link instance.
      * @param {String} linkUuid : uuid of a link
      * @returns {promise} string {localId }
