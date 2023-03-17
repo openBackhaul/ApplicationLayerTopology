@@ -236,7 +236,7 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
 }
 
 /**
- * An OperationClient identified by LtpUuid and all its entries in FCs and Links gets deleted
+ * Removes LTP and all it's data from corresponding control-construct and links.
  *
  * body V1_deleteltpanddependents_body 
  * user String User identifier from the system starting the service call
@@ -246,52 +246,52 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      await checkApplicationExists(originator);
+exports.deleteLtpAndDependents = async function (body) {
+  let ltpToBeRemovedUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
+  let controlConstruct = await ControlConstructService.getControlConstructFromLtpUuidAsync(ltpToBeRemovedUuid);
 
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let logicalTerminationPointUuid = body["uuid"];
-      let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
+  let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+  let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid)
 
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT +
-        "=" +
-        controlConstructUuid;
-      let logicalTerminationPointPath = controlConstructPath +
-        "/logical-termination-point"
-      let logicalTerminationPointPathForTheUuid = logicalTerminationPointPath +
-        "=" +
-        logicalTerminationPointUuid;
-
-      let existingLogicalTerminationPoint = await fileOperation.readFromDatabaseAsync(logicalTerminationPointPathForTheUuid);
-
-      if (existingLogicalTerminationPoint) {
-        let layerProtocol = existingLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
-        let layerProtocolName = layerProtocol[0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-        let isdeleted = await fileOperation.deletefromDatabaseAsync(logicalTerminationPointPathForTheUuid,
-          existingLogicalTerminationPoint,
-          true);
-        if (isdeleted && (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT ||
-          layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
-          await deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid);
-          await deleteDependentLinkPorts(logicalTerminationPointUuid);
-        }
+  // do removal based on layerProtocol
+  let layerProtocol = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+  let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+  switch (layerProtocolName) {
+    case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT:
+      await deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
+      await LinkServices.deleteDependentLinkPorts(ltpToBeRemovedUuid);
+      break;
+    case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT:
+      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
+        await deleteDependentFcPorts(controlConstruct, clientUUID);
+        await LinkServices.deleteDependentLinkPorts(clientUUID);
+        ControlConstructService.deleteLtp(controlConstruct, clientUUID);
+      });
+      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].forEach(async(serverUUID) => {
+        ControlConstructService.deleteLtp(controlConstruct, serverUUID);
+      });
+      break;
+    case LayerProtocol.layerProtocolNameEnum.TCP_CLIENT:
+      let httpClientUuid = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP][0];
+      let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
+      if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
+        httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
+          await deleteDependentFcPorts(controlConstruct, clientUUID);
+          await LinkServices.deleteDependentLinkPorts(clientUUID);
+          ControlConstructService.deleteLtp(controlConstruct, clientUUID);
+        });
+        ControlConstructService.deleteLtp(controlConstruct, httpClientUuid);
       }
+      break;
+    default:
+      // don't do anything if LTP is of type http-s, tcp-s or op-s
+      return;
+  }
 
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+  // update control-construct with removed LTP/FC
+  controlConstruct = ControlConstructService.deleteLtp(controlConstruct, ltpToBeRemovedUuid);
+  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
 }
-
 
 /**
  * Removes application from application layer topology representation
@@ -1383,33 +1383,6 @@ async function deleteFcPorts(forwardingName, controlConstructUuid, forwardingDom
           false);
       }
 
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
-async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let linkList = await NetworkControlDomain.getLinkListAsync();
-      if (linkList) {
-        for (let i = 0; i < linkList.length; i++) {
-          let link = linkList[i];
-          let linkUuid = link["uuid"];
-          let linkPortList = link["link-port"];
-          if (linkPortList) {
-            for (let j = 0; j < linkPortList.length; j++) {
-              let linkPort = linkPortList[j];
-              let linkPortLogicalTerminationPoint = linkPort["logical-termination-point"];
-              if (linkPortLogicalTerminationPoint == logicalTerminationPointUuid) {
-                await NetworkControlDomain.deleteLinkAsync(linkUuid);
-              }
-            }
-          }
-        }
-      }
       resolve();
     } catch (error) {
       reject(error);

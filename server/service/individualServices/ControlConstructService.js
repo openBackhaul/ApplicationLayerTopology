@@ -37,30 +37,6 @@ class ControlConstructService {
   }
 
   /**
-   * @description This function deletes a link instance that matches the localId argument from its corresponding 
-   * core-model-1-4:control-construct/link
-   * @param {String} linkUuid : uuid of the link
-   * @returns {promise} boolean {true|false}
-   **/
-  static async deleteLinkAsync(linkUuid) {
-    return new Promise(async function (resolve, reject) {
-      let isDeleted = false;
-      try {
-        let linkPath = onfPaths.LINK +
-          "=" +
-          linkUuid;
-        isDeleted = await fileOperation.deletefromDatabaseAsync(
-          linkPath,
-          linkPath,
-          true);
-        resolve(isDeleted);
-      } catch (error) {
-        reject(false);
-      }
-    });
-  }
-
-  /**
    * @description This function returns the link entries from the core-model-1-4:control-construct
    * @returns {promise} returns link.
    **/
@@ -290,26 +266,29 @@ class ControlConstructService {
     });
   }
 
-  /**
-   * @description This function deletes a link instance that matches the uuid argument from the 
-   * core-model-1-4:network-control-domain/link
-   * @param {String} linkUuid : uuid of the link
-   * @returns {promise} returns {true|false}
-   **/
-  static deleteLinkAsync(linkUuid) {
-    return new Promise(async function (resolve, reject) {
-      let isDeleted = false;
-      try {
-        let linkPath = onfPaths.LINK + "=" + linkUuid;
-        isDeleted = await fileOperation.deletefromDatabaseAsync(
-          linkPath,
-          linkUuid,
-          true);
-        resolve(isDeleted);
-      } catch (error) {
-        reject(error);
+  static deleteLtp(controlConstruct, ltpToBeRemovedUuid) {
+    let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    let ltpToBeRemovedIndex = ltps.findIndex(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid);
+    ltps.splice(ltpToBeRemovedIndex, 1);
+    ltps.forEach(ltp => {
+      let clientLtps = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
+      if (clientLtps.length !== 0) {
+        let clientLtpIndex = clientLtps.findIndex(clientLtp => clientLtp === ltpToBeRemovedUuid);
+        if (clientLtpIndex !== -1) {
+          clientLtps.splice(clientLtpIndex, 1);
+        }
       }
     });
+    ltps.forEach(ltp => {
+      let serverLtps = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP];
+      if (serverLtps.length !== 0) {
+        let serverLtpIndex = serverLtps.findIndex(serverLtp =>serverLtp === ltpToBeRemovedUuid);
+        if (serverLtpIndex !== -1) {
+          serverLtps.splice(serverLtpIndex, 1);
+        }
+      }
+    })
+    return controlConstruct;
   }
 
   /**
