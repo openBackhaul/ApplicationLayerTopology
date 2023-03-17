@@ -1,6 +1,7 @@
 'use strict';
 
 var utils = require('../utils/writer.js');
+var IndividualServices = require('../service/IndividualServicesService');
 var responseCodeEnum = require('onf-core-model-ap/applicationPattern/rest/server/ResponseCode');
 var restResponseHeader = require('onf-core-model-ap/applicationPattern/rest/server/ResponseHeader');
 var restResponseBuilder = require('onf-core-model-ap/applicationPattern/rest/server/ResponseBuilder');
@@ -396,16 +397,15 @@ module.exports.updateLtp = async function updateLtp (req, res, next, body, user,
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
     let responseBodyToDocument = {};
-    await IndividualServices.updateLtp(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+    IndividualServices.updateLtp(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
       .then(async function (responseBody) {
         responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
         responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       });
     executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
