@@ -207,8 +207,6 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
 exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
-      await checkApplicationExists(originator);
-
       /****************************************************************************************
        * Setting up required local variables from the request body
        ****************************************************************************************/
@@ -1116,7 +1114,7 @@ exports.removeOperationClientFromLink = function (body, user, originator, xCorre
  * no response value expected for this operation
  **/
 exports.updateAllLtpsAndFcs = async function (body, originator) {
-  await checkApplicationExists(originator);
+  await checkIfApplicationExists(body["core-model-1-4:control-construct"]);
   await createOrUpdateControlConstructInES(body);
 }
 
@@ -1134,8 +1132,6 @@ exports.updateAllLtpsAndFcs = async function (body, originator) {
 exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
-      await checkApplicationExists(originator);
-
       /****************************************************************************************
        * Setting up required local variables from the request body
        ****************************************************************************************/
@@ -1176,7 +1172,6 @@ exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator
 exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     try {
-      await checkApplicationExists(originator);
 
       /****************************************************************************************
        * Setting up required local variables from the request body
@@ -1712,16 +1707,30 @@ function getValueFromKey(nameList, key) {
   return undefined;
 }
 
+
 /**
- * Checks if http-client LTP with the given application name exists. Throws Error if not. 
- * @param {string} applicationName
+ * Checks if http-c ltp exists by fetching applicationName and releaseNumber from given controlConstruc. Throws Error if not. 
+ * @param {Object} controlConstruct
  * @throws {Error} Will throw an error if the application does not exist.
  */
-async function checkApplicationExists(applicationName) {
-  const applicationExists = await httpClientInterface.isApplicationExists(applicationName);
-  if (!applicationExists) {
-    throw new Error(`Application ${applicationName} is not in the list of known applications.`);
-  }
+async function checkIfApplicationExists(controlConstruct) {
+  return new Promise(async function (resolve, reject) {
+    let isApplicationExists = false;
+    try {
+      let applicationName = await getApplicationName(controlConstruct);
+      let releaseNumber = await getReleaseNumber(controlConstruct);
+      let httpClientUuid = await httpClientInterface.getHttpClientUuidAsync(applicationName, releaseNumber);
+      if (httpClientUuid != undefined) {
+        isApplicationExists = true;
+      }
+      if (!isApplicationExists) {
+        throw new Error(`Application ${applicationName} is not in the list of known applications.`);
+      }
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 

@@ -94,7 +94,7 @@ class ControlConstructService {
         }
       }
     })
-    if (Object.keys(res.body).length === 0) {
+    if (Object.keys(res.body.hits.hits).length === 0) {
       throw new Error(`Could not find existing control-construct with UUID ${controlConstructUuid}`);
     }
     let controlConstruct = createResultArray(res);
