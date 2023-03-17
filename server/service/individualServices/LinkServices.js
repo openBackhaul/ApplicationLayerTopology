@@ -12,6 +12,11 @@ const Link = require('../models/Link');
 const ControlConstructService = require('./ControlConstructService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const LinkPort = require('../models/LinkPort');
+const {
+    elasticsearchService,
+    getIndexAliasAsync
+  } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
 /**
  * @description This function find or create a link
@@ -105,24 +110,47 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
 }
 
 /**
- * @description This function deletes a link-port
+ * @description This function deletes a link from Elasticsearch
  * @param {String} linkUuid : uuid of the link
  * @param {String} consumingOperationuuid : logical-termination-point of the link-port
- * @return {Promise} boolean {true|false}
+ * @return {Promise<void>}
  **/
- function deleteLinkAsync(linkUuid,consumingOperationuuid) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            let localId = await Link.getLocalIdOfTheConsumingOperationAsync(linkUuid,consumingOperationuuid)
-            if (localId) {
-                await Link.deleteLinkPortAsync(linkUuid,localId);
-            }
-            resolve(linkUuid);
-        } catch (error) {
-            reject(error);
-        }
-    });
+ async function deleteLinkAsync(linkUuid, consumingOperationuuid) {
+    let localId = await Link.getLocalIdOfTheConsumingOperationAsync(linkUuid, consumingOperationuuid)
+    if (localId) {
+        await Link.deleteLinkPortAsync(linkUuid,localId);
+    }
 }
+
+  /**
+   * @description This function deletes the linkPort instance that matches the localId argument from its corresponding
+   * link
+   * @param {String} linkUuid : uuid of the link
+   * @param {String} linkPortLocalId : local-id of an existing link-port
+   * @returns {promise} boolean {true|false}
+   **/
+  async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let response = await client.updateByQuery({
+        index: indexAlias,
+        body: {
+            script: {
+                source: "ctx._source['link-port'].removeIf(port -> port['local-id'] == params['local-id'])",
+                params: {
+                    "local-id": linkPortLocalId
+                }
+            },
+            query: {
+                match: {
+                    "uuid": linkUuid
+                }
+            }
+        },
+    });
+    return response;
+  }
 
 /**
  * @description This function creates or updates a link
@@ -340,3 +368,66 @@ function getOperationClientUuid(controlConstruct, operationClientName, consuming
       console.log(error)
     }
   }
+}
+
+/**
+ * @description Retrieves output link-port object from link, where
+ * where input link-ports contain given operation-client UUID.
+ * @param {String} operationClientUuid
+ * @returns {Promise<Object>} output link-port
+ */
+exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function(operationClientUuid) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+        index: indexAlias,
+        filter_path: 'hits.hits._source.uuid,hits.hits._source.link-port',
+        body: {
+            "query": {
+                "nested": {
+                    "path": "link-port",
+                    "query": {
+                        "term": { "link-port.logical-termination-point": operationClientUuid }
+                    }
+                }
+            }
+        }
+    });
+    if (Object.keys(res.body).length === 0) {
+        return {};
+    }
+    let correctLink = res.body.hits.hits[0]._source;
+    let linkPorts = correctLink['link-port'];
+    return linkPorts.find(item => item['port-direction'] === LinkPort.portDirectionEnum.OUTPUT);
+}
+
+exports.deleteDependentLinkPorts = async function(uuid) {
+  let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+  let client = await elasticsearchService.getClient(false, esUuid);
+  let indexAlias = await getIndexAliasAsync(esUuid);
+  let res = await client.search({
+    index: indexAlias,
+    filter_path: 'hits.hits._id,hits.hits._source',
+    body: {
+      "query": {
+        "nested": {
+          "path": "link-port",
+          "query": {
+            "term": { "link-port.logical-termination-point": uuid }
+          }
+        }
+      }
+    }
+  });
+  if (Object.keys(res.body).length === 0) {
+    return;
+  }
+  let linkPorts = res.body.hits.hits[0]._source[onfAttributes.LINK.LINK_PORT];
+  let found = linkPorts.find(linkPort => linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT] === uuid);
+  let linkUuid = res.body.hits.hits[0]._source[onfAttributes.GLOBAL_CLASS.UUID];
+  if (LinkPort.portDirectionEnum.INPUT === found[onfAttributes.LINK.PORT_DIRECTION]) {
+    deleteLinkPortAsync(linkUuid, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
+  }
+}
+

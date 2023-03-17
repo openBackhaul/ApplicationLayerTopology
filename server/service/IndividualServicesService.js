@@ -2,8 +2,6 @@
 
 const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
 const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
-const LogicalTerminationPointConfigurationStatus = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
-const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
 
 const LinkServices = require('./individualServices/LinkServices');
 const forwardingService = require('./individualServices/ForwardingService');
@@ -11,14 +9,13 @@ const forwardingService = require('./individualServices/ForwardingService');
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
-const FcPort = require("onf-core-model-ap/applicationPattern/onfModel/models/FcPort");
+const FcPort = require('onf-core-model-ap/applicationPattern/onfModel/models/FcPort');
 
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
 const prepareForwardingAutomation = require('./individualServices/PrepareForwardingAutomation');
 const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
 const ConfigurationStatus = require('onf-core-model-ap/applicationPattern/onfModel/services/models/ConfigurationStatus');
 const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
-const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
 const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
 const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 
@@ -26,25 +23,16 @@ const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/on
 const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
 const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
 
-
-const operationServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
-const operationClientInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
-const consequentAction = require('../applicationPattern/rest/server/responseBody/ConsequentAction');
-const responseValue = require('../applicationPattern/rest/server/responseBody/ResponseValue');
-
 const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 
-const fileOperation = require('../applicationPattern/databaseDriver/JSONDriver');
+const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 
-const ForwardingConstruct = require('../applicationPattern/onfModel/models/ForwardingConstruct');
-const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
-const TcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
+const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
-const Link = require('./models/Link');
 const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ControlConstructService = require('./individualServices/ControlConstructService');
-
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -246,7 +234,7 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
 }
 
 /**
- * An OperationClient identified by LtpUuid and all its entries in FCs and Links gets deleted
+ * Removes LTP and all it's data from corresponding control-construct and links.
  *
  * body V1_deleteltpanddependents_body 
  * user String User identifier from the system starting the service call
@@ -256,50 +244,52 @@ exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndic
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let logicalTerminationPointUuid = body["uuid"];
-      let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
+exports.deleteLtpAndDependents = async function (body) {
+  let ltpToBeRemovedUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
+  let controlConstruct = await ControlConstructService.getControlConstructFromLtpUuidAsync(ltpToBeRemovedUuid);
 
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT +
-        "=" +
-        controlConstructUuid;
-      let logicalTerminationPointPath = controlConstructPath +
-        "/logical-termination-point"
-      let logicalTerminationPointPathForTheUuid = logicalTerminationPointPath +
-        "=" +
-        logicalTerminationPointUuid;
+  let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+  let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid)
 
-      let existingLogicalTerminationPoint = await fileOperation.readFromDatabaseAsync(logicalTerminationPointPathForTheUuid);
-
-      if (existingLogicalTerminationPoint) {
-        let layerProtocol = existingLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
-        let layerProtocolName = layerProtocol[0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-        let isdeleted = await fileOperation.deletefromDatabaseAsync(logicalTerminationPointPathForTheUuid,
-          existingLogicalTerminationPoint,
-          true);
-        if (isdeleted && (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT ||
-          layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
-          await deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid);
-          await deleteDependentLinkPorts(logicalTerminationPointUuid);
-        }
+  // do removal based on layerProtocol
+  let layerProtocol = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+  let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+  switch (layerProtocolName) {
+    case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT:
+      await deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
+      await LinkServices.deleteDependentLinkPorts(ltpToBeRemovedUuid);
+      break;
+    case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT:
+      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
+        await deleteDependentFcPorts(controlConstruct, clientUUID);
+        await LinkServices.deleteDependentLinkPorts(clientUUID);
+        ControlConstructService.deleteLtp(controlConstruct, clientUUID);
+      });
+      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].forEach(async(serverUUID) => {
+        ControlConstructService.deleteLtp(controlConstruct, serverUUID);
+      });
+      break;
+    case LayerProtocol.layerProtocolNameEnum.TCP_CLIENT:
+      let httpClientUuid = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP][0];
+      let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
+      if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
+        httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
+          await deleteDependentFcPorts(controlConstruct, clientUUID);
+          await LinkServices.deleteDependentLinkPorts(clientUUID);
+          ControlConstructService.deleteLtp(controlConstruct, clientUUID);
+        });
+        ControlConstructService.deleteLtp(controlConstruct, httpClientUuid);
       }
+      break;
+    default:
+      // don't do anything if LTP is of type http-s, tcp-s or op-s
+      return;
+  }
 
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+  // update control-construct with removed LTP/FC
+  controlConstruct = ControlConstructService.deleteLtp(controlConstruct, ltpToBeRemovedUuid);
+  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
 }
-
 
 /**
  * Removes application from application layer topology representation
@@ -1041,7 +1031,8 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
         }
         // response is full control construct of regarded application
 
-        await elasticsearchService.createOrUpdateControlConstructInES(response["core-model-1-4:control-construct"]);
+
+        await ControlConstructService.createOrUpdateControlConstructAsync(response["core-model-1-4:control-construct"]);
 
         let logicalTerminationPoints = response["core-model-1-4:control-construct"]["logical-termination-point"];
         let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
@@ -1219,53 +1210,46 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let logicalTerminationPoint = body;
-      let logicalTerminationPointUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-      let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-      let logicalTerminationPointPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT +
-        "=" +
-        controlConstructUuid +
-        "/" + onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT;
-
-      let logicalTerminationPointPathForTheUuid = logicalTerminationPointPath +
-        "=" +
-        logicalTerminationPointUuid;
-
-      let existingLogicalTerminationPoint = await fileOperation.readFromDatabaseAsync(logicalTerminationPointPathForTheUuid);
-
-      if (existingLogicalTerminationPoint) {
-        let existingLogicalTerminationPointAsAString = JSON.stringify(existingLogicalTerminationPoint);
-        let newLogicalTerminationPointAsAString = JSON.stringify(logicalTerminationPoint);
-        if (existingLogicalTerminationPointAsAString != newLogicalTerminationPointAsAString) {
-          await fileOperation.deletefromDatabaseAsync(logicalTerminationPointPathForTheUuid,
-            existingLogicalTerminationPoint,
-            true);
-          await fileOperation.writeToDatabaseAsync(logicalTerminationPointPath,
-            logicalTerminationPoint,
-            true);
-        }
-      } else {
-        await fileOperation.writeToDatabaseAsync(logicalTerminationPointPath,
-          logicalTerminationPoint,
-          true);
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
+exports.updateLtp = async function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  let logicalTerminationPointUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
+  let controlConstruct;
+  let existingLtps = [];
+  let forwardingAutomationInputList = [];
+  try {
+    controlConstruct = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
+    existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    let existingIndex = existingLtps.findIndex(item => item[onfAttributes.GLOBAL_CLASS.UUID] === logicalTerminationPointUuid);
+    let existingLtp = existingLtps.at(existingIndex);
+    if (JSON.stringify(existingLtp) === JSON.stringify(body)) {
+      console.log('LTP is already in database.');
+      return;
     }
-  });
+    existingLtps.splice(existingIndex, 1, body);
+    // deal with forwardings
+    forwardingAutomationInputList = await prepareForwardingAutomation.updateLtp(existingLtp, body);
+  } catch (err) {
+    // we did not find existing LTP with this name, figure out CC by UUID
+    let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
+    controlConstruct = await ControlConstructService.getControlConstructAsync(controlConstructUuid);
+    existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    existingLtps.push(body);
+  }
+
+  // update control construct
+  controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT] = existingLtps;
+  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
+
+  // forwardings
+  if (forwardingAutomationInputList.length !== 0) {
+    ForwardingAutomationService.automateForwardingConstructAsync(
+      operationServerName,
+      forwardingAutomationInputList,
+      user,
+      xCorrelator,
+      traceIndicator,
+      customerJourney
+    );
+  }
 }
 
 /****************************************************************************************
@@ -1401,33 +1385,6 @@ async function deleteFcPorts(forwardingName, controlConstructUuid, forwardingDom
   });
 }
 
-async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let linkList = await NetworkControlDomain.getLinkListAsync();
-      if (linkList) {
-        for (let i = 0; i < linkList.length; i++) {
-          let link = linkList[i];
-          let linkUuid = link["uuid"];
-          let linkPortList = link["link-port"];
-          if (linkPortList) {
-            for (let j = 0; j < linkPortList.length; j++) {
-              let linkPort = linkPortList[j];
-              let linkPortLogicalTerminationPoint = linkPort["logical-termination-point"];
-              if (linkPortLogicalTerminationPoint == logicalTerminationPointUuid) {
-                await NetworkControlDomain.deleteLinkAsync(linkUuid);
-              }
-            }
-          }
-        }
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
 /***************************************************************************************************************
  ****************** Funtions that are specific to the addOperationClientToLink ************
  ***************************************************************************************************************/
@@ -1451,45 +1408,6 @@ function getAllOperationServerNameAsync(logicalTerminationPoints) {
   }
   return operationServerNames;
 }
-
-/**
- * Provides operationClientUuid for the operationClientName
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationClientName operation name of the operation client
- * @returns operationClientUuid
- */
-function getOperationClientUuid(controlConstruct, operationClientName, consumingApplicationName, consumingApplicationReleaseNumber) {
-  let operationClientUuid;
-  try {
-    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    for (let i = 0; i < logicalTerminationPointList.length; i++) {
-      let logicalTerminationPoint = logicalTerminationPointList[i];
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
-        let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-        let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-        let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
-        if (operationName == operationClientName) {
-          let _operationClientUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-          let applicationName = getApplicationName(logicalTerminationPointList,
-            _operationClientUuid);
-          let releaseNumber = getReleaseNumber(logicalTerminationPointList,
-            _operationClientUuid);
-          if (applicationName == consumingApplicationName && releaseNumber == consumingApplicationReleaseNumber) {
-            operationClientUuid = _operationClientUuid;
-          }
-        }
-      }
-    }
-    return operationClientUuid;
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-
-
 
 /***************************************************************************************************************
  ****************** Funtions that are specific to the listOperationClientsReactingOnOperationServer ************

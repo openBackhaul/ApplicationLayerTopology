@@ -200,8 +200,6 @@ class Link {
         });
     }
 
-
-
     /**
      * @description This function returns the next available localId for the link-port list in a link instance.
      * @param {String} linkUuid : uuid of a link

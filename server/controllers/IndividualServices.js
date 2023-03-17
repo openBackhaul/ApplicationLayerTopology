@@ -2,10 +2,10 @@
 
 var utils = require('../utils/writer.js');
 var IndividualServices = require('../service/IndividualServicesService');
-var responseCodeEnum = require('../applicationPattern/rest/server/ResponseCode');
-var restResponseHeader = require('../applicationPattern/rest/server/ResponseHeader');
-var restResponseBuilder = require('../applicationPattern/rest/server/ResponseBuilder');
-var executionAndTraceService = require('../applicationPattern/services/ExecutionAndTraceService');
+var responseCodeEnum = require('onf-core-model-ap/applicationPattern/rest/server/ResponseCode');
+var restResponseHeader = require('onf-core-model-ap/applicationPattern/rest/server/ResponseHeader');
+var restResponseBuilder = require('onf-core-model-ap/applicationPattern/rest/server/ResponseBuilder');
+var executionAndTraceService = require('onf-core-model-ap/applicationPattern/services/ExecutionAndTraceService');
 
 module.exports.addOperationClientToLink = async function addOperationClientToLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
@@ -71,24 +71,21 @@ module.exports.deleteFcPort = async function deleteFcPort (req, res, next, body,
 };
 
 module.exports.deleteLtpAndDependents = async function deleteLtpAndDependents (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  try {
-    let startTime = process.hrtime();
-    let responseCode = responseCodeEnum.code.NO_CONTENT;
-    let responseBodyToDocument = {};
-    await IndividualServices.deleteLtpAndDependents(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
-      .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
-      })
-      .catch(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
-      });
-    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
-  } catch (error) {}
+  let startTime = process.hrtime();
+  let responseCode = responseCodeEnum.code.NO_CONTENT;
+  let responseBodyToDocument = {};
+  let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+  IndividualServices.deleteLtpAndDependents(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    .then(async function (responseBody) {
+      responseBodyToDocument = responseBody;
+      restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+    })
+    .catch(async function (responseBody) {
+      responseBodyToDocument = responseBody;
+      responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+      restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+    });
+  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
 };
 
 module.exports.disregardApplication = async function disregardApplication (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -397,16 +394,15 @@ module.exports.updateLtp = async function updateLtp (req, res, next, body, user,
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
     let responseBodyToDocument = {};
-    await IndividualServices.updateLtp(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+    IndividualServices.updateLtp(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
       .then(async function (responseBody) {
         responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
         responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       });
     executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
