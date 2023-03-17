@@ -319,9 +319,12 @@ function createForwarding(servingHttpServerCapability, operationName, forwarding
 function getOperationClientNameFromLtp(ltp) {
     let protocols = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
     let protocol = protocols[0];
-    let operationClientInterfacePac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-    let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-    return operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+    if (onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC in protocol) {
+        let opClientInterfacePac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+        let opClientConf = opClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+        return opClientConf[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+    }
+    return '';
 }
 
 async function findOperationServerNameAsync(operationServerUuid) {
@@ -329,10 +332,10 @@ async function findOperationServerNameAsync(operationServerUuid) {
     let filteredLtps = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let operationServerLtp = filteredLtps.find(ltp => ltp.uuid === operationServerUuid);
     if (operationServerLtp) {
-        let layerProtocol = operationServerLtp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-        if (onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC in layerProtocol) {
-            let opServerInterface = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-            let opServerCap = opServerInterface[onfAttributes.OPERATION_SERVER.CAPABILITY];
+        let protocol = operationServerLtp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+        if (onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC in protocol) {
+            let opServerInterfacePac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+            let opServerCap = opServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
             return opServerCap[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
         };
     }
@@ -343,24 +346,16 @@ async function findOperationClientNameAsync(operationClientUuid) {
     let cc = await ControlConstructService.getControlConstructFromLtpUuidAsync(operationClientUuid);
     let filteredLtps = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let operationClientLtp = filteredLtps.find(ltp => ltp.uuid === operationClientUuid);
-    if (operationClientLtp) {
-        let layerProtocol = operationClientLtp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-        if (onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC in layerProtocol) {
-            let opClientInterface = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-            let opClientConf = opClientInterface[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-            return opClientConf[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
-        };
-    }    
-    return '';
+    return getOperationClientNameFromLtp(operationClientLtp);
 }
 
 function getReleaseNumberFromHttpClient(logicalTerminationPoint) {
-    let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-    let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+    let protocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+    let layerProtocolName = protocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
     if (LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT === layerProtocolName) {
-        let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-        let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-        return httpClientCapability[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+        let httpClientInterfacePac = protocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+        let httpClientConf = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+        return httpClientConf[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
     }
     throw new Error('Release number of serving application not found.');
 }
