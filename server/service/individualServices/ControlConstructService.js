@@ -28,7 +28,20 @@ class ControlConstructService {
   static async getLinkListAsync() {
     return new Promise(async function (resolve, reject) {
       try {
-        let linkList = await fileOperation.readFromDatabaseAsync(onfPaths.LINK);
+        let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+        let client = await elasticsearchService.getClient(true, esUuid);
+        let indexAlias = await getIndexAliasAsync(esUuid);
+        let res = await client.search({
+          index: indexAlias,
+          filter_path: "hits.hits",
+          body: {
+            "query": {
+              "match_all": {}
+            }
+          }
+
+        })
+        let linkList = await createResultArray(res);
         resolve(linkList);
       } catch (error) {
         reject(error);
@@ -164,31 +177,28 @@ class ControlConstructService {
     return new Promise(async function (resolve, reject) {
       let controlConstructInstance;
       try {
-        let controlConstructList = await ControlConstructService.getControlConstructListAsync()
-        if (controlConstructList) {
-          for (let i = 0; i < controlConstructList.length; i++) {
-            let controlConstruct = controlConstructList[i];
-            let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-            for (let j = 0; j < logicalTerminationPointList.length; j++) {
-              let logicalTerminationPoint = logicalTerminationPointList[j];
-              let layerProtocolList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL]
-              let layerProtocol = layerProtocolList[0];
-              let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-              if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
-                let httpServerPac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
-                let httpServerCapability = httpServerPac[onfAttributes.HTTP_SERVER.CAPABILITY];
-                let _applicationName = httpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
-                let _releaseNumber = httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
-                if (_applicationName == applicationName && _releaseNumber == releaseNumber) {
-                  controlConstructInstance = controlConstruct;
+        let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+      index: indexAlias,
+      filter_path : "hits.hits",
+      body: {
+        "query": {
+              "bool": {
+                "must": [
+                 {"match" : { "logical-termination-point.layer-protocol.http-server-interface-1-0:http-server-interface-pac.http-server-interface-capability.application-name": applicationName} },
+                {"match" : { "logical-termination-point.layer-protocol.http-server-interface-1-0:http-server-interface-pac.http-server-interface-capability.release-number": releaseNumber} }                 
+                  ]
                 }
-              }
             }
-          }
-          resolve(controlConstructInstance);
-        } else {
-          resolve(controlConstructInstance);
+      }
+    })
+        if (Object.keys(res.body.hits.hits).length === 0) {
+          throw new Error(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
         }
+        let controlConstructList = await createResultArray(res);
+        resolve(controlConstructList[0]);
       } catch (error) {
         reject(error);
       }
@@ -254,12 +264,15 @@ class ControlConstructService {
     return new Promise(async function (resolve, reject) {
       let isCreated = false;
       try {
-        link = onfFormatter.modifyJsonObjectKeysToKebabCase(link);
-        isCreated = await fileOperation.writeToDatabaseAsync(
-          onfPaths.LINK,
-          link,
-          true);
-        resolve(isCreated);
+        link = onfFormatter.modifyJsonObjectKeysToKebabCase(link)
+        let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+        let client = await elasticsearchService.getClient(true, esUuid);
+        let indexAlias = await getIndexAliasAsync(esUuid);
+        let response = await client.index({
+          index: indexAlias,
+          body: link
+        });
+        resolve(response);
       } catch (error) {
         reject(error);
       }
