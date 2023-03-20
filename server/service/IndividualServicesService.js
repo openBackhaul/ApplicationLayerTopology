@@ -429,14 +429,14 @@ exports.listEndPointsOfLink = function (body, user, originator, xCorrelator, tra
        ****************************************************************************************/
 
       let linkEndPointList = [];
-      let link = await NetworkControlDomain.getLinkAsync(linkUuid);
+      let link = await ControlConstructService.getLinkAsync(linkUuid);
       let linkPortList = link[onfAttributes.LINK.LINK_PORT];
       for (let i = 0; i < linkPortList.length; i++) {
         let linkEndPoint = {};
         let linkPort = linkPortList[i];
         let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
         let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPoint);
-        let controlConstruct = (await NetworkControlDomain.getControlConstructAsync(controlConstructUuid))[0];
+        let controlConstruct = (await ControlConstructService.getControlConstructAsync(controlConstructUuid))[0];
         linkEndPoint.operationUuid = logicalTerminationPoint;
         if (controlConstruct) {
           linkEndPoint.ltpDirection = getLtpDirection(controlConstruct, logicalTerminationPoint);
@@ -482,7 +482,7 @@ exports.listLinkUuids = function (user, originator, xCorrelator, traceIndicator,
       /****************************************************************************************
        * Preparing response body
        ****************************************************************************************/
-      let linkList = await NetworkControlDomain.getLinkListAsync();
+      let linkList = await ControlConstructService.getLinkListAsync();
       for (let i = 0; i < linkList.length; i++) {
         let link = linkList[i];
         let linkUuid = link[onfAttributes.GLOBAL_CLASS.UUID];
@@ -534,14 +534,14 @@ exports.listLinksToOperationClientsOfApplication = function (body, user, origina
       /****************************************************************************************
        * Preparing response body
        ****************************************************************************************/
-      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+      let controlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
         applicationName,
         applicationReleaseNumber);
 
       if (controlConstruct) {
         let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
         let opertionClientUuidListWithLink = [];
-        let linkList = await NetworkControlDomain.getLinkListAsync();
+        let linkList = await ControlConstructService.getLinkListAsync();
         for (let i = 0; i < linkList.length; i++) {
           let link = linkList[i];
           let linkPortList = link[onfAttributes.LINK.LINK_PORT];
@@ -613,7 +613,7 @@ exports.listOperationClientsAtApplication = function (body, user, originator, xC
       /****************************************************************************************
        * Preparing response body
        ****************************************************************************************/
-      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+      let controlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
         applicationName,
         applicationReleaseNumber);
 
@@ -711,7 +711,7 @@ exports.listOperationClientsReactingOnOperationServer = function (body, user, or
       /****************************************************************************************
        * Preparing response body
        ****************************************************************************************/
-      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+      let controlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
         applicationName,
         applicationReleaseNumber);
       if (controlConstruct) {
@@ -775,7 +775,7 @@ exports.listOperationServersAtApplication = function (body, user, originator, xC
       /****************************************************************************************
        * Preparing response body
        ****************************************************************************************/
-      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
+      let controlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
         applicationName,
         applicationReleaseNumber);
       if (controlConstruct) {

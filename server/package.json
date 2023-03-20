@@ -20,6 +20,7 @@
     "moment": "^2.29.1",
     "node-statsd": "^0.1.1",
     "randexp": "^0.5.3",
+    "uuid": "^9.0.0",
     "response-time": "^2.3.2",
     "onf-core-model-ap": "2.0.1-alpha.5",
     "onf-core-model-ap-bs": "2.0.1-alpha.5",
