@@ -31,7 +31,6 @@ const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriv
 const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
-const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ControlConstructService = require('./individualServices/ControlConstructService');
 
 /**
@@ -1115,7 +1114,7 @@ exports.removeOperationClientFromLink = function (body, user, originator, xCorre
  **/
 exports.updateAllLtpsAndFcs = async function (body, originator) {
   await checkIfApplicationExists(body["core-model-1-4:control-construct"]);
-  await createOrUpdateControlConstructInES(body);
+  await ControlConstructService.createOrUpdateControlConstructAsync(body);
 }
 
 /**
