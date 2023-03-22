@@ -334,17 +334,20 @@ module.exports.removeOperationClientFromLink = async function removeOperationCli
 module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  IndividualServices.updateAllLtpsAndFcs(body, originator)
-    .then(async function (response) {
+  let responseBodyToDocument = {};
+  IndividualServices.updateAllLtpsAndFcs(body)
+    .then(async function (responseBody) {
+      responseBodyToDocument = responseBody;
       let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-      restResponseBuilder.buildResponse(res, responseCode, response, responseHeader);
+      restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
     })
-    .catch(async function (response) {
+    .catch(async function (responseBody) {
+      responseBodyToDocument = responseBody;
       responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
       let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-      restResponseBuilder.buildResponse(res, responseCode, response, responseHeader);
+      restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, response);
+  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
 };
 
 module.exports.updateFc = async function updateFc (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {

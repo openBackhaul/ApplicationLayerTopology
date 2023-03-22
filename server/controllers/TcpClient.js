@@ -22,7 +22,7 @@ module.exports.getTcpClientRemotePort = async function getTcpClientRemotePort(re
 
 module.exports.putTcpClientRemotePort = async function putTcpClientRemotePort(req, res, next, body, uuid) {
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  await TcpClient.putTcpClientRemotePort(req.url, body, uuid)
+  await TcpClient.putTcpClientRemotePort(body, uuid)
     .then(function (response) {
       responseBuilder.buildResponse(res, responseCode, response);
     })
@@ -63,7 +63,7 @@ module.exports.getTcpClientRemoteProtocol = async function getTcpClientRemotePro
 
 module.exports.putTcpClientRemoteAddress = function putTcpClientRemoteAddress(req, res, next, body, uuid) {
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  TcpClient.putTcpClientRemoteAddress(req.url, body, uuid)
+  TcpClient.putTcpClientRemoteAddress(body, uuid)
     .then(function (response) {
       responseBuilder.buildResponse(res, responseCode, response);
     })
@@ -76,7 +76,7 @@ module.exports.putTcpClientRemoteAddress = function putTcpClientRemoteAddress(re
 
 module.exports.putTcpClientRemoteProtocol = function putTcpClientRemoteProtocol(req, res, next, body, uuid) {
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  TcpClient.putTcpClientRemoteProtocol(req.url, body, uuid)
+  TcpClient.putTcpClientRemoteProtocol(body, uuid)
     .then(function (response) {
       responseBuilder.buildResponse(res, responseCode, response);
     })
