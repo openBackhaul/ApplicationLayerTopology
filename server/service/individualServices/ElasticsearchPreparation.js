@@ -10,7 +10,7 @@ module.exports = {
 /**
  * Returns Elasticsearch client UUID (decision made upon links param). CC UUID ends with '000', LINKS UUID ends with '001'.
  * @param {boolean} links if true, return LINKS ES UUID, if false, return CC ES UUID
- * @returns LINKS ES UUID or CC ES UUID
+ * @returns {Promise<String>} LINKS ES UUID or CC ES UUID
  */
 async function getCorrectEsUuid(links) {
     let uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
@@ -44,7 +44,7 @@ async function prepareElasticsearch() {
         } else if (uuid === await getCorrectEsUuid(true)) {
             await configureLinksIndexTemplate(uuid);
         }
-        await createAlias(uuid);
+        await elasticsearchService.createAlias(uuid);
     }
     console.log('Elasticsearch is properly configured!');
 }
@@ -157,28 +157,4 @@ async function configureLinksIndexTemplate(uuid) {
     });
     iTemplate.body.composed_of = ['alt-links-mappings'];
     await client.indices.putIndexTemplate(iTemplate);
-}
-
-/**
- * @description Creates index-alias with first index serving
- * as write_index (if such alias does not exist yet).
- */
-async function createAlias(uuid) {
-    let indexAlias = await getIndexAliasAsync(uuid);
-    let client = await elasticsearchService.getClient(false, uuid);
-    let alias = await client.indices.existsAlias({
-        name: indexAlias
-    });
-    if (!alias.body) {
-        await client.indices.create({
-            index: `${indexAlias}-000001`,
-            body: {
-                aliases: {
-                    [indexAlias]: {
-                        is_write_index: true
-                    }
-                }
-            }
-        });
-    }
 }
