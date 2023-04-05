@@ -1034,8 +1034,9 @@ exports.removeOperationClientFromLink = function (body, user, originator, xCorre
  * no response value expected for this operation
  **/
 exports.updateAllLtpsAndFcs = async function (body) {
-  await checkIfApplicationExists(body["core-model-1-4:control-construct"]);
-  await ControlConstructService.createOrUpdateControlConstructAsync(body);
+  let controlConstruct = body["core-model-1-4:control-construct"];
+  await checkIfApplicationExists(controlConstruct);
+  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
 }
 
 /**
