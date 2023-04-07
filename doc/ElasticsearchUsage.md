@@ -64,3 +64,4 @@ template: {
     }
 }
 ```
+The usage of ES within these indexes is the same as for other applications with one index.
