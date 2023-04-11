@@ -22,7 +22,7 @@ const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfM
 const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
 const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
 const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
-
+const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
 const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 
@@ -152,7 +152,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
         }      
         let serverAddress = await tcpServerInterface.getLocalAddressOfTheProtocol(protocol);
         let serverPort = await tcpServerInterface.getLocalPortOfTheProtocol(protocol);
-        if (address === serverAddress && port === serverPort) {
+        if (JSON.stringify(address) ===JSON.stringify(serverAddress) && port === serverPort) {
           isdataTransferRequired = false;
         }
 
