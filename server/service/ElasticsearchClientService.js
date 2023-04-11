@@ -1,7 +1,7 @@
 'use strict';
 var fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const { elasticsearchService, getApiKeyAsync, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
-const prepareElasticsearch = require('./individualServices/ElasticsearchPreparation');
+const ElasticsearchPreparation = require('./individualServices/ElasticsearchPreparation');
 
 /**
  * Returns API key
@@ -72,7 +72,7 @@ exports.putElasticsearchClientApiKey = async function(url, body, uuid) {
     await fileOperation.writeToDatabaseAsync(url, body, false);
     // recreate the client with new connection data
     await elasticsearchService.getClient(true, uuid);
-    await prepareElasticsearch();
+    await ElasticsearchPreparation.prepareElasticsearch();
   }
 }
 
@@ -87,6 +87,6 @@ exports.putElasticsearchClientIndexAlias = async function(url, body, uuid) {
   let oldValue = await getIndexAliasAsync(uuid);
   if (oldValue !== body['elasticsearch-client-interface-1-0:index-alias']) {
     await fileOperation.writeToDatabaseAsync(url, body, false);
-    await prepareElasticsearch();
+    await ElasticsearchPreparation.prepareElasticsearch();
   }
 }

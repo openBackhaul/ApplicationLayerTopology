@@ -2,7 +2,11 @@
 var fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const prepareForwardingAutomation = require('./individualServices/PrepareForwardingAutomation');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
-var tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
+const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
+const ElasticsearchPreparation = require('./individualServices/ElasticsearchPreparation');
+const { isTcpClientElasticsearch, elasticsearchService } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
+const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 
 /**
  * Returns remote IPv4 address
@@ -83,24 +87,29 @@ exports.getTcpClientRemotePort = function (url) {
  * uuid String 
  * no response value expected for this operation
  **/
-
-
-
-exports.putTcpClientRemoteAddress = function (url, body, uuid) {
+exports.putTcpClientRemoteAddress = function (body, uuid) {
   return new Promise(async function (resolve, reject) {
     try {
-      let isUpdated = await fileOperation.writeToDatabaseAsync(url, body, false);
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-      if (isUpdated) {
-        let forwardingAutomationInputList = await prepareForwardingAutomation.OAMLayerRequest(
-          uuid
-        );
-        ForwardingAutomationService.automateForwardingConstructWithoutInputAsync(
-          forwardingAutomationInputList
-        );
+      let oldValue = await tcpClientInterface.getRemoteAddressAsync(uuid);
+      let newValue = body["tcp-client-interface-1-0:remote-address"];
+      if (oldValue !== newValue) {
+        let isUpdated = await tcpClientInterface.setRemoteAddressAsync(uuid, newValue);
+        if (isUpdated) {
+          let forwardingAutomationInputList = await prepareForwardingAutomation.OAMLayerRequest(
+            uuid
+          );
+          ForwardingAutomationService.automateForwardingConstructWithoutInputAsync(
+            forwardingAutomationInputList
+          );
+          if (isTcpClientElasticsearch(uuid)) {
+            // recreate all the clients with new connection data
+            let uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
+            for (let uuid of uuids) {
+              await elasticsearchService.getClient(true, uuid);
+            }
+            await ElasticsearchPreparation.prepareElasticsearch();
+          }
+        }
       }
       resolve();
     } catch (error) {
@@ -108,6 +117,7 @@ exports.putTcpClientRemoteAddress = function (url, body, uuid) {
     }
   });
 }
+
 /**
  * Configures target TCP port at server
  *
@@ -115,23 +125,29 @@ exports.putTcpClientRemoteAddress = function (url, body, uuid) {
  * uuid String 
  * no response value expected for this operation
  **/
-exports.putTcpClientRemotePort = function (url, body, uuid) {
+exports.putTcpClientRemotePort = function (body, uuid) {
   return new Promise(async function (resolve, reject) {
     try {
-      let isUpdated = await fileOperation.writeToDatabaseAsync(url, body, false);
-
-
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-      if (isUpdated) {
-        let forwardingAutomationInputList = await prepareForwardingAutomation.OAMLayerRequest(
-          uuid
-        );
-        ForwardingAutomationService.automateForwardingConstructWithoutInputAsync(
-          forwardingAutomationInputList
-        );
+      let oldValue = await tcpClientInterface.getRemotePortAsync(uuid);
+      let newValue = body["tcp-client-interface-1-0:remote-port"];
+      if (oldValue !== newValue) {
+        let isUpdated = await tcpClientInterface.setRemotePortAsync(uuid, newValue);
+        if (isUpdated) {
+          let forwardingAutomationInputList = await prepareForwardingAutomation.OAMLayerRequest(
+            uuid
+          );
+          ForwardingAutomationService.automateForwardingConstructWithoutInputAsync(
+            forwardingAutomationInputList
+          );
+          if (isTcpClientElasticsearch(uuid)) {
+            // recreate all the clients with new connection data
+            let uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
+            for (let uuid of uuids) {
+              await elasticsearchService.getClient(true, uuid);
+            }
+            await ElasticsearchPreparation.prepareElasticsearch();
+          }
+        }
       }
       resolve();
     } catch (error) { }
@@ -139,24 +155,29 @@ exports.putTcpClientRemotePort = function (url, body, uuid) {
   });
 }
 
-exports.putTcpClientRemoteProtocol = function (url, body, uuid) {
+exports.putTcpClientRemoteProtocol = function (body, uuid) {
   return new Promise(async function (resolve, reject) {
-
     try {
-      let isUpdated = await fileOperation.writeToDatabaseAsync(url, body, false);
-
-
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-      if (isUpdated) {
-        let forwardingAutomationInputList = await prepareForwardingAutomation.OAMLayerRequest(
-          uuid
-        );
-        ForwardingAutomationService.automateForwardingConstructWithoutInputAsync(
-          forwardingAutomationInputList
-        );
+      let oldValue = await tcpClientInterface.getRemoteProtocolAsync(uuid);
+      let newValue = body["tcp-client-interface-1-0:remote-protocol"];
+      if (oldValue !== newValue) {
+        let isUpdated = await tcpClientInterface.setRemoteProtocolAsync(uuid, newValue);
+        if (isUpdated) {
+          let forwardingAutomationInputList = await prepareForwardingAutomation.OAMLayerRequest(
+            uuid
+          );
+          ForwardingAutomationService.automateForwardingConstructWithoutInputAsync(
+            forwardingAutomationInputList
+          );
+          if (isTcpClientElasticsearch(uuid)) {
+            // recreate all the clients with new connection data
+            let uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
+            for (let uuid of uuids) {
+              await elasticsearchService.getClient(true, uuid);
+            }
+            await ElasticsearchPreparation.prepareElasticsearch();
+          }
+        }
       }
       resolve();
     } catch (error) {
