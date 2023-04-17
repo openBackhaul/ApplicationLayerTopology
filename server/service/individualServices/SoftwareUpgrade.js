@@ -330,8 +330,8 @@ async function PromptForBequeathingDataCausesRObeingRequestedToStopNotifications
             let forwardingKindNameOfTheNotifyWithdrawnApprovals = "PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnApprovalsToNewRelease";
 
             let listOfOperationToBeUnsubscribed = [];
-            listOfOperationToBeUnsubscribed.push(await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyApprovals));
-            listOfOperationToBeUnsubscribed.push(await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyWithdrawnApprovals));
+            listOfOperationToBeUnsubscribed.push((await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyApprovals))[0]);
+            listOfOperationToBeUnsubscribed.push((await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyWithdrawnApprovals))[0]);
            /***********************************************************************************
              * Preparing requestBody 
              ************************************************************************************/
@@ -347,7 +347,7 @@ async function PromptForBequeathingDataCausesRObeingRequestedToStopNotifications
                      ************************************************************************************/
                     requestBody.subscriberApplication = await httpServerInterface.getApplicationNameAsync();
                     requestBody.subscriberReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-                    requestBody.subscription = subscriptionName.toString();
+                    requestBody.subscription = subscriptionName;
                     requestBody = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(requestBody);
                     result = await forwardRequest(
                         forwardingKindNameOfTheBequeathOperation,
