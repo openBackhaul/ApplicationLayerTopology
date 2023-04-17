@@ -1,5 +1,7 @@
 ## Using Elasticsearch in ApplicationLayerTopology Application
 
+For introduction to Elasticsearch and its general usage, please consult the [Elasticsearch guide in ApplicationPattern](https://github.com/openBackhaul/ApplicationPattern/blob/develop/doc/ImplementingApplications/ConceptOfElasticsearch/ConceptOfElasticsearch.md).
+
 Unlike other applications using ES, ALT uses 2 index aliases, that are configured in config file. One index alias is used for storing control-constructs of regarded application, other is used to store links between applications.
 
 The implicit rule, even if an index alias changes, is that the index alias covering links would end it's UUID with numbers `001`, whereas the control-construct index alias would end it's UUID with numbers `000`.
@@ -23,7 +25,7 @@ module.exports.putElasticsearchClientServiceRecordsPolicy = function putElastics
 };
 ```
 
-The methods dealing with ServiceRecordsPolicy are **not** used in ALT and should return HTTP status `405 Method not Allowed`.
+The methods dealing with ServiceRecordsPolicy are **not** used in ALT and should return HTTP status `405 Method not Allowed`. Service policy is not used, because ALT uses ES for application data and it is not desired for this data to be automatically removed at any point.
 
 ### service/individualService/ElasticsearchPreparation.js
 
