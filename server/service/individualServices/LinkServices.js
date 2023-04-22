@@ -438,3 +438,24 @@ exports.deleteDependentLinkPorts = async function (uuid) {
         deleteLinkPortAsync(linkUuid, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
     }
 }
+
+/**
+ * @description This function returns link given it's link UUID.
+ * @param {String} linkUuid Link UUID
+ * @returns {Promise<Object>} { link, took }
+ **/
+exports.getLinkAsync = async function(linkUuid) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(true, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+    index: indexAlias,
+    filter_path: "took,hits.hits._source",
+    body: {
+        "query": {
+        "term": { "uuid": linkUuid }
+        }
+    }
+    });
+    return { "link": res.body.hits.hits[0]._source, "took": res.body.took }
+}

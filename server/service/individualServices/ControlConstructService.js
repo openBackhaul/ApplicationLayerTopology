@@ -44,29 +44,6 @@ class ControlConstructService {
   }
 
   /**
-   * @description This function returns the link entries from the core-model-1-4:control-construct
-   * @returns {promise} returns link.
-   **/
-  static async getLinkAsync(linkUuid) {
-    return new Promise(async function (resolve, reject) {
-      let link;
-      try {
-        let linkList = await ControlConstructService.getLinkListAsync();
-        for (let i = 0; i < linkList.length; i++) {
-          let _link = linkList[i];
-          let _linkUuid = _link[onfAttributes.GLOBAL_CLASS.UUID];
-          if (_linkUuid == linkUuid) {
-            link = _link;
-          }
-        }
-        resolve(link);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  /**
    * @description This function returns the forwarding-domain list entries from the core-model-1-4:control-construct
    * @returns {promise} returns ForwardingDomain List.
    **/
@@ -84,7 +61,7 @@ class ControlConstructService {
   /**
    * @description This function returns the control-construct from Elasticsearch.
    * @param {String} controlConstructUuid
-   * @returns {Promise<Object>} control-construct
+   * @returns {Promise<Object>} { controlConstruct, took }
    **/
   static async getControlConstructAsync(controlConstructUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
@@ -92,7 +69,7 @@ class ControlConstructService {
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
       index: indexAlias,
-      filter_path: "hits.hits",
+      filter_path: "took, hits.hits",
       body: {
         "query": {
           "term": {
@@ -105,7 +82,7 @@ class ControlConstructService {
       throw new Error(`Could not find existing control-construct with UUID ${controlConstructUuid}`);
     }
     let controlConstruct = createResultArray(res);
-    return controlConstruct[0];
+    return { "controlConstruct": controlConstruct[0], "took": res.body.took };
   }
 
   /**
@@ -328,6 +305,45 @@ class ControlConstructService {
             return layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC][onfAttributes.HTTP_SERVER.CAPABILITY];
         }
     };
+  }
+
+  /**
+   * This function returns application name from http server LT in given control construct.
+   * @param {Object} controlConstruct
+   * @returns {String|undefined} applicationName
+   */
+  static getApplicationName(controlConstruct) {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
+        let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
+        let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
+        return httpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * This function return application name from http server LT in given control construct.
+   * @param {String} controlConstruct
+   * @returns {String|undefined} releaseNumber
+   */
+  static getReleaseNumber(controlConstruct) {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let i = 0; i < logicalTerminationPointList.length; i++) {
+      let logicalTerminationPoint = logicalTerminationPointList[i];
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
+        let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
+        let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
+        return httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
+      }
+    }
+    return undefined;
   }
 }
 
