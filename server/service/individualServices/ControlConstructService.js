@@ -23,30 +23,24 @@ class ControlConstructService {
 
   /**
    * @description This function returns the link list entries from the core-model-1-4:control-construct
-   * @returns {promise} returns link List.
+   * @returns {Promise<Object>} { links, took }.
    **/
   static async getLinkListAsync() {
-    return new Promise(async function (resolve, reject) {
-      try {
-        let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
-        let client = await elasticsearchService.getClient(true, esUuid);
-        let indexAlias = await getIndexAliasAsync(esUuid);
-        let res = await client.search({
-          index: indexAlias,
-          filter_path: "hits.hits",
-          body: {
-            "query": {
-              "match_all": {}
-            }
-          }
-
-        })
-        let linkList = await createResultArray(res);
-        resolve(linkList);
-      } catch (error) {
-        reject(error);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(true, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+      index: indexAlias,
+      filter_path: "hits.hits",
+      body: {
+        "query": {
+          "match_all": {}
+        }
       }
-    });
+
+    })
+    let linkList = createResultArray(res);
+    return { "links" : linkList, "took" : res.body.took };
   }
 
   /**

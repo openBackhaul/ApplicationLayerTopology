@@ -460,46 +460,14 @@ exports.listEndPointsOfLink = async function (body, user, originator, xCorrelato
 /**
  * Provides list of UUIDs of Links
  *
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_5
  **/
-exports.listLinkUuids = function (user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    try {
-      let linkUuidList = [];
-      /****************************************************************************************
-       * Preparing response body
-       ****************************************************************************************/
-      let linkList = await ControlConstructService.getLinkListAsync();
-      for (let i = 0; i < linkList.length; i++) {
-        let link = linkList[i];
-        let linkUuid = link[onfAttributes.GLOBAL_CLASS.UUID];
-        linkUuidList.push(linkUuid);
-      }
-
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = {
-        "link-uuid-list": linkUuidList
-      };
-    } catch (error) {
-      console.log(error);
-    }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
-    }
-  });
-
+exports.listLinkUuids = async function () {
+  let linksResponse = await ControlConstructService.getLinkListAsync();
+  let linkList = linksResponse.links;
+  const linkUuidList = linkList.flatMap(link => link['uuid']);
+  return { "body" : { "link-uuid-list": linkUuidList }, "took" : linksResponse.took };
 }
-
 
 /**
  * Provides list of applications and names of operations that are connected by links to an application
