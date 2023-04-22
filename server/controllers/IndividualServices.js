@@ -53,12 +53,11 @@ module.exports.deleteFcPort = async function deleteFcPort (req, res, next, body,
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
-    let responseBodyToDocument = {};
-    await IndividualServices.deleteFcPort(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    let responseBodyToDocument = undefined;
+    await IndividualServices.deleteFcPort(body)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;

@@ -199,29 +199,3 @@ exports.getForwardingConstructListToUpdateFcPort = function (controlConstructUui
         }
     });
 }
-
-exports.getForwardingConstructListToDeleteFcPort = function (controlConstructUuid, forwardingConstructUuid, fcPortLocalId) {
-    return new Promise(async function (resolve, reject) {
-        let forwardingConstructListToBeUpdated = {};
-        try {
-
-            let forwardingDomainOfControlConstruct = await getForwardingDomainFromControlConstruct(controlConstructUuid);
-            let documentId = forwardingDomainOfControlConstruct.id;
-
-            let forwardingConstructList = await getForwardingConstructList(forwardingDomainOfControlConstruct, forwardingConstructUuid);
-
-            let fcPort = await getFcPortList(forwardingConstructList, fcPortLocalId);
-            let indexOfIncomingFcPortLocalId = fcPort.indexOfIncomingFcPortLocalId;
-
-            if (indexOfIncomingFcPortLocalId != -1) {
-                fcPort.fcPortList.splice(indexOfIncomingFcPortLocalId, 1)
-                forwardingConstructListToBeUpdated = await getUpdatedForwardingConstructList(forwardingConstructList, fcPort, documentId);
-
-            }
-
-            resolve(forwardingConstructListToBeUpdated);
-        } catch (error) {
-            reject(error);
-        }
-    });
-}

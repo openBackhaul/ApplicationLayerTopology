@@ -32,6 +32,8 @@ const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfMod
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
 const ControlConstructService = require('./individualServices/ControlConstructService');
+const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
+const ElasticsearchPreparation = require('./individualServices/ElasticsearchPreparation');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -196,40 +198,48 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
  * FcPort identified by FcUuid and FcPortLid will be deleted
  *
  * body V1_deletefcport_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let forwardingConstructUuid = body["fc-uuid"];
-      let fcPortLocalId = body["fc-port-local-id"];
-      let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-      let forwardingConstructListToBeUpdated = await forwardingService.getForwardingConstructListToDeleteFcPort(controlConstructUuid, forwardingConstructUuid ,fcPortLocalId);
-      
-      let response = await forwardingService.updateForwardingConstructList(forwardingConstructListToBeUpdated,forwardingConstructUuid) 
-      
-      if(response && response.body.result === 'updated' || Object.keys(forwardingConstructListToBeUpdated).length === 0) {
-        resolve();
-      } else {
-        throw new Error ('fc-port is not deleted')
+exports.deleteFcPort = async function (body) {
+  let forwardingConstructUuid = body["fc-uuid"];
+  let fcPortLocalId = body["fc-port-local-id"];
+  let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+  let client = await elasticsearchService.getClient(false, esUuid);
+  let indexAlias = await getIndexAliasAsync(esUuid);
+  let response = await client.updateByQuery(
+    {
+      index: indexAlias,
+      body: {
+        "script": {
+          "source": `def fwDomain = ctx._source['forwarding-domain'];
+              for (domain in fwDomain) {
+                def fcs = domain['forwarding-construct'];
+                for (fc in fcs) {
+                  if (fc['uuid'] == params['fc-uuid']) {
+                    def ports = fc['fc-port'];
+                    ports.removeIf(port -> port['local-id'] == params['local-id'])
+                  }
+                }
+              }
+              `,
+            "params": {
+                "local-id": fcPortLocalId,
+                "fc-uuid": forwardingConstructUuid
+            }
+        },
+        "query": {
+            "match": {
+                "forwarding-domain.forwarding-construct.uuid": "aa-2-0-1-op-fc-bm-000"
+            }
+        }
       }
-    } catch (error) {
-      reject(error);
     }
-  });
+  );
+  if (response && response.body.updated === 1) {
+    return { "took" : response.body.took };
+  } else {
+    throw new Error ('fc-port was not deleted');
+  }
 }
 
 /**
