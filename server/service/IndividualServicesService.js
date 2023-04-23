@@ -539,49 +539,34 @@ exports.listOperationClientsAtApplication = async function (body) {
  * Informs about the internal forwarding (FCs).
  *
  * body V1_listoperationclientsreactingonoperationserver_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_4
  **/
-exports.listOperationClientsReactingOnOperationServer = async function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+exports.listOperationClientsReactingOnOperationServer = async function (body) {
     let operationClientList = [];
-    /****************************************************************************************
-     * Setting up required local variables from the request body
-     ****************************************************************************************/
+    let took = 0;
     let applicationName = body["receiving-application-name"];
     let applicationReleaseNumber = body["receiving-application-release-number"];
     let operationServerName = body["receiving-operation"];
 
-    /****************************************************************************************
-     * Preparing response body
-     ****************************************************************************************/
-    let controlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
+    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplication(
       applicationName,
       applicationReleaseNumber);
-    if (controlConstruct) {
-      let operationServerUuid = getOperationServerUuid(controlConstruct, operationServerName);
-      if (operationServerUuid) {
-        let operationClientsUuidsReactingOnOperationServerList = getOperationClientsUuidsReactingOnOperationServerList(
-          controlConstruct,
-          operationServerUuid
-        );
-        if (operationClientsUuidsReactingOnOperationServerList) {
-          let clientsReactingOnOperationServerList = getClientsReactingOnOperationServerList(
-            controlConstruct,
-            operationClientsUuidsReactingOnOperationServerList
-          );
-          if (clientsReactingOnOperationServerList) {
-            operationClientList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(clientsReactingOnOperationServerList);
-          }
-        }
-      }
+    let controlConstruct = controlConstructResponse.controlConstruct;
+    took += controlConstructResponse.took;
+
+    let operationServerUuid = ControlConstructService.getOperationServerUuid(controlConstruct, operationServerName);
+    if (operationServerUuid) {
+      let operationClientsUuidsReactingOnOperationServerList = getOperationClientsUuidsReactingOnOperationServerList(
+        controlConstruct,
+        operationServerUuid
+      );
+      let clientsReactingOnOperationServerList = getClientsReactingOnOperationServerList(
+        controlConstruct,
+        operationClientsUuidsReactingOnOperationServerList
+      );
+      operationClientList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(clientsReactingOnOperationServerList);
     }
-    return {
-      "operation-client-list": operationClientList
-    };
+    return { "body": { "operation-client-list": operationClientList }, "took": took };
 }
 
 /**
@@ -1222,114 +1207,66 @@ function getAllOperationServerNameAsync(logicalTerminationPoints) {
  ***************************************************************************************************************/
 
 /**
- * Provides operationServerUuid for the operationServerName
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationServerName operation name of the operation Server
- * @returns operationServeruuid
- */
-function getOperationServerUuid(controlConstruct, operationServerName) {
-  let operationServerUuid;
-  try {
-    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    for (let i = 0; i < logicalTerminationPointList.length; i++) {
-      let logicalTerminationPoint = logicalTerminationPointList[i];
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
-        let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-        let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-        let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-        if (operationName == operationServerName) {
-          operationServerUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-        }
-      }
-    }
-    return operationServerUuid;
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-
-/**
  * This function gets the operation client uuids reacting on the operation server list
  * @param {*} controlConstruct 
  * @param {*} operationServerUuid 
  * @returns array
  */
 function getOperationClientsUuidsReactingOnOperationServerList(controlConstruct, operationServerUuid) {
-  let operationClientsUuidsReactingOnOperationServerList = [];
-  try {
-    let forwardingDomainList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN];
-    for (let i = 0; i < forwardingDomainList.length; i++) {
-      let forwardingDomain = forwardingDomainList[i];
-      let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
-      for (let j = 0; j < forwardingConstructList.length; j++) {
-        let forwardingConstruct = forwardingConstructList[j];
-        let fcOutputUuidList = getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid);
-        for (let k = 0; k < fcOutputUuidList.length; k++) {
-          let fcOutputUuid = fcOutputUuidList[k];
-          operationClientsUuidsReactingOnOperationServerList.push(fcOutputUuid);
-        }
+  let operationClientsUuids = [];
+  let forwardingDomainList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN];
+  for (let forwardingDomain of forwardingDomainList) {
+    let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+    for (let forwardingConstruct of forwardingConstructList) {
+      let fcOutputUuidList = getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid)
+      for (let fcOutputUuid of fcOutputUuidList) {
+        operationClientsUuids.push(fcOutputUuid);
       }
     }
-    return operationClientsUuidsReactingOnOperationServerList;
-  } catch (error) {
-    console.log(error)
   }
+  return operationClientsUuids;
 }
 
 /**
  * This function returns the list of output fc-port uuids for the operationServerUuid in the given forwardingConstruct
- * @param {*} forwardingConstruct 
- * @param {*} operationServerUuid 
- * @returns array
+ * @param {Object} forwardingConstruct
+ * @param {String} operationServerUuid
+ * @returns {Array}
  */
 function getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid) {
   let fcOutputUuidList = [];
-  try {
-    if (isOperationServerIsInInput(forwardingConstruct, operationServerUuid)) {
-      let fcPortList = forwardingConstruct["fc-port"];
-      for (let i = 0; i < fcPortList.length; i++) {
-        let fcPort = fcPortList[i];
-        let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
-        if (fcPortDirection == FcPort.portDirectionEnum.OUTPUT) {
-          let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
-          fcOutputUuidList.push(logicalTerminationPoint);
-        }
+  if (isOperationServerIsInInput(forwardingConstruct, operationServerUuid)) {
+    let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
+    for (let fcPort of fcPortList) {
+      let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
+      if (fcPortDirection === FcPort.portDirectionEnum.OUTPUT) {
+        let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
+        fcOutputUuidList.push(logicalTerminationPoint);
       }
     }
-    return fcOutputUuidList;
-  } catch (error) {
-    console.log(error)
   }
+  return fcOutputUuidList;
 }
 
 
 /**
  * This function returns true if the operation server is listed as a input port in given forwarding construct
- * @param {*} forwardingConstruct 
- * @param {*} operationServerUuid 
- * @returns boolean
+ * @param {Object} forwardingConstruct
+ * @param {String} operationServerUuid
+ * @returns {boolean}
  */
 function isOperationServerIsInInput(forwardingConstruct, operationServerUuid) {
-  let isOperationServerUuidIsAInput = false;
-  try {
-    let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
-    for (let i = 0; i < fcPortList.length; i++) {
-      let fcPort = fcPortList[i];
-      let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
-      if (fcPortDirection == FcPort.portDirectionEnum.INPUT) {
-        let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
-        if (logicalTerminationPoint == operationServerUuid) {
-          isOperationServerUuidIsAInput = true;
-        }
+  let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
+  for (let fcPort of fcPortList) {
+    let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
+    if (fcPortDirection === FcPort.portDirectionEnum.INPUT) {
+      let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
+      if (logicalTerminationPoint === operationServerUuid) {
+        return true;
       }
     }
-    return isOperationServerUuidIsAInput;
-  } catch (error) {
-    console.log(error)
   }
+  return false;
 }
 
 /**

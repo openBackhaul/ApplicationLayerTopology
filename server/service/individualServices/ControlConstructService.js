@@ -324,6 +324,29 @@ class ControlConstructService {
     }
     return undefined;
   }
+
+  /**
+   * Provides operationServerUuid for the operationServerName.
+   * @param {Object} controlConstruct complete control-construct instance
+   * @param {String} operationServerName operation name of the operation Server
+   * @returns {String|undefined} operationServerUuid
+   */
+  static getOperationServerUuid(controlConstruct, operationServerName) {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
+        let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+        let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+        let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
+        if (operationName === operationServerName) {
+          return logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+        }
+      }
+    }
+    return undefined;
+  }
 }
 
 module.exports = ControlConstructService;
