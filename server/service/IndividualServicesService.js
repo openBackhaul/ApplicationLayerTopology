@@ -588,47 +588,33 @@ exports.listOperationClientsReactingOnOperationServer = async function (body, us
  * Provides list of names of operations that are supported by an application
  *
  * body V1_listoperationserversatapplication_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_2
  **/
-exports.listOperationServersAtApplication = async function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+exports.listOperationServersAtApplication = async function (body) {
     let operationServerNameList = [];
-    /****************************************************************************************
-     * Setting up required local variables from the request body
-     ****************************************************************************************/
+    let took = 0;
     let applicationName = body["application-name"];
     let applicationReleaseNumber = body["release-number"];
 
-    /****************************************************************************************
-     * Preparing response body
-     ****************************************************************************************/
-    let controlConstruct;
-    try {
-      controlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
+    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplication(
       applicationName,
       applicationReleaseNumber);
-      let logicalTerminationPointList = controlConstruct["logical-termination-point"];
-      for (let i = 0; i < logicalTerminationPointList.length; i++) {
-        let logicalTerminationPoint = logicalTerminationPointList[i];
-        let layerProtocol = logicalTerminationPoint["layer-protocol"][0];
-        let layerProtocolName = layerProtocol["layer-protocol-name"];
-        if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
-          let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-          let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-          let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-          operationServerNameList.push(operationName);
-        }
-      }
-    } catch (err) {
-      console.log(err);
+    let controlConstruct = controlConstructResponse.controlConstruct;
+    took += controlConstructResponse.took;
+
+    let logicalTerminationPointFullList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    let logicalTerminationPointList = logicalTerminationPointFullList.filter(ltp => {
+      let name = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      return name === LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER;
+    });
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+      let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+      let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
+      operationServerNameList.push(operationName);
     }
-    return {
-      "operation-server-name-list": operationServerNameList
-    };
+    return { "body": { "operation-server-name-list": operationServerNameList }, "took" : took };
 }
 
 /**
