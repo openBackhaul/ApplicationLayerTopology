@@ -914,82 +914,36 @@ exports.updateAllLtpsAndFcs = async function (body) {
  * Existing documentation of an FC identified by FcUuid will be replaced
  *
  * body V1_updatefc_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let forwardingConstruct = body;
-      let forwardingConstructUuid = forwardingConstruct["uuid"];
-      let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-
-      /****************************************************************************************
-       * Get the forwarding construct list to be updated
-       ****************************************************************************************/
-      let forwardingConstructListToBeUpdated = await forwardingService.getForwardingConstructListToUpdateFc(controlConstructUuid, forwardingConstructUuid, forwardingConstruct);
-
-      let response = await forwardingService.updateForwardingConstructList(forwardingConstructListToBeUpdated)
-
-      if (response && response.body.result === 'updated') {
-        resolve();
-      } else {
-        throw new Error('fc is not updated')
-      }
-    } catch (error) {
-      reject(error);
-    }
-  });
+exports.updateFc = async function (body) {
+  let forwardingConstructUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
+  let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+  let response = await forwardingService.updateForwardingConstruct(controlConstructUuid, body)
+  if (response) {
+    return response;
+  } else {
+    throw new Error('fc is not updated')
+  }
 }
-
 
 /**
  * Existing documentation of an FcPort identified by FcUuid and FcPortLid will be replaced
  *
  * body V1_updatefcport_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let forwardingConstructUuid = body["fc-uuid"];
-      let fcPort = body["fc-port"];
-      let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-
-      /****************************************************************************************
-       * Get the forwarding construct list to be updated
-       ****************************************************************************************/
-      let forwardingConstructListToBeUpdated = await forwardingService.getForwardingConstructListToUpdateFcPort(controlConstructUuid, forwardingConstructUuid, fcPort);
-
-      let response = await forwardingService.updateForwardingConstructList(forwardingConstructListToBeUpdated)
-
-      if (response && response.body.result === 'updated') {
-        resolve();
-      } else {
-        throw new Error('fc-port is not updated')
-      }
-    } catch (error) {
-      reject(error);
-    }
-  });
+exports.updateFcPort = async function (body) {
+  let forwardingConstructUuid = body["fc-uuid"];
+  let fcPort = body["fc-port"];
+  let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+  let response = await forwardingService.updateFCPort(controlConstructUuid, forwardingConstructUuid, fcPort);
+  if (response) {
+    return response;
+  } else {
+    throw new Error('fc-port is not updated')
+  }
 }
-
 
 /**
  * Existing documentation of the interface identified by LtpUuid will be replaced
