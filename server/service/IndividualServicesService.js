@@ -473,69 +473,56 @@ exports.listLinksToOperationClientsOfApplication = async function (body) {
  * Returns information about targets of OperationClients.
  *
  * body V1_listoperationclientsatapplication_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_3
  **/
-exports.listOperationClientsAtApplication = async function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+exports.listOperationClientsAtApplication = async function (body) {
     let operationClientList = [];
-    /****************************************************************************************
-     * Setting up required local variables from the request body
-     ****************************************************************************************/
+    let took = 0;
     let applicationName = body["application-name"];
     let applicationReleaseNumber = body["release-number"];
 
-    /****************************************************************************************
-     * Preparing response body
-     ****************************************************************************************/
-    let controlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
+    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplication(
       applicationName,
       applicationReleaseNumber);
+    let controlConstruct = controlConstructResponse.controlConstruct;
+    took += controlConstructResponse.took;
 
-    if (controlConstruct) {
-      let logicalTerminationPointList = controlConstruct["logical-termination-point"];
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
 
-      for (let i = 0; i < logicalTerminationPointList.length; i++) {
-        let logicalTerminationPoint = logicalTerminationPointList[i];
-        let layerProtocol = logicalTerminationPoint["layer-protocol"][0];
-        let layerProtocolName = layerProtocol["layer-protocol-name"];
-        if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
-          let clientUuidList = logicalTerminationPoint["client-ltp"];
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+        let clientUuidList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
 
-          let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-          let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-          let clientApplicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
-          let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+        let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+        let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+        let clientApplicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+        let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
 
-          if (clientUuidList) {
+        if (clientUuidList) {
 
-            for (let j = 0; j < clientUuidList.length; j++) {
-              let clientUuid = clientUuidList[j];
+          for (let clientUuid of clientUuidList) {
 
-              for (let k = 0; k < logicalTerminationPointList.length; k++) {
-                let clientLogicalTerminationPoint = logicalTerminationPointList[k];
-                let clientlogicalTerminationPointUuid = clientLogicalTerminationPoint["uuid"];
+            for (let clientLogicalTerminationPoint of logicalTerminationPointList) {
+              let clientlogicalTerminationPointUuid = clientLogicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
 
-                if (clientlogicalTerminationPointUuid == clientUuid) {
-                  let clientLayerProtocol = clientLogicalTerminationPoint["layer-protocol"][0];
-                  let clientLayerProtocolName = clientLayerProtocol["layer-protocol-name"];
+              if (clientlogicalTerminationPointUuid === clientUuid) {
+                let clientLayerProtocol = clientLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+                let clientLayerProtocolName = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
 
-                  if (clientLayerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
-                    let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-                    let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-                    let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+                if (clientLayerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
+                  let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+                  let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+                  let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
 
-                    let operationClient = {};
-                    operationClient.servingApplicationName = clientApplicationName;
-                    operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
-                    operationClient.operationName = operationName;
-                    operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
+                  let operationClient = {};
+                  operationClient.servingApplicationName = clientApplicationName;
+                  operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
+                  operationClient.operationName = operationName;
+                  operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
 
-                    operationClientList.push(operationClient);
-                  }
+                  operationClientList.push(operationClient);
                 }
               }
             }
@@ -543,9 +530,7 @@ exports.listOperationClientsAtApplication = async function (body, user, originat
         }
       }
     }
-    return {
-      "operation-client-list": operationClientList
-    };
+    return { "body": { "operation-client-list": operationClientList }, "took" : took };
 }
 
 

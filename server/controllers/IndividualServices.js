@@ -199,11 +199,11 @@ module.exports.listOperationClientsAtApplication = async function listOperationC
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.OK;
     let responseBodyToDocument = {};
-    await IndividualServices.listOperationClientsAtApplication(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    await IndividualServices.listOperationClientsAtApplication(body)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        responseBodyToDocument = responseBody.body;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
