@@ -902,13 +902,12 @@ exports.removeOperationClientFromLink = function (body, user, originator, xCorre
  * Existing documentation of all interfaces and internal connections will be replaced for the same CcUuid
  *
  * body V1_updateallltpsandfcs_body
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-2-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]'
  * no response value expected for this operation
  **/
 exports.updateAllLtpsAndFcs = async function (body) {
   let controlConstruct = body["core-model-1-4:control-construct"];
   await checkIfApplicationExists(controlConstruct);
-  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
+  return await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
 }
 
 /**
@@ -1357,32 +1356,19 @@ function getValueFromKey(nameList, key) {
   return undefined;
 }
 
-
 /**
  * Checks if http-c ltp exists by fetching applicationName and releaseNumber from given controlConstruc. Throws Error if not. 
  * @param {Object} controlConstruct
  * @throws {Error} Will throw an error if the application does not exist.
  */
 async function checkIfApplicationExists(controlConstruct) {
-  return new Promise(async function (resolve, reject) {
-    let isApplicationExists = false;
-    try {
-      let applicationName = ControlConstructService.getApplicationName(controlConstruct);
-      let releaseNumber = ControlConstructService.getReleaseNumber(controlConstruct);
-      let httpClientUuid = await httpClientInterface.getHttpClientUuidAsync(applicationName, releaseNumber);
-      if (httpClientUuid != undefined) {
-        isApplicationExists = true;
-      }
-      if (!isApplicationExists) {
-        throw new Error(`Application ${applicationName} is not in the list of known applications.`);
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+  let applicationName = ControlConstructService.getApplicationName(controlConstruct);
+  let releaseNumber = ControlConstructService.getReleaseNumber(controlConstruct);
+  let httpClientUuid = await httpClientInterface.getHttpClientUuidAsync(applicationName, releaseNumber);
+  if (httpClientUuid === undefined) {
+    throw new Error(`Application ${applicationName} is not in the list of known applications.`);
+  }
 }
-
 
 var resolveHttpClient = exports.resolveHttpClientLtpUuidFromForwardingName = function () {
   return new Promise(async function (resolve, reject) {
