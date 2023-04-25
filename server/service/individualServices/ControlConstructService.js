@@ -22,28 +22,6 @@ const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 class ControlConstructService {
 
   /**
-   * @description This function returns the link list entries from the core-model-1-4:control-construct
-   * @returns {Promise<Object>} { links, took }.
-   **/
-  static async getLinkListAsync() {
-    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
-    let client = await elasticsearchService.getClient(true, esUuid);
-    let indexAlias = await getIndexAliasAsync(esUuid);
-    let res = await client.search({
-      index: indexAlias,
-      filter_path: "hits.hits",
-      body: {
-        "query": {
-          "match_all": {}
-        }
-      }
-
-    })
-    let linkList = createResultArray(res);
-    return { "links" : linkList, "took" : res.body.took };
-  }
-
-  /**
    * @description This function returns the forwarding-domain list entries from the core-model-1-4:control-construct
    * @returns {promise} returns ForwardingDomain List.
    **/

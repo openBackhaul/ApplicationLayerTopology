@@ -32,8 +32,6 @@ const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfMod
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
 const ControlConstructService = require('./individualServices/ControlConstructService');
-const { elasticsearchService, getIndexAliasAsync } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
-const ElasticsearchPreparation = require('./individualServices/ElasticsearchPreparation');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -203,43 +201,8 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
 exports.deleteFcPort = async function (body) {
   let forwardingConstructUuid = body["fc-uuid"];
   let fcPortLocalId = body["fc-port-local-id"];
-  let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
-  let client = await elasticsearchService.getClient(false, esUuid);
-  let indexAlias = await getIndexAliasAsync(esUuid);
-  let response = await client.updateByQuery(
-    {
-      index: indexAlias,
-      body: {
-        "script": {
-          "source": `def fwDomain = ctx._source['forwarding-domain'];
-              for (domain in fwDomain) {
-                def fcs = domain['forwarding-construct'];
-                for (fc in fcs) {
-                  if (fc['uuid'] == params['fc-uuid']) {
-                    def ports = fc['fc-port'];
-                    ports.removeIf(port -> port['local-id'] == params['local-id'])
-                  }
-                }
-              }
-              `,
-            "params": {
-                "local-id": fcPortLocalId,
-                "fc-uuid": forwardingConstructUuid
-            }
-        },
-        "query": {
-            "match": {
-                "forwarding-domain.forwarding-construct.uuid": "aa-2-0-1-op-fc-bm-000"
-            }
-        }
-      }
-    }
-  );
-  if (response && response.body.updated === 1) {
-    return { "took" : response.body.took };
-  } else {
-    throw new Error ('fc-port was not deleted');
-  }
+  let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+  return forwardingService.deleteFcPort(fcPortLocalId, forwardingConstructUuid, controlConstructUuid);
 }
 
 /**
@@ -452,9 +415,9 @@ exports.listEndPointsOfLink = async function (body) {
  * returns inline_response_200_5
  **/
 exports.listLinkUuids = async function () {
-  let linksResponse = await ControlConstructService.getLinkListAsync();
+  let linksResponse = await LinkServices.getLinkListAsync();
   let linkList = linksResponse.links;
-  const linkUuidList = linkList.flatMap(link => link['uuid']);
+  const linkUuidList = linkList.flatMap(link => link[onfAttributes.GLOBAL_CLASS.UUID]);
   return { "body" : { "link-uuid-list": linkUuidList }, "took" : linksResponse.took };
 }
 
@@ -488,7 +451,7 @@ exports.listLinksToOperationClientsOfApplication = async function (body, user, o
     if (controlConstruct) {
       let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
       let opertionClientUuidListWithLink = [];
-      let linkList = await ControlConstructService.getLinkListAsync();
+      let linkList = await LinkServices.getLinkListAsync();
       for (let i = 0; i < linkList.length; i++) {
         let link = linkList[i];
         let linkPortList = link[onfAttributes.LINK.LINK_PORT];

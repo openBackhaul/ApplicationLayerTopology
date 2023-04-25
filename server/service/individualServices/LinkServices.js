@@ -18,7 +18,8 @@ const {
 
 const {
     elasticsearchService,
-    getIndexAliasAsync
+    getIndexAliasAsync,
+    createResultArray
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
@@ -458,4 +459,25 @@ exports.getLinkAsync = async function(linkUuid) {
     }
     });
     return { "link": res.body.hits.hits[0]._source, "took": res.body.took }
+}
+
+/**
+ * @description This function returns the link list entries from the core-model-1-4:control-construct
+ * @returns {Promise<Object>} { links, took }.
+ **/
+exports.getLinkListAsync = async function() {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(true, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+        index: indexAlias,
+        filter_path: "took, hits.hits",
+        body: {
+            "query": {
+                "match_all": {}
+            }
+        }
+    })
+    let linkList = createResultArray(res);
+    return { "links" : linkList, "took" : res.body.took };
 }
