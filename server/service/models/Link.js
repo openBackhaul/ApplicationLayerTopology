@@ -11,6 +11,7 @@ const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constant
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const ControlConstructService = require('../individualServices/ControlConstructService');
+const LinkServices = require('../individualServices/LinkServices');
 const LinkPort = require('./LinkPort');
 const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 const {
@@ -36,7 +37,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let isLinkExists = false;
             try {
-                let linkList = await ControlConstructService.getLinkListAsync();
+                let linkList = await LinkServices.getLinkListAsync();
                 for (let i = 0; i < linkList.length; i++) {
                     let isServingOperationUuidExists = false;
                     let isConsumingOperationuuid = false;
@@ -88,7 +89,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let linkUuidOfTheServingOperation;
             try {
-                let linkList = await ControlConstructService.getLinkListAsync();
+                let linkList = await LinkServices.getLinkListAsync();
                 for (let i = 0; i < linkList.length; i++) {
                     let link = linkList[i];
                     let linkPortList = link[onfAttributes.LINK.LINK_PORT];
@@ -112,7 +113,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let linkUuidOfTheConsumingOperation;
             try {
-                let linkList = await ControlConstructService.getLinkListAsync();
+                let linkList = await LinkServices.getLinkListAsync();
                 for (let i = 0; i < linkList.length; i++) {
                     let link = linkList[i];
                     let linkPortList = link[onfAttributes.LINK.LINK_PORT];

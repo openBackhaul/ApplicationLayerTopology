@@ -18,7 +18,8 @@ const {
 
 const {
     elasticsearchService,
-    getIndexAliasAsync
+    getIndexAliasAsync,
+    createResultArray
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
@@ -437,4 +438,46 @@ exports.deleteDependentLinkPorts = async function (uuid) {
     if (LinkPort.portDirectionEnum.INPUT === found[onfAttributes.LINK.PORT_DIRECTION]) {
         deleteLinkPortAsync(linkUuid, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
     }
+}
+
+/**
+ * @description This function returns link given it's link UUID.
+ * @param {String} linkUuid Link UUID
+ * @returns {Promise<Object>} { link, took }
+ **/
+exports.getLinkAsync = async function(linkUuid) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(true, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+    index: indexAlias,
+    filter_path: "took,hits.hits._source",
+    body: {
+        "query": {
+        "term": { "uuid": linkUuid }
+        }
+    }
+    });
+    return { "link": res.body.hits.hits[0]._source, "took": res.body.took }
+}
+
+/**
+ * @description This function returns the link list entries from the core-model-1-4:control-construct
+ * @returns {Promise<Object>} { links, took }.
+ **/
+exports.getLinkListAsync = async function() {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(true, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let res = await client.search({
+        index: indexAlias,
+        filter_path: "took, hits.hits",
+        body: {
+            "query": {
+                "match_all": {}
+            }
+        }
+    })
+    let linkList = createResultArray(res);
+    return { "links" : linkList, "took" : res.body.took };
 }

@@ -5,6 +5,8 @@ const {
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
+
+
 exports.updateForwardingConstructList = function (forwardingConstructListToBeUpdated) {
     return new Promise(async function (resolve, reject) {
         try {
@@ -200,28 +202,49 @@ exports.getForwardingConstructListToUpdateFcPort = function (controlConstructUui
     });
 }
 
-exports.getForwardingConstructListToDeleteFcPort = function (controlConstructUuid, forwardingConstructUuid, fcPortLocalId) {
-    return new Promise(async function (resolve, reject) {
-        let forwardingConstructListToBeUpdated = {};
-        try {
-
-            let forwardingDomainOfControlConstruct = await getForwardingDomainFromControlConstruct(controlConstructUuid);
-            let documentId = forwardingDomainOfControlConstruct.id;
-
-            let forwardingConstructList = await getForwardingConstructList(forwardingDomainOfControlConstruct, forwardingConstructUuid);
-
-            let fcPort = await getFcPortList(forwardingConstructList, fcPortLocalId);
-            let indexOfIncomingFcPortLocalId = fcPort.indexOfIncomingFcPortLocalId;
-
-            if (indexOfIncomingFcPortLocalId != -1) {
-                fcPort.fcPortList.splice(indexOfIncomingFcPortLocalId, 1)
-                forwardingConstructListToBeUpdated = await getUpdatedForwardingConstructList(forwardingConstructList, fcPort, documentId);
-
+/**
+ * @description Removes fcPort from forwarding-construct
+ * @param {String} fcPortLocalId Local ID of fcPort that should be deleted
+ * @param {String} forwardingConstructUuid UUID of forwarding-construct containing fc-port to be deleted
+ * @param {String} controlConstructUuid UUID of affected control construct
+ * @returns {Promise<Object>} { took }
+ */
+exports.deleteFcPort = async function(fcPortLocalId, forwardingConstructUuid, controlConstructUuid) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let response = await client.updateByQuery(
+        {
+        index: indexAlias,
+        body: {
+            "script": {
+            "source": `def fwDomain = ctx._source['forwarding-domain'];
+                for (domain in fwDomain) {
+                    def fcs = domain['forwarding-construct'];
+                    for (fc in fcs) {
+                    if (fc['uuid'] == params['fc-uuid']) {
+                        def ports = fc['fc-port'];
+                        ports.removeIf(port -> port['local-id'] == params['local-id'])
+                    }
+                    }
+                }
+                `,
+                "params": {
+                    "local-id": fcPortLocalId,
+                    "fc-uuid": forwardingConstructUuid
+                }
+            },
+            "query": {
+                "term": {
+                    "uuid": controlConstructUuid
+                }
             }
-
-            resolve(forwardingConstructListToBeUpdated);
-        } catch (error) {
-            reject(error);
         }
-    });
+        }
+    );
+    if (response && response.body.updated === 1) {
+        return { "took" : response.body.took };
+    } else {
+        throw new Error ('fc-port was not deleted');
+    }
 }
