@@ -122,7 +122,7 @@ class ControlConstructService {
    * @param {String} releaseNumber
    * @returns {Promise<Object>} { controlConstruct, took }
    **/
-  static async getControlConstructOfTheApplication(applicationName, releaseNumber) {
+  static async getControlConstructOfTheApplicationAsync(applicationName, releaseNumber) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
@@ -151,8 +151,8 @@ class ControlConstructService {
     if (Object.keys(res.body.hits.hits).length === 0) {
       throw new Error(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
     }
-    let controlConstruct = res.body.hits.hits[0]._source;
-    return { "controlConstruct": controlConstruct, "took": res.body.took };
+    let controlConstruct = createResultArray(res);
+    return { "controlConstruct": controlConstruct[0], "took": res.body.took };
   }
 
   /**

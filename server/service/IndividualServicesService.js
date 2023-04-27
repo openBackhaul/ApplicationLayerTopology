@@ -430,7 +430,7 @@ exports.listLinksToOperationClientsOfApplication = async function (body) {
     let applicationName = body["application-name"];
     let applicationReleaseNumber = body["release-number"];
 
-    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplication(
+    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
       applicationName,
       applicationReleaseNumber);
     let controlConstruct = controlConstructResponse.controlConstruct;
@@ -481,7 +481,7 @@ exports.listOperationClientsAtApplication = async function (body) {
     let applicationName = body["application-name"];
     let applicationReleaseNumber = body["release-number"];
 
-    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplication(
+    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
       applicationName,
       applicationReleaseNumber);
     let controlConstruct = controlConstructResponse.controlConstruct;
@@ -548,7 +548,7 @@ exports.listOperationClientsReactingOnOperationServer = async function (body) {
     let applicationReleaseNumber = body["receiving-application-release-number"];
     let operationServerName = body["receiving-operation"];
 
-    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplication(
+    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
       applicationName,
       applicationReleaseNumber);
     let controlConstruct = controlConstructResponse.controlConstruct;
@@ -581,7 +581,7 @@ exports.listOperationServersAtApplication = async function (body) {
     let applicationName = body["application-name"];
     let applicationReleaseNumber = body["release-number"];
 
-    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplication(
+    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
       applicationName,
       applicationReleaseNumber);
     let controlConstruct = controlConstructResponse.controlConstruct;
