@@ -25965,7 +25965,6 @@ components:
       type: object
       properties:
         link-uuid:
-          pattern: "^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-link-([0-9]{3})$"
           type: string
           description: |
             'UUID of Link with searched end points find [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]'
