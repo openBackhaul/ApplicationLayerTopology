@@ -7,10 +7,8 @@
 
 'use strict';
 
-const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
-const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
-const ControlConstructService = require('../individualServices/ControlConstructService');
+const LinkServices = require('../individualServices/LinkServices');
 
 class LinkPort {
 
@@ -43,9 +41,9 @@ class LinkPort {
         return new Promise(async function (resolve, reject) {
             let nextlocalId = "100";
             try {
-                let link = await ControlConstructService.getLinkAsync(
+                let link = (await LinkServices.getLinkAsync(
                     linkUuid
-                );
+                )).link;
                 let linkPortList = link[
                     onfAttributes.LINK.LINK_PORT];
                 let linkPortLocalIdList = [];

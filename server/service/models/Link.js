@@ -37,7 +37,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let isLinkExists = false;
             try {
-                let linkList = await LinkServices.getLinkListAsync();
+                let linkList = await (LinkServices.getLinkListAsync()).links;
                 for (let i = 0; i < linkList.length; i++) {
                     let isServingOperationUuidExists = false;
                     let isConsumingOperationuuid = false;
@@ -68,7 +68,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let isConsumingServiceExists = false;
             try {
-                let link = await ControlConstructService.getLinkAsync(linkUuid);
+                let link = (await LinkServices.getLinkAsync(linkUuid)).link;
                 let linkPortList = link["link-port"];
                 for (let j = 0; j < linkPortList.length; j++) {
                     let linkPort = linkPortList[j];
@@ -89,7 +89,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let linkUuidOfTheServingOperation;
             try {
-                let linkList = await LinkServices.getLinkListAsync();
+                let linkList = (await LinkServices.getLinkListAsync()).links;
                 for (let i = 0; i < linkList.length; i++) {
                     let link = linkList[i];
                     let linkPortList = link[onfAttributes.LINK.LINK_PORT];
@@ -113,7 +113,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let linkUuidOfTheConsumingOperation;
             try {
-                let linkList = await LinkServices.getLinkListAsync();
+                let linkList = (await LinkServices.getLinkListAsync()).links;
                 for (let i = 0; i < linkList.length; i++) {
                     let link = linkList[i];
                     let linkPortList = link[onfAttributes.LINK.LINK_PORT];
@@ -137,7 +137,7 @@ class Link {
         return new Promise(async function (resolve, reject) {
             let linkPortLocalIdOfTheConsumingOperation;
             try {
-                let link = await ControlConstructService.getLinkAsync(linkUuid);
+                let link = (await LinkServices.getLinkAsync(linkUuid)).link;
                 let linkPortList = link[onfAttributes.LINK.LINK_PORT];
                 for (let i = 0; i < linkPortList.length; i++) {
                     let linkPort = linkPortList[i];
