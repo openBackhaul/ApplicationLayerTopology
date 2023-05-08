@@ -16,6 +16,7 @@ The ApplicationLayerTopology is core element of the application layer running in
 ### Resources
 - [Specification](./spec/)
 - [TestSuite](./testing/)
+- [Documentation](./doc/main.md)
 - [Implementation](./server/)
 
 ### Comments
