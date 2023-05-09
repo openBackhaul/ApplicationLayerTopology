@@ -473,11 +473,13 @@ exports.getLinkListAsync = async function() {
         index: indexAlias,
         filter_path: "took, hits.hits",
         body: {
+            "from": 0,
+            "size": 9999,
             "query": {
                 "match_all": {}
             }
         }
-    })
+    });
     let linkList = createResultArray(res);
     return { "links" : linkList, "took" : res.body.took };
 }
