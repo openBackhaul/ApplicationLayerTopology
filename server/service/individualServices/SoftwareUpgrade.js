@@ -330,8 +330,8 @@ async function PromptForBequeathingDataCausesRObeingRequestedToStopNotifications
             let forwardingKindNameOfTheNotifyWithdrawnApprovals = "PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnApprovalsToNewRelease";
 
             let listOfOperationToBeUnsubscribed = [];
-            listOfOperationToBeUnsubscribed.push(await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyApprovals));
-            listOfOperationToBeUnsubscribed.push(await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyWithdrawnApprovals));
+            listOfOperationToBeUnsubscribed.push((await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyApprovals))[0]);
+            listOfOperationToBeUnsubscribed.push((await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyWithdrawnApprovals))[0]);
            /***********************************************************************************
              * Preparing requestBody 
              ************************************************************************************/
