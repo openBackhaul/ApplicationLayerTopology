@@ -123,10 +123,7 @@ class ControlConstructService {
    * @returns {promise} returns LogicalTerminationPoint instance List.
    **/
   static async getControlConstructOfTheApplication(applicationName, releaseNumber) {
-    return new Promise(async function (resolve, reject) {
-      let controlConstructInstance;
-      try {
-        let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
@@ -143,15 +140,11 @@ class ControlConstructService {
             }
       }
     })
-        if (Object.keys(res.body.hits.hits).length === 0) {
-          throw new Error(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
-        }
-        let controlConstructList = await createResultArray(res);
-        resolve(controlConstructList[0]);
-      } catch (error) {
-        reject(error);
-      }
-    });
+    if (Object.keys(res.body.hits.hits).length === 0) {
+      throw new Error(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
+    }
+    let controlConstructList = createResultArray(res);
+    return controlConstructList[0];
   }
 
   /**

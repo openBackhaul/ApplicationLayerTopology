@@ -634,10 +634,11 @@ exports.listOperationServersAtApplication = async function (body, user, originat
     /****************************************************************************************
      * Preparing response body
      ****************************************************************************************/
-    let controlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
+    let controlConstruct;
+    try {
+      controlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
       applicationName,
       applicationReleaseNumber);
-    if (controlConstruct) {
       let logicalTerminationPointList = controlConstruct["logical-termination-point"];
       for (let i = 0; i < logicalTerminationPointList.length; i++) {
         let logicalTerminationPoint = logicalTerminationPointList[i];
@@ -650,6 +651,8 @@ exports.listOperationServersAtApplication = async function (body, user, originat
           operationServerNameList.push(operationName);
         }
       }
+    } catch (err) {
+      console.log(err);
     }
     return {
       "operation-server-name-list": operationServerNameList
@@ -1077,7 +1080,7 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
   } catch (err) {
     // we did not find existing LTP with this name, figure out CC by UUID
     let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
-    controlConstruct = await ControlConstructService.getControlConstructAsync(controlConstructUuid);
+    controlConstruct = (await ControlConstructService.getControlConstructAsync(controlConstructUuid)).controlConstruct;
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     existingLtps.push(body);
   }
