@@ -12,7 +12,7 @@ exports.updateForwardingConstructList = function (forwardingConstructListToBeUpd
         try {
             let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
             let client = await elasticsearchService.getClient(false, esUuid);
-            let indexAlias = await getIndexAliasAsync(false, esUuid);
+            let indexAlias = await getIndexAliasAsync(esUuid);
             let response;
             if (Object.keys(forwardingConstructListToBeUpdated).length >= 2) {
 
