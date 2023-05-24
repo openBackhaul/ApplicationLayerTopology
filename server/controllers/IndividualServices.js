@@ -178,11 +178,11 @@ module.exports.listLinksToOperationClientsOfApplication = async function listLin
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.OK;
     let responseBodyToDocument = {};
-    await IndividualServices.listLinksToOperationClientsOfApplication(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    await IndividualServices.listLinksToOperationClientsOfApplication(body)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        responseBodyToDocument = responseBody.body;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
@@ -199,11 +199,11 @@ module.exports.listOperationClientsAtApplication = async function listOperationC
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.OK;
     let responseBodyToDocument = {};
-    await IndividualServices.listOperationClientsAtApplication(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    await IndividualServices.listOperationClientsAtApplication(body)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        responseBodyToDocument = responseBody.body;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
@@ -220,11 +220,11 @@ module.exports.listOperationClientsReactingOnOperationServer = async function li
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.OK;
     let responseBodyToDocument = {};
-    await IndividualServices.listOperationClientsReactingOnOperationServer(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    await IndividualServices.listOperationClientsReactingOnOperationServer(body)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        responseBodyToDocument = responseBody.body;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
@@ -241,11 +241,11 @@ module.exports.listOperationServersAtApplication = async function listOperationS
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.OK;
     let responseBodyToDocument = {};
-    await IndividualServices.listOperationServersAtApplication(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    await IndividualServices.listOperationServersAtApplication(body)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        responseBodyToDocument = responseBody.body;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;

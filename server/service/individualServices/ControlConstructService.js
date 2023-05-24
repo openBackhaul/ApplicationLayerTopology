@@ -117,34 +117,42 @@ class ControlConstructService {
   }
 
   /**
-   * @description This function returns the logical-termination-point list entries from the core-model-1-4:control-construct that 
-   * matches the layerProtocolName
-   * @param {String} layerProtocolName : The vaue can be either undefined or any one of the LayerProtocol.layerProtocolNameEnum
-   * @returns {promise} returns LogicalTerminationPoint instance List.
+   * @description This function returns control-construct for given application name and release number.
+   * @param {String} applicationName
+   * @param {String} releaseNumber
+   * @returns {Promise<Object>} { controlConstruct, took }
    **/
-  static async getControlConstructOfTheApplication(applicationName, releaseNumber) {
+  static async getControlConstructOfTheApplicationAsync(applicationName, releaseNumber) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
       index: indexAlias,
-      filter_path : "hits.hits",
+      filter_path: "took,hits.hits",
       body: {
         "query": {
-              "bool": {
-                "must": [
-                 {"match" : { "logical-termination-point.layer-protocol.http-server-interface-1-0:http-server-interface-pac.http-server-interface-capability.application-name": applicationName} },
-                {"match" : { "logical-termination-point.layer-protocol.http-server-interface-1-0:http-server-interface-pac.http-server-interface-capability.release-number": releaseNumber} }                 
-                  ]
+          "bool": {
+            "must": [
+              {
+                "match": {
+                  "logical-termination-point.layer-protocol.http-server-interface-1-0:http-server-interface-pac.http-server-interface-capability.application-name": applicationName
                 }
-            }
+              },
+              {
+                "match": {
+                  "logical-termination-point.layer-protocol.http-server-interface-1-0:http-server-interface-pac.http-server-interface-capability.release-number": releaseNumber
+                }
+              }
+            ]
+          }
+        }
       }
     })
     if (Object.keys(res.body.hits.hits).length === 0) {
       throw new Error(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
     }
-    let controlConstructList = createResultArray(res);
-    return controlConstructList[0];
+    let controlConstruct = createResultArray(res);
+    return { "controlConstruct": controlConstruct[0], "took": res.body.took };
   }
 
   /**
@@ -312,6 +320,29 @@ class ControlConstructService {
         let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
         let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
         return httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Provides operationServerUuid for the operationServerName.
+   * @param {Object} controlConstruct complete control-construct instance
+   * @param {String} operationServerName operation name of the operation Server
+   * @returns {String|undefined} operationServerUuid
+   */
+  static getOperationServerUuid(controlConstruct, operationServerName) {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
+        let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+        let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+        let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
+        if (operationName === operationServerName) {
+          return logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+        }
       }
     }
     return undefined;

@@ -39,10 +39,10 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
             let consumingApplicationName = EndPoints["consuming-application-name"];
             let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
 
-            let ServingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
+            let ServingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplicationAsync(
                 servingApplicationName,
                 servingApplicationReleaseNumber);
-            let consumingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
+            let consumingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplicationAsync(
                 consumingApplicationName,
                 consumingApplicationReleaseNumber);
 
@@ -83,10 +83,10 @@ exports.deleteOperationClientFromTheEndPointsAsync = function (EndPoints) {
             let consumingApplicationName = EndPoints["consuming-application-name"];
             let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
 
-            let ServingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
+            let ServingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplicationAsync(
                 servingApplicationName,
                 servingApplicationReleaseNumber);
-            let consumingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplication(
+            let consumingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplicationAsync(
                 consumingApplicationName,
                 consumingApplicationReleaseNumber);
 
