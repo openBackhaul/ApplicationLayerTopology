@@ -1045,6 +1045,9 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
     // we did not find existing LTP with this name, figure out CC by UUID
     let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
     controlConstruct = (await ControlConstructService.getControlConstructAsync(controlConstructUuid)).controlConstruct;
+    if (!controlConstruct) {
+      return;
+    }
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     existingLtps.push(body);
   }
