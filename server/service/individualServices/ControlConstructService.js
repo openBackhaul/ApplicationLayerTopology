@@ -83,8 +83,9 @@ class ControlConstructService {
         }
       }
     })
-    if (Object.keys(res.body).length === 0) {
-      throw new Error(`Could not find existing control-construct with LTP UUID ${ltpUuid}`);
+    if (res.body.hits === undefined) {
+      console.log(`Could not find existing control-construct with LTP UUID ${ltpUuid}`);
+      return undefined;
     }
     let controlConstruct = createResultArray(res);
     return controlConstruct[0];

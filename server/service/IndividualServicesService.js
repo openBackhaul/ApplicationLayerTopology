@@ -215,9 +215,16 @@ exports.deleteFcPort = async function (body) {
 exports.deleteLtpAndDependents = async function (body) {
   let ltpToBeRemovedUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
   let controlConstruct = await ControlConstructService.getControlConstructFromLtpUuidAsync(ltpToBeRemovedUuid);
+  if (!controlConstruct) {
+    return;
+  }
 
   let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
   let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid)
+  if (!ltpToBeRemoved) {
+    console.log(`LTP with UUID ${ltpToBeRemovedUuid} could not be found.`);
+    return;
+  }
 
   // do removal based on layerProtocol
   let layerProtocol = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
@@ -1013,14 +1020,20 @@ exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndic
  **/
 exports.updateLtp = async function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
   let logicalTerminationPointUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
-  let controlConstruct;
   let existingLtps = [];
   let forwardingAutomationInputList = [];
+  let controlConstruct = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
+  if (!controlConstruct) {
+    return;
+  }
   try {
-    controlConstruct = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let existingIndex = existingLtps.findIndex(item => item[onfAttributes.GLOBAL_CLASS.UUID] === logicalTerminationPointUuid);
     let existingLtp = existingLtps.at(existingIndex);
+    if (!existingLtp) {
+      console.log(`LTP with UUID ${logicalTerminationPointUuid} could not be found.`);
+      return;
+    }
     if (JSON.stringify(existingLtp) === JSON.stringify(body)) {
       console.log('LTP is already in database.');
       return;
