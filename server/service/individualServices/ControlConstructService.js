@@ -181,7 +181,7 @@ class ControlConstructService {
       });
     }
     let backendTime = process.hrtime(startTime);
-    if (res.result === 'created' || res.result === 'updated') {
+    if (res.body.result === 'created' || res.body.result === 'updated') {
       return { "took": backendTime[0] * 1000 + backendTime[1] / 1000000 };
     }
   }
