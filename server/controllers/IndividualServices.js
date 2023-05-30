@@ -333,12 +333,11 @@ module.exports.removeOperationClientFromLink = async function removeOperationCli
 module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  let responseBodyToDocument = {};
+  let responseBodyToDocument = undefined;
   IndividualServices.updateAllLtpsAndFcs(body)
     .then(async function (responseBody) {
-      responseBodyToDocument = responseBody;
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-      restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+      restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
       responseBodyToDocument = responseBody;
@@ -353,12 +352,11 @@ module.exports.updateFc = async function updateFc (req, res, next, body, user, o
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
-    let responseBodyToDocument = {};
-    await IndividualServices.updateFc(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    let responseBodyToDocument = undefined;
+    await IndividualServices.updateFc(body)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
@@ -374,12 +372,11 @@ module.exports.updateFcPort = async function updateFcPort (req, res, next, body,
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
-    let responseBodyToDocument = {};
-    await IndividualServices.updateFcPort(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    let responseBodyToDocument = undefined;
+    await IndividualServices.updateFcPort(body)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;

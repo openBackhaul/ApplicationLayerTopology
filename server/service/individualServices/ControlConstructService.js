@@ -158,7 +158,7 @@ class ControlConstructService {
   /**
    * @description Creates or updates full control-construct in ES.
    * @param {Object} controlConstruct full control-construct
-   * @returns {Promise<boolean>} true if create/update succeeded, false if not
+   * @returns {Promise<Object>} { took }
    **/
   static async createOrUpdateControlConstructAsync(controlConstruct) {
     let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
@@ -167,6 +167,7 @@ class ControlConstructService {
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res;
+    let startTime = process.hrtime();
     if (documentId) {
       res = await client.index({
         index: indexAlias,
@@ -179,7 +180,10 @@ class ControlConstructService {
         body: controlConstruct
       });
     }
-    return Object.keys(res).length !== 0 && (res.result === 'created' || res.result === 'updated');
+    let backendTime = process.hrtime(startTime);
+    if (res.body.result === 'created' || res.body.result === 'updated') {
+      return { "took": backendTime[0] * 1000 + backendTime[1] / 1000000 };
+    }
   }
 
   /**
