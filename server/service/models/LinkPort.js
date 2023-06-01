@@ -7,8 +7,6 @@
 
 'use strict';
 
-const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
-const LinkServices = require('../individualServices/LinkServices');
 
 class LinkPort {
 
@@ -32,38 +30,29 @@ class LinkPort {
         this.logicalTerminationPoint = logicalTerminationPoint;
     }
 
+    getLocalId() {
+        return this.localId;
+    }
+
     /**
      * @description This function returns the next available localId for the link-port list in a link instance.
-     * @param {String} linkUuid : uuid of a link
-     * @returns {promise} string {localId }
+     * @param {Link} link
+     * @returns {String} new local ID
      **/
-    static generateNextLocalIdAsync(linkUuid) {
-        return new Promise(async function (resolve, reject) {
-            let nextlocalId = "100";
-            try {
-                let link = (await LinkServices.getLinkAsync(
-                    linkUuid
-                )).link;
-                let linkPortList = link[
-                    onfAttributes.LINK.LINK_PORT];
-                let linkPortLocalIdList = [];
-                for (let i = 0; i < linkPortList.length; i++) {
-                    let linkPort = linkPortList[i];
-                    let localId = linkPort[
-                        onfAttributes.LOCAL_CLASS.LOCAL_ID];
-                    linkPortLocalIdList.push(localId);
-                }
-                if (linkPortLocalIdList.length > 0) {
-                    linkPortLocalIdList.sort();
-                    let lastUuid = linkPortLocalIdList[
-                        linkPortLocalIdList.length - 1];
-                    nextlocalId = parseInt(lastUuid) + 1;
-                }
-                resolve(nextlocalId.toString());
-            } catch (error) {
-                reject(error);
-            }
-        });
+    static generateNextLocalId(link) {
+        let nextlocalId = "100";
+        let linkPortList = link.getLinkPorts();
+        let linkPortLocalIdList = [];
+        for (let linkPort of linkPortList) {
+            let localId = linkPort.getLocalId();
+            linkPortLocalIdList.push(localId);
+        }
+        if (linkPortLocalIdList.length > 0) {
+            linkPortLocalIdList.sort();
+            let lastUuid = linkPortLocalIdList[linkPortLocalIdList.length - 1];
+            nextlocalId = parseInt(lastUuid) + 1;
+        }
+        return nextlocalId.toString();
     }
 }
 

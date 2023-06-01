@@ -22,21 +22,6 @@ const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 class ControlConstructService {
 
   /**
-   * @description This function returns the forwarding-domain list entries from the core-model-1-4:control-construct
-   * @returns {promise} returns ForwardingDomain List.
-   **/
-  static async getControlConstructListAsync() {
-    return new Promise(async function (resolve, reject) {
-      try {
-        let controlConstructList = await fileOperation.readFromDatabaseAsync(onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT);
-        resolve(controlConstructList);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  /**
    * @description This function returns the control-construct from Elasticsearch.
    * @param {String} controlConstructUuid
    * @returns {Promise<Object>} { controlConstruct, took }
@@ -186,54 +171,7 @@ class ControlConstructService {
     }
   }
 
-  /**
-   * @description This function deletes a logical-termination-point instance that matches the uuid argument from the 
-   * core-model-1-4:control-construct/logical-termination-point
-   * @param {String} logicalTerminationPointUuid : the value should be a valid string in the pattern '-\d+-\d+-\d+-(http|tcp|op)-(s|c)-\d{4}$'
-   * @returns {promise} returns {true|false}
-   **/
-  static deleteControlConstructAsync(controlConstructUuid) {
-    return new Promise(async function (resolve, reject) {
-      let isDeleted = false;
-      try {
-        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid
-        isDeleted = await fileOperation.deletefromDatabaseAsync(
-          controlConstructPath,
-          controlConstructUuid,
-          true);
-        resolve(isDeleted);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-
-  /**
-   * @description This function adds a link instance to the core-model-1-4:network-control-domain/link
-   * @param {String} link an instance of the link
-   * @returns {promise} returns {true|false}
-   **/
-   static addLinkAsync(link) {
-    return new Promise(async function (resolve, reject) {
-      let isCreated = false;
-      try {
-        link = onfFormatter.modifyJsonObjectKeysToKebabCase(link)
-        let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
-        let client = await elasticsearchService.getClient(true, esUuid);
-        let indexAlias = await getIndexAliasAsync(esUuid);
-        let response = await client.index({
-          index: indexAlias,
-          body: link
-        });
-        resolve(response);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  static deleteLtp(controlConstruct, ltpToBeRemovedUuid) {
+  static deleteLtpFromCCObject(controlConstruct, ltpToBeRemovedUuid) {
     let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let ltpToBeRemovedIndex = ltps.findIndex(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid);
     ltps.splice(ltpToBeRemovedIndex, 1);
@@ -264,7 +202,7 @@ class ControlConstructService {
    * @param {String} ltpUuid
    * @returns {Promise<Object>} http-server-capability
    */
-  static async findHttpServerCapabilityFromLtpUuid(ltpUuid) {
+  static async findHttpServerCapabilityFromLtpUuidAsync(ltpUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
@@ -346,6 +284,58 @@ class ControlConstructService {
         let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
         if (operationName === operationServerName) {
           return logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+        }
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * This function returns http-client configuration for operation-client UUID.
+   * @param {Object} logicalTerminationPointList
+   * @param {String} operationClientUuid
+   * @returns {Object|undefined} httpClientConfiguration
+   */
+  static findHttpClientConfiguration(logicalTerminationPointList, operationClientUuid) {
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+        let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
+        if (clientLtpList.includes(operationClientUuid)) {
+          let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+          return httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+        }
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Provides operationClientUuid for the operationClientName.
+   * @param {Object} controlConstruct complete control-construct instance
+   * @param {String} operationClientName operation name of the operation client
+   * @returns {String|undefined} operationClientUuid
+   */
+  static getOperationClientUuid(controlConstruct, operationClientName, consumingApplicationName, consumingApplicationReleaseNumber) {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
+        let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+        let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+        let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+        if (operationName === operationClientName) {
+          let _operationClientUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+          let httpClientConfiguration = this.findHttpClientConfiguration(logicalTerminationPointList, _operationClientUuid);
+          if (httpClientConfiguration) {
+            let applicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+            let releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+            if (applicationName === consumingApplicationName && releaseNumber === consumingApplicationReleaseNumber) {
+              return _operationClientUuid;
+            }
+          }
         }
       }
     }

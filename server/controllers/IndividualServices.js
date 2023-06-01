@@ -11,12 +11,11 @@ module.exports.addOperationClientToLink = async function addOperationClientToLin
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
-    let responseBodyToDocument = {};
-    await IndividualServices.addOperationClientToLink(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    let responseBodyToDocument = undefined;
+    await IndividualServices.addOperationClientToLink(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
@@ -72,16 +71,16 @@ module.exports.deleteFcPort = async function deleteFcPort (req, res, next, body,
 module.exports.deleteLtpAndDependents = async function deleteLtpAndDependents (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  let responseBodyToDocument = {};
-  let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-  IndividualServices.deleteLtpAndDependents(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+  let responseBodyToDocument = undefined;
+  await IndividualServices.deleteLtpAndDependents(body)
     .then(async function (responseBody) {
-      responseBodyToDocument = responseBody;
-      restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+      restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
       responseBodyToDocument = responseBody;
       responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
       restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
     });
   executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
@@ -292,12 +291,11 @@ module.exports.regardApplication = async function regardApplication (req, res, n
   try {
       let startTime = process.hrtime();
       let responseCode = responseCodeEnum.code.NO_CONTENT;
-      let responseBodyToDocument = {};
-      await IndividualServices.regardApplication(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+      let responseBodyToDocument = undefined;
+      await IndividualServices.regardApplication(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
         .then(async function (responseBody) {
-          responseBodyToDocument = responseBody;
-          let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-          restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+          let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+          restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
         })
         .catch(async function (responseBody) {
           responseBodyToDocument = responseBody;
@@ -313,12 +311,11 @@ module.exports.removeOperationClientFromLink = async function removeOperationCli
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
-    let responseBodyToDocument = {};
+    let responseBodyToDocument = undefined;
     await IndividualServices.removeOperationClientFromLink(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
