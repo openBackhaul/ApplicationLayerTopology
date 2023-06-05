@@ -32,6 +32,7 @@ const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfMod
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
 const ControlConstructService = require('./individualServices/ControlConstructService');
+const isEqual = require('lodash.isequal');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -966,7 +967,7 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let existingIndex = existingLtps.findIndex(item => item[onfAttributes.GLOBAL_CLASS.UUID] === logicalTerminationPointUuid);
     let existingLtp = existingLtps.at(existingIndex);
-    if (JSON.stringify(existingLtp) === JSON.stringify(body)) {
+    if (isEqual(existingLtp, body)) {
       console.log('LTP is already in database.');
       return;
     }
