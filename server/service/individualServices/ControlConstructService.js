@@ -57,7 +57,8 @@ class ControlConstructService {
       }
     })
     if (Object.keys(res.body.hits.hits).length === 0) {
-      throw new Error(`Could not find existing control-construct with UUID ${controlConstructUuid}`);
+      console.log(`Could not find existing control-construct with UUID ${controlConstructUuid}`);
+      return { "controlConstruct": undefined, "took": res.body.took };
     }
     let controlConstruct = createResultArray(res);
     return { "controlConstruct": controlConstruct[0], "took": res.body.took };
@@ -83,8 +84,9 @@ class ControlConstructService {
         }
       }
     })
-    if (Object.keys(res.body).length === 0) {
-      throw new Error(`Could not find existing control-construct with LTP UUID ${ltpUuid}`);
+    if (res.body.hits === undefined) {
+      console.log(`Could not find existing control-construct with LTP UUID ${ltpUuid}`);
+      return undefined;
     }
     let controlConstruct = createResultArray(res);
     return controlConstruct[0];
@@ -149,7 +151,8 @@ class ControlConstructService {
       }
     })
     if (Object.keys(res.body.hits.hits).length === 0) {
-      throw new Error(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
+      console.log(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
+      return { "controlConstruct": undefined, "took": res.body.took };
     }
     let controlConstruct = createResultArray(res);
     return { "controlConstruct": controlConstruct[0], "took": res.body.took };
