@@ -114,7 +114,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
        ****************************************************************************************/
       let isdataTransferRequired = true;
       
-      let httpClientUuidList = await resolveHttpClient() 
+      let httpClientUuidList = await LogicalTerminationPointService.resolveHttpTcpAndOperationClientUuidFromForwardingName()
       let newReleaseHttpClientLtpUuid = httpClientUuidList.httpClientUuid
       let tcpclientUuid = httpClientUuidList.tcpClientUuid
 
@@ -1274,27 +1274,3 @@ async function checkIfApplicationExists(controlConstruct) {
   }
 }
 
-var resolveHttpClient = exports.resolveHttpClientLtpUuidFromForwardingName = function () {
-  return new Promise(async function (resolve, reject) {
-    try {
-      const forwardingName = 'PromptForBequeathingDataCausesTransferOfListOfApplications';
-      let uuidlist = {};
-      let ForwardConstructName = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(forwardingName)
-      if (ForwardConstructName === undefined) {
-        return {};
-      }
-      let ForwardConstructUuid = ForwardConstructName[onfAttributes.GLOBAL_CLASS.UUID]
-      let listofUuid = await ForwardingConstruct.getFcPortListAsync(ForwardConstructUuid)
-      let fcPort = listofUuid.find(fcp => fcp[onfAttributes.FC_PORT.PORT_DIRECTION] === FcPort.portDirectionEnum.OUTPUT);
-      let operationClientUuid = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
-          let httpClientUuid = (await logicalTerminationPoint.getServerLtpListAsync(operationClientUuid))[0]
-          let tcpClientUuid = (await logicalTerminationPoint.getServerLtpListAsync(httpClientUuid))[0]
-          uuidlist = {
-            httpClientUuid, tcpClientUuid
-          }
-      resolve(uuidlist)
-    } catch (error) {
-      console.log(error)
-    }
-  })
-}
