@@ -39,13 +39,14 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
             let consumingApplicationName = EndPoints["consuming-application-name"];
             let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
 
-            let ServingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+            let ServingApplicationControlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
                 servingApplicationName,
                 servingApplicationReleaseNumber);
-            let consumingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+            let ServingApplicationControlConstruct = ServingApplicationControlConstructResponse.controlConstruct;
+            let consumingApplicationControlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
                 consumingApplicationName,
                 consumingApplicationReleaseNumber);
-
+            let consumingApplicationControlConstruct = consumingApplicationControlConstructResponse.controlConstruct;
             if (ServingApplicationControlConstruct && consumingApplicationControlConstruct) {
                 let servingOperationuuid = getOperationServerUuid(
                     ServingApplicationControlConstruct,
@@ -83,13 +84,14 @@ exports.deleteOperationClientFromTheEndPointsAsync = function (EndPoints) {
             let consumingApplicationName = EndPoints["consuming-application-name"];
             let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
 
-            let ServingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+            let ServingApplicationControlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
                 servingApplicationName,
                 servingApplicationReleaseNumber);
-            let consumingApplicationControlConstruct = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+            let ServingApplicationControlConstruct = ServingApplicationControlConstructResponse.controlConstruct;
+            let consumingApplicationControlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
                 consumingApplicationName,
                 consumingApplicationReleaseNumber);
-
+            let consumingApplicationControlConstruct = consumingApplicationControlConstructResponse.controlConstruct;
             if (ServingApplicationControlConstruct && consumingApplicationControlConstruct) {
                 let servingOperationuuid = getOperationServerUuid(
                     ServingApplicationControlConstruct,

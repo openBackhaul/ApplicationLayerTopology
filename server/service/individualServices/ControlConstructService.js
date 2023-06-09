@@ -56,7 +56,7 @@ class ControlConstructService {
         }
       }
     })
-    if (Object.keys(res.body.hits.hits).length === 0) {
+    if (res.body.hits === undefined) {
       console.log(`Could not find existing control-construct with UUID ${controlConstructUuid}`);
       return { "controlConstruct": undefined, "took": res.body.took };
     }
@@ -67,7 +67,7 @@ class ControlConstructService {
   /**
    * @description Given any LTP UUID, return its full control-construct.
    * @param {String} ltpUuid
-   * @returns {Promise<String>} control-construct
+   * @returns {Promise<Object>} { controlConstruct, took }
    */
   static async getControlConstructFromLtpUuidAsync(ltpUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
@@ -75,7 +75,7 @@ class ControlConstructService {
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
       index: indexAlias,
-      filter_path: "hits.hits._source",
+      filter_path: "took,hits.hits._source",
       body: {
         "query": {
           "term": {
@@ -86,24 +86,24 @@ class ControlConstructService {
     })
     if (res.body.hits === undefined) {
       console.log(`Could not find existing control-construct with LTP UUID ${ltpUuid}`);
-      return undefined;
+      return { "controlConstruct" : undefined, "took" : res.body.took };
     }
     let controlConstruct = createResultArray(res);
-    return controlConstruct[0];
+    return { "controlConstruct" : controlConstruct[0], "took" : res.body.took };
   }
 
   /**
    * @description Retrieves Elasticsearch document ID for a specific control-construct.
    * @param {String} controlConstructUuid
-   * @returns {Promise<String>} Elasticsearch document ID
+   * @returns {Promise<Object>} { id, took }
    */
-  static async getDocumentId(controlConstructUuid) {
+  static async getDocumentIdAsync(controlConstructUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
       index: indexAlias,
-      filter_path: 'hits.hits._id',
+      filter_path: "took,hits.hits._id",
       body: {
         "query": {
           "term": {
@@ -112,10 +112,10 @@ class ControlConstructService {
         }
       }
     });
-    if (Object.keys(res.body).length === 0) {
-      return undefined;
+    if (res.body.hits === undefined) {
+      return { "id": undefined, "took" : res.body.took };
     }
-    return res.body.hits.hits[0]._id;
+    return { "id": res.body.hits.hits[0]._id, "took" : res.body.took }
   }
 
   /**
@@ -150,7 +150,7 @@ class ControlConstructService {
         }
       }
     })
-    if (Object.keys(res.body.hits.hits).length === 0) {
+    if (res.body.hits.hits.length === 0) {
       console.log(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
       return { "controlConstruct": undefined, "took": res.body.took };
     }
@@ -165,7 +165,9 @@ class ControlConstructService {
    **/
   static async createOrUpdateControlConstructAsync(controlConstruct) {
     let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-    let documentId = await ControlConstructService.getDocumentId(controlConstructUuid);
+    let documentIdResponse = await ControlConstructService.getDocumentIdAsync(controlConstructUuid);
+    let documentId = documentIdResponse.id;
+    let took = documentIdResponse.took;
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
@@ -184,8 +186,9 @@ class ControlConstructService {
       });
     }
     let backendTime = process.hrtime(startTime);
+    let intermitent = (backendTime[0] * 1000 + backendTime[1] / 1000000);
     if (res.body.result === 'created' || res.body.result === 'updated') {
-      return { "took": backendTime[0] * 1000 + backendTime[1] / 1000000 };
+      return { "took": took + intermitent };
     }
   }
 

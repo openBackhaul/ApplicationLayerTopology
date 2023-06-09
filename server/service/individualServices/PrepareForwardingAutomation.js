@@ -329,7 +329,8 @@ function getOperationClientNameFromLtp(ltp) {
 }
 
 async function findOperationServerNameAsync(operationServerUuid) {
-    let cc = await ControlConstructService.getControlConstructFromLtpUuidAsync(operationServerUuid);
+    let ccResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(operationServerUuid);
+    let cc = ccResponse.controlConstruct;
     if (cc) {
         let filteredLtps = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
         let operationServerLtp = filteredLtps.find(ltp => ltp.uuid === operationServerUuid);
@@ -346,7 +347,8 @@ async function findOperationServerNameAsync(operationServerUuid) {
 }
 
 async function findOperationClientNameAsync(operationClientUuid) {
-    let cc = await ControlConstructService.getControlConstructFromLtpUuidAsync(operationClientUuid);
+    let ccResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(operationClientUuid);
+    let cc = ccResponse.controlConstruct;
     if (cc) {
         let filteredLtps = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
         let operationClientLtp = filteredLtps.find(ltp => ltp.uuid === operationClientUuid);
