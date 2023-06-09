@@ -51,7 +51,7 @@ exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
                 let servingOperationuuid = getOperationServerUuid(
                     ServingApplicationControlConstruct,
                     operationName);
-                let consumingOperationuuid = getOperationClientUuid(
+                let consumingOperationuuid = ControlConstructService.getOperationClientUuid(
                     consumingApplicationControlConstruct,
                     operationName,
                     servingApplicationName,
@@ -96,7 +96,7 @@ exports.deleteOperationClientFromTheEndPointsAsync = function (EndPoints) {
                 let servingOperationuuid = getOperationServerUuid(
                     ServingApplicationControlConstruct,
                     operationName);
-                let consumingOperationuuid = getOperationClientUuid(
+                let consumingOperationuuid = ControlConstructService.getOperationClientUuid(
                     consumingApplicationControlConstruct,
                     operationName,
                     servingApplicationName,
@@ -275,42 +275,6 @@ function getOperationServerUuid(controlConstruct, operationServerName) {
             }
         }
         return operationServerUuid;
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-/**
- * Provides operationClientUuid for the operationClientName
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationClientName operation name of the operation client
- * @returns operationClientUuid
- */
-function getOperationClientUuid(controlConstruct, operationClientName, consumingApplicationName, consumingApplicationReleaseNumber) {
-    let operationClientUuid;
-    try {
-        let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
-                let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-                let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-                let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
-                if (operationName == operationClientName) {
-                    let _operationClientUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-                    let applicationName = getApplicationName(logicalTerminationPointList,
-                        _operationClientUuid);
-                    let releaseNumber = getReleaseNumber(logicalTerminationPointList,
-                        _operationClientUuid);
-                    if (applicationName == consumingApplicationName && releaseNumber == consumingApplicationReleaseNumber) {
-                        operationClientUuid = _operationClientUuid;
-                    }
-                }
-            }
-        }
-        return operationClientUuid;
     } catch (error) {
         console.log(error)
     }
