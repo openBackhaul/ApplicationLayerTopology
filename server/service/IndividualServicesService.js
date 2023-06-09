@@ -214,12 +214,12 @@ exports.deleteFcPort = async function (body) {
  **/
 exports.deleteLtpAndDependents = async function (body) {
   let ltpToBeRemovedUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
-  let controlConstruct;
   let controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(ltpToBeRemovedUuid);
-  controlConstruct = controlConstructResponse.controlConstruct;
+  let controlConstruct = controlConstructResponse.controlConstruct;
   if (!controlConstruct) {
     return;
   }
+
   let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
   let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid)
   if (!ltpToBeRemoved) {
@@ -263,8 +263,9 @@ exports.deleteLtpAndDependents = async function (body) {
   }
 
   // update control-construct with removed LTP/FC
-  controlConstruct = ControlConstructService.deleteLtp(controlConstruct, ltpToBeRemovedUuid);
-  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
+  let res = await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
+  took += res.took;
+  return { "took" : took };
 }
 
 /**
@@ -965,23 +966,20 @@ exports.updateFcPort = async function (body) {
  * Existing documentation of the interface identified by LtpUuid will be replaced
  *
  * body V1_updateltp_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.updateLtp = async function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+exports.updateLtp = async function (body) {
   let logicalTerminationPointUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
   let existingLtps = [];
   let forwardingAutomationInputList = [];
   let controlConstruct;
   let controlConstructResponse;
+  let took = 0;
   controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
-  controlConstruct = controlConstructResponse.controlConstruct;
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  took += controlConstructResponse.took;
   if (!controlConstruct) {
-    return;
+    return { "took" : took };
   }
   try {
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
@@ -992,7 +990,7 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
     }
     if (JSON.stringify(existingLtp) === JSON.stringify(body)) {
       console.log('LTP is already in database.');
-      return;
+      return { "took" : took };
     }
     existingLtps.splice(existingIndex, 1, body);
     // deal with forwardings
@@ -1002,8 +1000,9 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
     let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
     controlConstructResponse = await ControlConstructService.getControlConstructAsync(controlConstructUuid);
     controlConstruct = controlConstructResponse.controlConstruct;
+    took += controlConstructResponse.took;
     if (!controlConstruct) {
-      return;
+      return { "took" : took };
     }
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     existingLtps.push(body);
@@ -1011,7 +1010,9 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
 
   // update control construct
   controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT] = existingLtps;
-  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
+  took += controlConstructResponse.took;
+  let controlConstructUpdateResponse = await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
+  took += controlConstructUpdateResponse.took;
 
   // forwardings
   if (forwardingAutomationInputList.length !== 0) {
@@ -1024,6 +1025,7 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
       customerJourney
     );
   }
+  return { "took" : took };
 }
 
 /****************************************************************************************
