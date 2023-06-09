@@ -216,8 +216,16 @@ exports.deleteLtpAndDependents = async function (body) {
   let ltpToBeRemovedUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
   let controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(ltpToBeRemovedUuid);
   let controlConstruct = controlConstructResponse.controlConstruct;
+  if (!controlConstruct) {
+    return;
+  }
+
   let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
   let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid)
+  if (!ltpToBeRemoved) {
+    console.log(`LTP with UUID ${ltpToBeRemovedUuid} could not be found.`);
+    return;
+  }
 
   // do removal based on layerProtocol
   let layerProtocol = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
@@ -435,35 +443,37 @@ exports.listLinksToOperationClientsOfApplication = async function (body) {
       applicationName,
       applicationReleaseNumber);
     let controlConstruct = controlConstructResponse.controlConstruct;
-    took += controlConstructResponse.took;
+    if (controlConstruct) {
+      took += controlConstructResponse.took;
 
-    let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-    let opertionClientUuidListWithLink = [];
-    let linkListResponse = await LinkServices.getLinkListAsync();
-    let linkList = linkListResponse.links;
-    took += linkListResponse.took;
-    for (let link of linkList) {
-      let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-      for (let linkPort of linkPortList) {
-        let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-        if (portDirection === LinkPort.portDirectionEnum.INPUT) {
-          let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-          let controlConstructUuidOfTheLTP = figureOutControlConstructUuid(logicalTerminationPoint);
-          if (controlConstructUuidOfTheLTP === controlConstructUuid) {
-            opertionClientUuidListWithLink.push(logicalTerminationPoint);
+      let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
+      let opertionClientUuidListWithLink = [];
+      let linkListResponse = await LinkServices.getLinkListAsync();
+      let linkList = linkListResponse.links;
+      took += linkListResponse.took;
+      for (let link of linkList) {
+        let linkPortList = link[onfAttributes.LINK.LINK_PORT];
+        for (let linkPort of linkPortList) {
+          let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
+          if (portDirection === LinkPort.portDirectionEnum.INPUT) {
+            let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
+            let controlConstructUuidOfTheLTP = figureOutControlConstructUuid(logicalTerminationPoint);
+            if (controlConstructUuidOfTheLTP === controlConstructUuid) {
+              opertionClientUuidListWithLink.push(logicalTerminationPoint);
+            }
           }
         }
       }
-    }
 
-    let operationClientInformationList = getClientsReactingOnOperationServerList(controlConstruct, opertionClientUuidListWithLink);
-    for (let operationClientInformation of operationClientInformationList) {
-      let servingApplication = {};
-      servingApplication.servingApplicationName = operationClientInformation.addressedApplicationName;
-      servingApplication.servingApplicationReleaseNumber = operationClientInformation.addressedApplicationReleaseNumber;
-      servingApplication.operationName = operationClientInformation.addressedOperationName;
-      servingApplication = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(servingApplication);
-      operationServerList.push(servingApplication);
+      let operationClientInformationList = getClientsReactingOnOperationServerList(controlConstruct, opertionClientUuidListWithLink);
+      for (let operationClientInformation of operationClientInformationList) {
+        let servingApplication = {};
+        servingApplication.servingApplicationName = operationClientInformation.addressedApplicationName;
+        servingApplication.servingApplicationReleaseNumber = operationClientInformation.addressedApplicationReleaseNumber;
+        servingApplication.operationName = operationClientInformation.addressedOperationName;
+        servingApplication = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(servingApplication);
+        operationServerList.push(servingApplication);
+      }
     }
     return { "body": { "operation-server-list": operationServerList }, "took" : took };
 }
@@ -486,44 +496,46 @@ exports.listOperationClientsAtApplication = async function (body) {
       applicationName,
       applicationReleaseNumber);
     let controlConstruct = controlConstructResponse.controlConstruct;
-    took += controlConstructResponse.took;
+    if (controlConstruct) {
+      took += controlConstructResponse.took;
 
-    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+      let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
 
-    for (let logicalTerminationPoint of logicalTerminationPointList) {
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
-        let clientUuidList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
+      for (let logicalTerminationPoint of logicalTerminationPointList) {
+        let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+        let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+        if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+          let clientUuidList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
 
-        let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-        let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-        let clientApplicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
-        let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+          let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+          let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+          let clientApplicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+          let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
 
-        if (clientUuidList) {
+          if (clientUuidList) {
 
-          for (let clientUuid of clientUuidList) {
+            for (let clientUuid of clientUuidList) {
 
-            for (let clientLogicalTerminationPoint of logicalTerminationPointList) {
-              let clientlogicalTerminationPointUuid = clientLogicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+              for (let clientLogicalTerminationPoint of logicalTerminationPointList) {
+                let clientlogicalTerminationPointUuid = clientLogicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
 
-              if (clientlogicalTerminationPointUuid === clientUuid) {
-                let clientLayerProtocol = clientLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-                let clientLayerProtocolName = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+                if (clientlogicalTerminationPointUuid === clientUuid) {
+                  let clientLayerProtocol = clientLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+                  let clientLayerProtocolName = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
 
-                if (clientLayerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
-                  let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-                  let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-                  let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+                  if (clientLayerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
+                    let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+                    let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+                    let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
 
-                  let operationClient = {};
-                  operationClient.servingApplicationName = clientApplicationName;
-                  operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
-                  operationClient.operationName = operationName;
-                  operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
+                    let operationClient = {};
+                    operationClient.servingApplicationName = clientApplicationName;
+                    operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
+                    operationClient.operationName = operationName;
+                    operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
 
-                  operationClientList.push(operationClient);
+                    operationClientList.push(operationClient);
+                  }
                 }
               }
             }
@@ -553,19 +565,21 @@ exports.listOperationClientsReactingOnOperationServer = async function (body) {
       applicationName,
       applicationReleaseNumber);
     let controlConstruct = controlConstructResponse.controlConstruct;
-    took += controlConstructResponse.took;
+    if (controlConstruct) {
+      took += controlConstructResponse.took;
 
-    let operationServerUuid = ControlConstructService.getOperationServerUuid(controlConstruct, operationServerName);
-    if (operationServerUuid) {
-      let operationClientsUuidsReactingOnOperationServerList = getOperationClientsUuidsReactingOnOperationServerList(
-        controlConstruct,
-        operationServerUuid
-      );
-      let clientsReactingOnOperationServerList = getClientsReactingOnOperationServerList(
-        controlConstruct,
-        operationClientsUuidsReactingOnOperationServerList
-      );
-      operationClientList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(clientsReactingOnOperationServerList);
+      let operationServerUuid = ControlConstructService.getOperationServerUuid(controlConstruct, operationServerName);
+      if (operationServerUuid) {
+        let operationClientsUuidsReactingOnOperationServerList = getOperationClientsUuidsReactingOnOperationServerList(
+          controlConstruct,
+          operationServerUuid
+        );
+        let clientsReactingOnOperationServerList = getClientsReactingOnOperationServerList(
+          controlConstruct,
+          operationClientsUuidsReactingOnOperationServerList
+        );
+        operationClientList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(clientsReactingOnOperationServerList);
+      }
     }
     return { "body": { "operation-client-list": operationClientList }, "took": took };
 }
@@ -586,19 +600,21 @@ exports.listOperationServersAtApplication = async function (body) {
       applicationName,
       applicationReleaseNumber);
     let controlConstruct = controlConstructResponse.controlConstruct;
-    took += controlConstructResponse.took;
+    if (controlConstruct) {
+      took += controlConstructResponse.took;
 
-    let logicalTerminationPointFullList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    let logicalTerminationPointList = logicalTerminationPointFullList.filter(ltp => {
-      let name = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      return name === LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER;
-    });
-    for (let logicalTerminationPoint of logicalTerminationPointList) {
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-      let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-      let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-      operationServerNameList.push(operationName);
+      let logicalTerminationPointFullList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+      let logicalTerminationPointList = logicalTerminationPointFullList.filter(ltp => {
+        let name = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+        return name === LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER;
+      });
+      for (let logicalTerminationPoint of logicalTerminationPointList) {
+        let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+        let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+        let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+        let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
+        operationServerNameList.push(operationName);
+      }
     }
     return { "body": { "operation-server-name-list": operationServerNameList }, "took" : took };
 }
@@ -954,21 +970,24 @@ exports.updateFcPort = async function (body) {
  **/
 exports.updateLtp = async function (body) {
   let logicalTerminationPointUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
-  let controlConstruct;
   let existingLtps = [];
   let forwardingAutomationInputList = [];
+  let controlConstruct;
   let controlConstructResponse;
   let took = 0;
+  controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  took += controlConstructResponse.took;
+  if (!controlConstruct) {
+    return { "took" : took };
+  }
   try {
-    controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
-    controlConstruct = controlConstructResponse.controlConstruct;
-    took += controlConstructResponse.took;
-    if (!controlConstruct) {
-      return { "took" : took };
-    }
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let existingIndex = existingLtps.findIndex(item => item[onfAttributes.GLOBAL_CLASS.UUID] === logicalTerminationPointUuid);
     let existingLtp = existingLtps[existingIndex];
+    if (!existingLtp) {
+      throw new Error(`LTP with UUID ${logicalTerminationPointUuid} could not be found.`);
+    }
     if (JSON.stringify(existingLtp) === JSON.stringify(body)) {
       console.log('LTP is already in database.');
       return { "took" : took };

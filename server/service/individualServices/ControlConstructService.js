@@ -56,7 +56,7 @@ class ControlConstructService {
         }
       }
     })
-    if (Object.keys(res.body.hits.hits).length === 0) {
+    if (res.body.hits === undefined) {
       console.log(`Could not find existing control-construct with UUID ${controlConstructUuid}`);
       return { "controlConstruct": undefined, "took": res.body.took };
     }
@@ -84,7 +84,7 @@ class ControlConstructService {
         }
       }
     })
-    if (res.body.hits.hits.length === 0) {
+    if (res.body.hits === undefined) {
       console.log(`Could not find existing control-construct with LTP UUID ${ltpUuid}`);
       return { "controlConstruct" : undefined, "took" : res.body.took };
     }
@@ -103,7 +103,7 @@ class ControlConstructService {
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
       index: indexAlias,
-      filter_path: 'took,hits.hits._id',
+      filter_path: "took,hits.hits._id",
       body: {
         "query": {
           "term": {
@@ -112,7 +112,7 @@ class ControlConstructService {
         }
       }
     });
-    if (res.body.hits.hits.length === 0) {
+    if (res.body.hits === undefined) {
       return { "id": undefined, "took" : res.body.took };
     }
     return { "id": res.body.hits.hits[0]._id, "took" : res.body.took }
@@ -150,8 +150,9 @@ class ControlConstructService {
         }
       }
     })
-    if (Object.keys(res.body.hits.hits).length === 0) {
-      throw new Error(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
+    if (res.body.hits.hits.length === 0) {
+      console.log(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
+      return { "controlConstruct": undefined, "took": res.body.took };
     }
     let controlConstruct = createResultArray(res);
     return { "controlConstruct": controlConstruct[0], "took": res.body.took };
@@ -187,7 +188,7 @@ class ControlConstructService {
     let backendTime = process.hrtime(startTime);
     let intermitent = (backendTime[0] * 1000 + backendTime[1] / 1000000);
     if (res.body.result === 'created' || res.body.result === 'updated') {
-      return { "took": took+intermitent };
+      return { "took": took + intermitent };
     }
   }
 

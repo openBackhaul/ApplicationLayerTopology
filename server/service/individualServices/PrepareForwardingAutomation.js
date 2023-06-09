@@ -28,7 +28,8 @@ exports.regardApplication = function (logicalTerminationPointconfigurationStatus
             let topologyChangeInformationRequestBody = {};
             topologyChangeInformationRequestBody.topologyApplication = await httpServerInterface.getApplicationNameAsync();
             topologyChangeInformationRequestBody.topologyApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-            topologyChangeInformationRequestBody.topologyApplicationAddress = await tcpServerInterface.getLocalAddress();
+            topologyChangeInformationRequestBody.topologyApplicationProtocol = await tcpServerInterface.getLocalProtocol();
+            topologyChangeInformationRequestBody.topologyApplicationAddress = await tcpServerInterface.getLocalAddressForForwarding();
             topologyChangeInformationRequestBody.topologyApplicationPort = await tcpServerInterface.getLocalPort();
             topologyChangeInformationRequestBody.topologyOperationApplicationUpdate = "/v1/update-all-ltps-and-fcs";
             topologyChangeInformationRequestBody.topologyOperationLtpUpdate = "/v1/update-ltp";
@@ -330,15 +331,17 @@ function getOperationClientNameFromLtp(ltp) {
 async function findOperationServerNameAsync(operationServerUuid) {
     let ccResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(operationServerUuid);
     let cc = ccResponse.controlConstruct;
-    let filteredLtps = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    let operationServerLtp = filteredLtps.find(ltp => ltp.uuid === operationServerUuid);
-    if (operationServerLtp) {
-        let protocol = operationServerLtp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-        if (onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC in protocol) {
-            let opServerInterfacePac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-            let opServerCap = opServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-            return opServerCap[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-        };
+    if (cc) {
+        let filteredLtps = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+        let operationServerLtp = filteredLtps.find(ltp => ltp.uuid === operationServerUuid);
+        if (operationServerLtp) {
+            let protocol = operationServerLtp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+            if (onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC in protocol) {
+                let opServerInterfacePac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+                let opServerCap = opServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+                return opServerCap[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
+            };
+        }
     }
     return '';
 }
@@ -346,9 +349,12 @@ async function findOperationServerNameAsync(operationServerUuid) {
 async function findOperationClientNameAsync(operationClientUuid) {
     let ccResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(operationClientUuid);
     let cc = ccResponse.controlConstruct;
-    let filteredLtps = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    let operationClientLtp = filteredLtps.find(ltp => ltp.uuid === operationClientUuid);
-    return getOperationClientNameFromLtp(operationClientLtp);
+    if (cc) {
+        let filteredLtps = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+        let operationClientLtp = filteredLtps.find(ltp => ltp.uuid === operationClientUuid);
+        return getOperationClientNameFromLtp(operationClientLtp);
+    }
+    return '';
 }
 
 function getReleaseNumberFromHttpClient(logicalTerminationPoint) {
