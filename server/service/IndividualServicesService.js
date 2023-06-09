@@ -214,13 +214,11 @@ exports.deleteFcPort = async function (body) {
  **/
 exports.deleteLtpAndDependents = async function (body) {
   let ltpToBeRemovedUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
-  let took = 0;
   let controlConstruct;
   let controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(ltpToBeRemovedUuid);
-  took += controlConstructResponse.took;
   controlConstruct = controlConstructResponse.controlConstruct;
   if (!controlConstruct) {
-    return { "took" : took };
+    return;
   }
   let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
   let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid)
@@ -266,9 +264,7 @@ exports.deleteLtpAndDependents = async function (body) {
 
   // update control-construct with removed LTP/FC
   controlConstruct = ControlConstructService.deleteLtp(controlConstruct, ltpToBeRemovedUuid);
-  let res = await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
-  took += res.took;
-  return { "took" : took };
+  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
 }
 
 /**
@@ -982,12 +978,10 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
   let forwardingAutomationInputList = [];
   let controlConstruct;
   let controlConstructResponse;
-  let took = 0;
   controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
   controlConstruct = controlConstructResponse.controlConstruct;
-  took += controlConstructResponse.took;
   if (!controlConstruct) {
-    return { "took" : took };
+    return;
   }
   try {
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
@@ -996,9 +990,9 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
     if (!existingLtp) {
       throw new Error(`LTP with UUID ${logicalTerminationPointUuid} could not be found.`);
     }
-    if (isEqual(existingLtp, body)) {
+    if (JSON.stringify(existingLtp) === JSON.stringify(body)) {
       console.log('LTP is already in database.');
-      return { "took" : took };
+      return;
     }
     existingLtps.splice(existingIndex, 1, body);
     // deal with forwardings
@@ -1008,9 +1002,8 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
     let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
     controlConstructResponse = await ControlConstructService.getControlConstructAsync(controlConstructUuid);
     controlConstruct = controlConstructResponse.controlConstruct;
-    took += controlConstructResponse.took;
     if (!controlConstruct) {
-      return { "took" : took };
+      return;
     }
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     existingLtps.push(body);
@@ -1018,9 +1011,7 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
 
   // update control construct
   controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT] = existingLtps;
-  took += controlConstructResponse.took;
-  let controlConstructUpdateResponse = await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
-  took += controlConstructUpdateResponse.took;
+  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
 
   // forwardings
   if (forwardingAutomationInputList.length !== 0) {
@@ -1033,7 +1024,6 @@ exports.updateLtp = async function (body, user, originator, xCorrelator, traceIn
       customerJourney
     );
   }
-  return { "took" : took };
 }
 
 /****************************************************************************************
