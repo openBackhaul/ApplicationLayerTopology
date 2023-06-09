@@ -207,7 +207,7 @@ exports.removeOperationClientFromLink = function (linkUuid) {
 }
 
 exports.updateLtp = async function(existingLtp, newLtp) {
-    let consumingHttpServerCapability = await ControlConstructService.findHttpServerCapabilityFromLtpUuid(existingLtp.uuid);
+    let consumingHttpServerCapability = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(existingLtp.uuid);
     let protocols = newLtp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
     let protocol = protocols[0];
     let protocolName = protocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
@@ -233,7 +233,7 @@ async function updateHttpClientLtp(existingLtp, newLtp, consumingHttpServerCapab
         }
         let operationClientName = await findOperationClientNameAsync(existingOperationClientUuid);
         let operationServerUuid = linkOutput[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-        let servingHttpServerCapability = await ControlConstructService.findHttpServerCapabilityFromLtpUuid(operationServerUuid);
+        let servingHttpServerCapability = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(operationServerUuid);
         let servingApplicationReleaseNumber = servingHttpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
         if (newReleaseNumber !== servingApplicationReleaseNumber) {
             let forwardingAutomation = createForwarding(
@@ -275,7 +275,7 @@ async function updateOperationClientLtp(existingLtp, newLtp, consumingHttpServer
     if (operationClientNewName === operationServerName) {
         return forwardingConstructAutomationList;
     }
-    let servingHttpServerCapability = await ControlConstructService.findHttpServerCapabilityFromLtpUuid(operationServerUuid);
+    let servingHttpServerCapability = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(operationServerUuid);
     /**************************************************************************************************************
      * LtpUpdateMightCauseOperationClientBeingRemovedFromLink /v1/update-ltp -> /v1/remove-operation-client-to-link
      *************************************************************************************************************/

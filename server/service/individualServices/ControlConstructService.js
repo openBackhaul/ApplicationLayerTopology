@@ -270,7 +270,7 @@ class ControlConstructService {
    * @param {String} ltpUuid
    * @returns {Promise<Object>} http-server-capability
    */
-  static async findHttpServerCapabilityFromLtpUuid(ltpUuid) {
+  static async findHttpServerCapabilityFromLtpUuidAsync(ltpUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
