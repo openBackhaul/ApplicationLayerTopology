@@ -976,7 +976,7 @@ exports.updateLtp = async function (body) {
   let controlConstructResponse;
   let took = 0;
   controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
-  let controlConstruct = controlConstructResponse.controlConstruct;
+  controlConstruct = controlConstructResponse.controlConstruct;
   took += controlConstructResponse.took;
   if (!controlConstruct) {
     return { "took" : took };
