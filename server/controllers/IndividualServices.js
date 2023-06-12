@@ -392,16 +392,16 @@ module.exports.updateLtp = async function updateLtp (req, res, next, body, user,
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
-    let responseBodyToDocument = {};
-    let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
-    IndividualServices.updateLtp(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+    let responseBodyToDocument = undefined;
+    await IndividualServices.updateLtp(body)
       .then(async function (responseBody) {
-        responseBodyToDocument = responseBody;
-        restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+        restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
         responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       });
     executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
