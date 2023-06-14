@@ -33,6 +33,7 @@ const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/mod
 const LinkPort = require('./models/LinkPort');
 const ControlConstructService = require('./individualServices/ControlConstructService');
 const isEqual = require('lodash.isequal');
+const ForwardingService = require('./individualServices/ForwardingService');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -233,17 +234,17 @@ exports.deleteLtpAndDependents = async function (body) {
   let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
   switch (layerProtocolName) {
     case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT:
-      await deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
+      await ForwardingService.deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
       await LinkServices.deleteDependentLinkPorts(ltpToBeRemovedUuid);
       break;
     case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT:
       ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
-        await deleteDependentFcPorts(controlConstruct, clientUUID);
+        await ForwardingService.deleteDependentFcPorts(controlConstruct, clientUUID);
         await LinkServices.deleteDependentLinkPorts(clientUUID);
-        ControlConstructService.deleteLtp(controlConstruct, clientUUID);
+        ControlConstructService.deleteLtpFromCCObject(controlConstruct, clientUUID);
       });
       ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].forEach(async(serverUUID) => {
-        ControlConstructService.deleteLtp(controlConstruct, serverUUID);
+        ControlConstructService.deleteLtpFromCCObject(controlConstruct, serverUUID);
       });
       break;
     case LayerProtocol.layerProtocolNameEnum.TCP_CLIENT:
@@ -251,22 +252,20 @@ exports.deleteLtpAndDependents = async function (body) {
       let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
       if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
         httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
-          await deleteDependentFcPorts(controlConstruct, clientUUID);
+          await ForwardingService.deleteDependentFcPorts(controlConstruct, clientUUID);
           await LinkServices.deleteDependentLinkPorts(clientUUID);
-          ControlConstructService.deleteLtp(controlConstruct, clientUUID);
+          ControlConstructService.deleteLtpFromCCObject(controlConstruct, clientUUID);
         });
-        ControlConstructService.deleteLtp(controlConstruct, httpClientUuid);
+        ControlConstructService.deleteLtpFromCCObject(controlConstruct, httpClientUuid);
       }
       break;
     default:
       // don't do anything if LTP is of type http-s, tcp-s or op-s
       return;
   }
-
+  ControlConstructService.deleteLtpFromCCObject(controlConstruct, ltpToBeRemovedUuid);
   // update control-construct with removed LTP/FC
-  let res = await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
-  took += res.took;
-  return { "took" : took };
+  await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
 }
 
 /**
@@ -1085,83 +1084,6 @@ function getAllClientApplicationList() {
   });
 }
 
-async function deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-      let forwardingConstructPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN;
-
-      let forwardingDomainList = await fileOperation.readFromDatabaseAsync(
-        forwardingConstructPath);
-      /*************************************************************************************
-       ****************delete dependents , if a fc-port exist for them***********************
-       *************************************************************************************/
-      for (let i = 0; i < forwardingDomainList.length; i++) {
-        let forwardingDomain = forwardingDomainList[i];
-        let forwardingDomainUuid = forwardingDomain[onfAttributes.GLOBAL_CLASS.UUID];
-        let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
-
-        for (let j = 0; j < forwardingConstructList.length; j++) {
-          let forwardingConstruct = forwardingConstructList[j];
-          let forwardingConstructUuid = forwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-          let nameList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.NAME];
-          let forwardingKind = getValueFromKey(nameList, "ForwardingKind");
-          let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
-
-          for (let k = 0; k < fcPortList.length; k++) {
-            let fcPort = fcPortList[k];
-            let fcPortLocalId = fcPort[onfAttributes.LOCAL_CLASS.LOCAL_ID];
-            let FcPortlogicalTerminationPoint = fcPort[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-
-            if (FcPortlogicalTerminationPoint == logicalTerminationPointUuid) {
-              await deleteFcPorts(
-                forwardingKind,
-                controlConstructUuid,
-                forwardingDomainUuid,
-                forwardingConstructUuid,
-                fcPortLocalId
-              );
-            }
-
-          }
-        }
-      }
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
-
-async function deleteFcPorts(forwardingName, controlConstructUuid, forwardingDomainUuid, forwardingConstructUuid, fcPortLocalId) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-      let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-      let forwardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT + "=" + forwardingConstructUuid;
-      let fcPortPath = forwardingConstructPath + "/" + onfAttributes.FORWARDING_CONSTRUCT.FC_PORT + "=" + fcPortLocalId;
-
-      if (forwardingName != ForwardingConstruct.name.forwardingConstructKindEnum.INVARIANT_PROCESS_SNIPPET) {
-        await fileOperation.deletefromDatabaseAsync(fcPortPath,
-          fcPortPath,
-          true);
-      } else {
-        fcPortPath = fcPortPath +
-          "/" + onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT;
-        await fileOperation.writeToDatabaseAsync(fcPortPath,
-          "-1",
-          false);
-      }
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
 /***************************************************************************************************************
  ****************** Funtions that are specific to the addOperationClientToLink ************
  ***************************************************************************************************************/
@@ -1323,22 +1245,6 @@ function getOperationName(logicalTerminationPointList,
 function figureOutControlConstructUuid(uuid) {
   let controlConstructUuid = uuid.split('-').slice(0, 4).join("-");
   return controlConstructUuid;
-}
-
-/**
- * This function provides the values of the key from the provided nameList
- * @param {*} nameList 
- * @param {*} key 
- * @returns keyValue
- */
-function getValueFromKey(nameList, key) {
-  for (let i = 0; i < nameList.length; i++) {
-    let valueName = nameList[i]["value-name"];
-    if (valueName == key) {
-      return nameList[i]["value"];
-    }
-  }
-  return undefined;
 }
 
 /**
