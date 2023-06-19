@@ -5,7 +5,7 @@ const LogicalTerminationPointService = require('onf-core-model-ap/applicationPat
 
 const LinkServices = require('./individualServices/LinkServices');
 const forwardingService = require('./individualServices/ForwardingService');
-
+const LogicalTerminationPointServiceOfUtility = require("onf-core-model-ap-bs/basicServices/basicServices/utility/LogicalTerminationPoint.js")
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
@@ -114,7 +114,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
        ****************************************************************************************/
       let isdataTransferRequired = true;
       
-      let httpClientUuidList = await LogicalTerminationPointService.resolveHttpTcpAndOperationClientUuidFromForwardingName()
+      let httpClientUuidList = await LogicalTerminationPointServiceOfUtility.resolveHttpTcpAndOperationClientUuidFromForwardingName()
       let newReleaseHttpClientLtpUuid = httpClientUuidList.httpClientUuid
       let tcpclientUuid = httpClientUuidList.tcpClientUuid
 
@@ -355,7 +355,7 @@ exports.listApplications = function (user, originator, xCorrelator, traceIndicat
        * Preparing response body
        ****************************************************************************************/
       
-      let applicationList = await LogicalTerminationPointService.getAllApplicationList(forwardingName);
+      let applicationList = await LogicalTerminationPointServiceOfUtility.getAllApplicationList(forwardingName);
       /****************************************************************************************
        * Setting 'application/json' response body
        ****************************************************************************************/
