@@ -270,7 +270,7 @@ class ControlConstructService {
    * @param {String} ltpUuid
    * @returns {Promise<Object>} http-server-capability
    */
-  static async findHttpServerCapabilityFromLtpUuid(ltpUuid) {
+  static async findHttpServerCapabilityFromLtpUuidAsync(ltpUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
@@ -352,6 +352,58 @@ class ControlConstructService {
         let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
         if (operationName === operationServerName) {
           return logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+        }
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * This function returns http-client configuration for operation-client UUID.
+   * @param {Object} logicalTerminationPointList
+   * @param {String} operationClientUuid
+   * @returns {Object|undefined} httpClientConfiguration
+   */
+  static findHttpClientConfiguration(logicalTerminationPointList, operationClientUuid) {
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+        let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
+        if (clientLtpList.includes(operationClientUuid)) {
+          let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+          return httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+        }
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Provides operationClientUuid for the operationClientName
+   * @param {*} controlConstruct complete control-construct instance
+   * @param {*} operationClientName operation name of the operation client
+   * @returns operationClientUuid
+   */
+  static getOperationClientUuid(controlConstruct, operationClientName, consumingApplicationName, consumingApplicationReleaseNumber) {
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
+        let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+        let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+        let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+        if (operationName === operationClientName) {
+          let _operationClientUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+          let httpClientConfiguration = this.findHttpClientConfiguration(logicalTerminationPointList, _operationClientUuid);
+          if (httpClientConfiguration) {
+            let applicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+            let releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+            if (applicationName === consumingApplicationName && releaseNumber === consumingApplicationReleaseNumber) {
+              return _operationClientUuid;
+            }
+          }
         }
       }
     }
