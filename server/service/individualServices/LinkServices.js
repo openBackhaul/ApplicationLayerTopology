@@ -176,7 +176,7 @@ function createLinkAsync(consumingOperationuuid, servingOperationuuid) {
         try {
             let linkUuid = await uuidv4();
             let link = new Link(linkUuid, []);
-            let isLinkCreated = await ControlConstructService.addLinkAsync(link);
+            let isLinkCreated = await addLinkAsync(link);
             if (isLinkCreated.body.result === "created") {
                 let consumingOperationLocalId = await LinkPort.generateNextLocalIdAsync(linkUuid);
                 let consumingOperationLinkPort = new LinkPort(
@@ -206,94 +206,29 @@ function createLinkAsync(consumingOperationuuid, servingOperationuuid) {
 }
 
 /**
- * Provides operationServerUuid for the operationServerName
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationServerName operation name of the operation Server
- * @returns operationServeruuid
- */
-function getOperationServerUuid(controlConstruct, operationServerName) {
-    let operationServerUuid;
-    try {
-        let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
-                let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-                let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-                let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-                if (operationName == operationServerName) {
-                    operationServerUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-                }
-            }
-        }
-        return operationServerUuid;
-    } catch (error) {
-        console.log(error)
-    }
+ * @description This function adds a link instance to the links index in ES.
+ * @param {String} link an instance of the link
+ * @returns {Promise<Object>} { took }
+ **/
+async function addLinkAsync(link) {
+   link = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(link);
+   let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+   let client = await elasticsearchService.getClient(true, esUuid);
+   let indexAlias = await getIndexAliasAsync(esUuid);
+   let startTime = process.hrtime();
+   let res = await client.index({
+       index: indexAlias,
+       body: link
+   });
+   let backendTime = process.hrtime(startTime);
+   if (res && res.body.result !== 'created') {
+       throw new Error("Link was not added to ES.");
+   }
+   return {
+       "link": link,
+       "took": (backendTime[0] * 1000 + backendTime[1] / 1000000)
+   };
 }
-
-/**
- * This function returns the list of clients information reacting on the operation server 
- * @param {*} controlConstruct 
- * @param {*} operationClientsUuidsReactingOnOperationServerList 
- * @returns object in the form of {addressedApplicationName:"name",
- * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
- */
-function getApplicationName(logicalTerminationPointList,
-    operationClientUuid) {
-    let applicationName;
-    try {
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
-                let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
-                if (clientLtpList.includes(operationClientUuid)) {
-                    let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-                    let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-                    applicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
-                }
-            }
-        }
-        return applicationName;
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-/**
- * This function returns the list of clients information reacting on the operation server 
- * @param {*} controlConstruct 
- * @param {*} operationClientsUuidsReactingOnOperationServerList 
- * @returns object in the form of {addressedApplicationName:"name",
- * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
- */
-function getReleaseNumber(logicalTerminationPointList,
-    operationClientUuid) {
-    let releaseNumber;
-    try {
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
-                let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
-                if (clientLtpList.includes(operationClientUuid)) {
-                    let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-                    let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-                    releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
-                }
-            }
-        }
-        return releaseNumber;
-    } catch (error) {
-        console.log(error)
-    }
-}
-
 
 /**
  * @description Retrieves output link-port object from link, where

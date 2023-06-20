@@ -7,10 +7,7 @@
 
 'use strict';
 
-const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
-const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
-const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const {
   elasticsearchService,
@@ -20,21 +17,6 @@ const {
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
 class ControlConstructService {
-
-  /**
-   * @description This function returns the forwarding-domain list entries from the core-model-1-4:control-construct
-   * @returns {promise} returns ForwardingDomain List.
-   **/
-  static async getControlConstructListAsync() {
-    return new Promise(async function (resolve, reject) {
-      try {
-        let controlConstructList = await fileOperation.readFromDatabaseAsync(onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT);
-        resolve(controlConstructList);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
 
   /**
    * @description This function returns the control-construct from Elasticsearch.
@@ -190,53 +172,6 @@ class ControlConstructService {
     if (res.body.result === 'created' || res.body.result === 'updated') {
       return { "took": took + intermitent };
     }
-  }
-
-  /**
-   * @description This function deletes a logical-termination-point instance that matches the uuid argument from the 
-   * core-model-1-4:control-construct/logical-termination-point
-   * @param {String} logicalTerminationPointUuid : the value should be a valid string in the pattern '-\d+-\d+-\d+-(http|tcp|op)-(s|c)-\d{4}$'
-   * @returns {promise} returns {true|false}
-   **/
-  static deleteControlConstructAsync(controlConstructUuid) {
-    return new Promise(async function (resolve, reject) {
-      let isDeleted = false;
-      try {
-        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid
-        isDeleted = await fileOperation.deletefromDatabaseAsync(
-          controlConstructPath,
-          controlConstructUuid,
-          true);
-        resolve(isDeleted);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-
-  /**
-   * @description This function adds a link instance to the core-model-1-4:network-control-domain/link
-   * @param {String} link an instance of the link
-   * @returns {promise} returns {true|false}
-   **/
-   static addLinkAsync(link) {
-    return new Promise(async function (resolve, reject) {
-      let isCreated = false;
-      try {
-        link = onfFormatter.modifyJsonObjectKeysToKebabCase(link)
-        let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
-        let client = await elasticsearchService.getClient(true, esUuid);
-        let indexAlias = await getIndexAliasAsync(esUuid);
-        let response = await client.index({
-          index: indexAlias,
-          body: link
-        });
-        resolve(response);
-      } catch (error) {
-        reject(error);
-      }
-    });
   }
 
   static deleteLtpFromCCObject(controlConstruct, ltpToBeRemovedUuid) {
