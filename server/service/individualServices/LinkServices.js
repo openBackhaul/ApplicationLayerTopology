@@ -24,96 +24,72 @@ const {
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
 /**
- * @description This function find or create a link
- * @param {object} EndPoints : EndPoint details of the link
+ * @description This function finds or creates a link.
+ * @param {Object} EndPoints details of the link
  * @return {Promise} String {uuid}
  **/
-exports.findOrCreateLinkForTheEndPointsAsync = function (EndPoints) {
-    return new Promise(async function (resolve, reject) {
-        let linkUuid;
-        try {
-
-            let servingApplicationName = EndPoints["serving-application-name"];
-            let servingApplicationReleaseNumber = EndPoints["serving-application-release-number"];
-            let operationName = EndPoints["operation-name"];
-            let consumingApplicationName = EndPoints["consuming-application-name"];
-            let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
-
-            let ServingApplicationControlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-                servingApplicationName,
-                servingApplicationReleaseNumber);
-            let ServingApplicationControlConstruct = ServingApplicationControlConstructResponse.controlConstruct;
-            let consumingApplicationControlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-                consumingApplicationName,
-                consumingApplicationReleaseNumber);
-            let consumingApplicationControlConstruct = consumingApplicationControlConstructResponse.controlConstruct;
-            if (ServingApplicationControlConstruct && consumingApplicationControlConstruct) {
-                let servingOperationuuid = getOperationServerUuid(
-                    ServingApplicationControlConstruct,
-                    operationName);
-                let consumingOperationuuid = getOperationClientUuid(
-                    consumingApplicationControlConstruct,
-                    operationName,
-                    servingApplicationName,
-                    servingApplicationReleaseNumber
-                );
-                if (servingOperationuuid && consumingOperationuuid) {
-                    linkUuid = await createOrUpdateLinkAsync(consumingOperationuuid, servingOperationuuid)
-                }
-            }
-            resolve(linkUuid);
-        } catch (error) {
-            reject(error);
+exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
+    let linkUuid;
+    let servingOperationUuid = await getServingOperationUuidAsync(EndPoints);
+    let consumingOperationUuid = await getConsumingOperationUuidAsync(EndPoints);
+    if (servingOperationUuid && consumingOperationUuid) {
+        linkUuid = await Link.getLinkUuidOfTheServingOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+        if (linkUuid) {
+            linkUuid = await updateLinkAsync(linkUuid, consumingOperationUuid);
+        } else {
+            linkUuid = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
         }
-    });
+    }
+    return linkUuid;
 }
 
 /**
  * @description This function deletes a operation client from the link 
  * @param {String} EndPoints : EndPoint details of the link
- * @return {Promise} boolean {true | false}
+ * @return {Promise<String>} linkUuid
  **/
-exports.deleteOperationClientFromTheEndPointsAsync = function (EndPoints) {
-    return new Promise(async function (resolve, reject) {
-        let linkUuid;
-        try {
-
-            let servingApplicationName = EndPoints["serving-application-name"];
-            let servingApplicationReleaseNumber = EndPoints["serving-application-release-number"];
-            let operationName = EndPoints["operation-name"];
-            let consumingApplicationName = EndPoints["consuming-application-name"];
-            let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
-
-            let ServingApplicationControlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-                servingApplicationName,
-                servingApplicationReleaseNumber);
-            let ServingApplicationControlConstruct = ServingApplicationControlConstructResponse.controlConstruct;
-            let consumingApplicationControlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-                consumingApplicationName,
-                consumingApplicationReleaseNumber);
-            let consumingApplicationControlConstruct = consumingApplicationControlConstructResponse.controlConstruct;
-            if (ServingApplicationControlConstruct && consumingApplicationControlConstruct) {
-                let servingOperationuuid = getOperationServerUuid(
-                    ServingApplicationControlConstruct,
-                    operationName);
-                let consumingOperationuuid = getOperationClientUuid(
-                    consumingApplicationControlConstruct,
-                    operationName,
-                    servingApplicationName,
-                    servingApplicationReleaseNumber
-                );
-                if (servingOperationuuid && consumingOperationuuid) {
-                    linkUuid = await Link.getLinkUuidOfTheServingOperationAsync(servingOperationuuid);
-                    if (linkUuid) {
-                        await deleteLinkAsync(linkUuid, consumingOperationuuid);
-                    }
-                }
-            }
-            resolve(linkUuid);
-        } catch (error) {
-            reject(error);
+exports.deleteOperationClientFromTheEndPointsAsync = async function (EndPoints) {
+    let linkUuid;
+    let servingOperationUuid = await getServingOperationUuidAsync(EndPoints);
+    let consumingOperationUuid = await getConsumingOperationUuidAsync(EndPoints);
+    if (servingOperationUuid && consumingOperationUuid) {
+        linkUuid = await Link.getLinkUuidOfTheServingOperationAsync(servingOperationUuid);
+        if (linkUuid) {
+            await deleteLinkAsync(linkUuid, consumingOperationUuid);
         }
-    });
+    }
+    return linkUuid;
+}
+
+async function getServingOperationUuidAsync(EndPoints) {
+    let servingApplicationName = EndPoints["serving-application-name"];
+    let servingApplicationReleaseNumber = EndPoints["serving-application-release-number"];
+    let operationName = EndPoints["operation-name"];
+    let servingApplicationCCResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+        servingApplicationName,
+        servingApplicationReleaseNumber);
+    let servingOperationUuid = ControlConstructService.getOperationServerUuid(
+        servingApplicationCCResponse.controlConstruct,
+        operationName);
+    return servingOperationUuid;
+}
+
+async function getConsumingOperationUuidAsync(EndPoints) {
+    let servingApplicationName = EndPoints["serving-application-name"];
+    let servingApplicationReleaseNumber = EndPoints["serving-application-release-number"];
+    let operationName = EndPoints["operation-name"];
+    let consumingApplicationName = EndPoints["consuming-application-name"];
+    let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
+    let consumingApplicationCCResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+        consumingApplicationName,
+        consumingApplicationReleaseNumber);
+    let consumingOperationUuid = ControlConstructService.getOperationClientUuid(
+        consumingApplicationCCResponse.controlConstruct,
+        operationName,
+        servingApplicationName,
+        servingApplicationReleaseNumber
+    );
+    return consumingOperationUuid;
 }
 
 /**
@@ -157,28 +133,6 @@ async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
         },
     });
     return response;
-}
-
-/**
- * @description This function creates or updates a link
- * @param {String} servingOperationuuid : logical-termination-point of the link-port
- * @param {String} consumingOperationuuid : logical-termination-point of the link-port
- * @return {Promise} string {uuid}
- **/
-function createOrUpdateLinkAsync(consumingOperationuuid, servingOperationuuid) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            let linkUuid = await Link.getLinkUuidOfTheServingOperationAsync(servingOperationuuid);
-            if (linkUuid) {
-                await updateLinkAsync(linkUuid, consumingOperationuuid)
-            } else {
-                linkUuid = await createLinkAsync(consumingOperationuuid, servingOperationuuid)
-            }
-            resolve(linkUuid);
-        } catch (error) {
-            reject(error);
-        }
-    });
 }
 
 /**
@@ -275,42 +229,6 @@ function getOperationServerUuid(controlConstruct, operationServerName) {
             }
         }
         return operationServerUuid;
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-/**
- * Provides operationClientUuid for the operationClientName
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationClientName operation name of the operation client
- * @returns operationClientUuid
- */
-function getOperationClientUuid(controlConstruct, operationClientName, consumingApplicationName, consumingApplicationReleaseNumber) {
-    let operationClientUuid;
-    try {
-        let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
-                let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-                let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-                let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
-                if (operationName == operationClientName) {
-                    let _operationClientUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-                    let applicationName = getApplicationName(logicalTerminationPointList,
-                        _operationClientUuid);
-                    let releaseNumber = getReleaseNumber(logicalTerminationPointList,
-                        _operationClientUuid);
-                    if (applicationName == consumingApplicationName && releaseNumber == consumingApplicationReleaseNumber) {
-                        operationClientUuid = _operationClientUuid;
-                    }
-                }
-            }
-        }
-        return operationClientUuid;
     } catch (error) {
         console.log(error)
     }

@@ -16,7 +16,7 @@ class ForwardingService {
             body: {
                 script: {
                     source: `ctx._source['forwarding-domain'][0]['forwarding-construct'].removeIf(fc -> fc['uuid'] == params['uuid']);
-                    ctx._source['forwarding-domain'][0]['forwarding-construct'].add(params['newForwardingConstruct'])`,
+                        ctx._source['forwarding-domain'][0]['forwarding-construct'].add(params['newForwardingConstruct'])`,
                     params: {
                         "newForwardingConstruct": newForwardingConstruct,
                         "uuid": newForwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID]
@@ -45,16 +45,16 @@ class ForwardingService {
             body: {
                 script: {
                     source: `def fwDomain = ctx._source['forwarding-domain'];
-                  for (domain in fwDomain) {
-                    def fcs = domain['forwarding-construct'];
-                    for (fc in fcs) {
-                      if (fc['uuid'] == params['fc-uuid']) {
-                        def ports = fc['fc-port'];
-                        ports.removeIf(port -> port['local-id'] == params['local-id']);
-                        ports.add(params['new-fc-port']);
-                      }
-                    }
-                  }`,
+                    for (domain in fwDomain) {
+                        def fcs = domain['forwarding-construct'];
+                        for (fc in fcs) {
+                        if (fc['uuid'] == params['fc-uuid']) {
+                            def ports = fc['fc-port'];
+                            ports.removeIf(port -> port['local-id'] == params['local-id']);
+                            ports.add(params['new-fc-port']);
+                        }
+                        }
+                    }`,
                     params: {
                         "new-fc-port": newFCPort,
                         "local-id": newFCPort[onfAttributes.LOCAL_CLASS.LOCAL_ID],
@@ -92,16 +92,16 @@ class ForwardingService {
                 body: {
                     "script": {
                         "source": `def fwDomain = ctx._source['forwarding-domain'];
-                for (domain in fwDomain) {
-                    def fcs = domain['forwarding-construct'];
-                    for (fc in fcs) {
-                    if (fc['uuid'] == params['fc-uuid']) {
-                        def ports = fc['fc-port'];
-                        ports.removeIf(port -> port['local-id'] == params['local-id'])
+                    for (domain in fwDomain) {
+                        def fcs = domain['forwarding-construct'];
+                        for (fc in fcs) {
+                        if (fc['uuid'] == params['fc-uuid']) {
+                            def ports = fc['fc-port'];
+                            ports.removeIf(port -> port['local-id'] == params['local-id'])
+                        }
+                        }
                     }
-                    }
-                }
-                `,
+                    `,
                         "params": {
                             "local-id": fcPortLocalId,
                             "fc-uuid": forwardingConstructUuid
