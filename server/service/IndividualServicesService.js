@@ -5,7 +5,7 @@ const LogicalTerminationPointService = require('onf-core-model-ap/applicationPat
 
 const LinkServices = require('./individualServices/LinkServices');
 const forwardingService = require('./individualServices/ForwardingService');
-
+const LogicalTerminationPointServiceOfUtility = require("onf-core-model-ap-bs/basicServices/basicServices/utility/LogicalTerminationPoint")
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
@@ -115,7 +115,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
        ****************************************************************************************/
       let isdataTransferRequired = true;
       
-      let httpClientUuidList = await resolveHttpClient() 
+      let httpClientUuidList = await LogicalTerminationPointServiceOfUtility.resolveHttpTcpAndOperationClientUuidFromForwardingName()
       let newReleaseHttpClientLtpUuid = httpClientUuidList.httpClientUuid
       let tcpclientUuid = httpClientUuidList.tcpClientUuid
 
@@ -359,12 +359,13 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
 exports.listApplications = function (user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     let response = {};
+    const forwardingName = 'NewApplicationCausesRequestForTopologyChangeInformation';
     try {
       /****************************************************************************************
        * Preparing response body
        ****************************************************************************************/
-      let applicationList = await getAllClientApplicationList();
-
+      
+      let applicationList = await LogicalTerminationPointServiceOfUtility.getAllApplicationList(forwardingName);
       /****************************************************************************************
        * Setting 'application/json' response body
        ****************************************************************************************/
@@ -1033,57 +1034,6 @@ exports.updateLtp = async function (body) {
  * Functions utilized by individual services
  ****************************************************************************************/
 
-/**
- * @description This function returns list of registered application information application-name , release-number.
- * @return {Promise} return the list of application information
- **/
-function getAllClientApplicationList() {
-  return new Promise(async function (resolve, reject) {
-    let clientApplicationList = [];
-    let httpClientUuidList = [];
-    let LogicalTerminationPointlist;
-    const forwardingName = 'NewApplicationCausesRequestForTopologyChangeInformation';
-    try {
-
-
-      let ForwardConstructName = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(forwardingName)
-      let ForwardConstructUuid = ForwardConstructName[onfAttributes.GLOBAL_CLASS.UUID]
-
-      let ListofUuid = await ForwardingConstruct.getFcPortListAsync(ForwardConstructUuid)
-      for (let i = 0; i < ListofUuid.length; i++) {
-        let PortDirection = ListofUuid[i][[onfAttributes.FC_PORT.PORT_DIRECTION]]
-
-        if (PortDirection === FcPort.portDirectionEnum.OUTPUT) {
-          LogicalTerminationPointlist = ListofUuid[i][onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT]
-          let httpClientUuid = await logicalTerminationPoint.getServerLtpListAsync(LogicalTerminationPointlist)
-          httpClientUuidList.push(httpClientUuid[0]);
-        }
-      }
-      for (let j = 0; j < httpClientUuidList.length; j++) {
-        let httpClientUuid = httpClientUuidList[j];
-        let applicationName = await httpClientInterface.getApplicationNameAsync(httpClientUuid);
-        let applicationReleaseNumber = await httpClientInterface.getReleaseNumberAsync(httpClientUuid);
-        let serverLtp = await logicalTerminationPoint.getServerLtpListAsync(httpClientUuid);
-        let tcpClientUuid = serverLtp[0];
-        let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(tcpClientUuid);
-        let applicationPort = await tcpClientInterface.getRemotePortAsync(tcpClientUuid);
-        let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(tcpClientUuid);
-
-        let application = {};
-        application.applicationName = applicationName,
-          application.releaseNumber = applicationReleaseNumber,
-          application.protocol = applicationProtocol,
-          application.address = applicationAddress,
-          application.port = applicationPort,
-
-          clientApplicationList.push(application);
-      }
-      resolve(clientApplicationList);
-    } catch (error) {
-      reject();
-    }
-  });
-}
 
 async function deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid) {
   return new Promise(async function (resolve, reject) {
@@ -1355,27 +1305,3 @@ async function checkIfApplicationExists(controlConstruct) {
   }
 }
 
-var resolveHttpClient = exports.resolveHttpClientLtpUuidFromForwardingName = function () {
-  return new Promise(async function (resolve, reject) {
-    try {
-      const forwardingName = 'PromptForBequeathingDataCausesTransferOfListOfApplications';
-      let uuidlist = {};
-      let ForwardConstructName = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(forwardingName)
-      if (ForwardConstructName === undefined) {
-        return {};
-      }
-      let ForwardConstructUuid = ForwardConstructName[onfAttributes.GLOBAL_CLASS.UUID]
-      let listofUuid = await ForwardingConstruct.getFcPortListAsync(ForwardConstructUuid)
-      let fcPort = listofUuid.find(fcp => fcp[onfAttributes.FC_PORT.PORT_DIRECTION] === FcPort.portDirectionEnum.OUTPUT);
-      let operationClientUuid = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
-          let httpClientUuid = (await logicalTerminationPoint.getServerLtpListAsync(operationClientUuid))[0]
-          let tcpClientUuid = (await logicalTerminationPoint.getServerLtpListAsync(httpClientUuid))[0]
-          uuidlist = {
-            httpClientUuid, tcpClientUuid
-          }
-      resolve(uuidlist)
-    } catch (error) {
-      console.log(error)
-    }
-  })
-}
