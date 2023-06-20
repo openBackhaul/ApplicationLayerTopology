@@ -400,7 +400,11 @@ module.exports.updateLtp = async function updateLtp (req, res, next, body, user,
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
+        if(responseBody.message == "controlConstructNotFound"){
+          responseCode = responseCodeEnum.code.BAD_REQUEST;
+        }else{
         responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        }
         let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       });

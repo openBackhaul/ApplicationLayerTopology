@@ -980,7 +980,7 @@ exports.updateLtp = async function (body) {
   controlConstruct = controlConstructResponse.controlConstruct;
   took += controlConstructResponse.took;
   if (!controlConstruct) {
-    return { "took" : took };
+    throw new Error("controlConstructNotFound")
   }
   try {
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
@@ -1003,7 +1003,7 @@ exports.updateLtp = async function (body) {
     controlConstruct = controlConstructResponse.controlConstruct;
     took += controlConstructResponse.took;
     if (!controlConstruct) {
-      return { "took" : took };
+      throw new Error("controlConstructNotFound")
     }
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     existingLtps.push(body);
