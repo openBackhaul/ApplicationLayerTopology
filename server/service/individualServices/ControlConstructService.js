@@ -239,7 +239,7 @@ class ControlConstructService {
     });
   }
 
-  static deleteLtp(controlConstruct, ltpToBeRemovedUuid) {
+  static deleteLtpFromCCObject(controlConstruct, ltpToBeRemovedUuid) {
     let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let ltpToBeRemovedIndex = ltps.findIndex(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid);
     ltps.splice(ltpToBeRemovedIndex, 1);

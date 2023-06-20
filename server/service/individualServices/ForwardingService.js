@@ -121,6 +121,37 @@ class ForwardingService {
             throw new Error('fc-port was not deleted');
         }
     }
+
+    /**
+     * @description Finds and deletes fc-ports where INPUT ports match given ltpUUID.
+     * @param {Object} controlConstruct
+     * @param {String} ltpUuid
+     * @returns {Promise<Object>} { took }
+     */
+    static async deleteDependentFcPorts(controlConstruct, ltpUuid) {
+        let forwardingDomainList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN];
+        let took = 0;
+        for (let forwardingDomain of forwardingDomainList) {
+            let fcList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+            for (let fc of fcList) {
+                let fcUuid = fc[onfAttributes.GLOBAL_CLASS.UUID];
+                let fcPortList = fc[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
+                for (let fcPort of fcPortList) {
+                    let fcPortLocalId = fcPort[onfAttributes.LOCAL_CLASS.LOCAL_ID];
+                    let fcPortlogicalTerminationPoint = fcPort[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+                    if (fcPortlogicalTerminationPoint === ltpUuid) {
+                        let deleteResponse = this.deleteFcPort(
+                            fcPortLocalId,
+                            fcUuid,
+                            controlConstruct[onfAttributes.GLOBAL_CLASS.UUID]
+                        );
+                        took += deleteResponse.took;
+                    }
+                }
+            }
+        }
+        return { "took": took };
+    }
 }
 
 module.exports = ForwardingService;
