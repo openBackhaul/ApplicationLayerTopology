@@ -33,7 +33,7 @@ exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
     let servingOperationUuid = await getServingOperationUuidAsync(EndPoints);
     let consumingOperationUuid = await getConsumingOperationUuidAsync(EndPoints);
     if (servingOperationUuid && consumingOperationUuid) {
-        linkUuid = await Link.getLinkUuidOfTheConsumingOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+        linkUuid = await Link.getLinkUuidOfTheServingOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
         if (linkUuid) {
             linkUuid = await updateLinkAsync(linkUuid, consumingOperationUuid);
         } else {
@@ -133,28 +133,6 @@ async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
         },
     });
     return response;
-}
-
-/**
- * @description This function creates or updates a link
- * @param {String} servingOperationuuid : logical-termination-point of the link-port
- * @param {String} consumingOperationuuid : logical-termination-point of the link-port
- * @return {Promise} string {uuid}
- **/
-function createOrUpdateLinkAsync(consumingOperationuuid, servingOperationuuid) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            let linkUuid = await Link.getLinkUuidOfTheServingOperationAsync(servingOperationuuid);
-            if (linkUuid) {
-                await updateLinkAsync(linkUuid, consumingOperationuuid)
-            } else {
-                linkUuid = await createLinkAsync(consumingOperationuuid, servingOperationuuid)
-            }
-            resolve(linkUuid);
-        } catch (error) {
-            reject(error);
-        }
-    });
 }
 
 /**
