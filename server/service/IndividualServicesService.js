@@ -827,7 +827,7 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           applicationName,
           releaseNumber
         );
-        let response = await ForwardingAutomationService.automateForwardingConstructAsync(
+        let response = ForwardingAutomationService.automateForwardingConstructAsync(
           operationServerName,
           forwardingAutomationInputList,
           user,
@@ -841,15 +841,15 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
         }
         // response is full control construct of regarded application
 
-        let cc = response["data"]["core-model-1-4:control-construct"];
-        await ControlConstructService.createOrUpdateControlConstructAsync(cc);
 
-        let logicalTerminationPoints = cc["logical-termination-point"];
+        await ControlConstructService.createOrUpdateControlConstructAsync(response["core-model-1-4:control-construct"]);
+
+        let logicalTerminationPoints = response["core-model-1-4:control-construct"]["logical-termination-point"];
         let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
         for (let operationServerName of operationServerNames) {
           let endPointDetails = {
             'serving-application-name': applicationName,
-            'serving-application-release-number': releaseNumber,
+            'serving-application-release-number': applicationReleaseNumber,
             'operationServerName': operationServerName,
             'consuming-application-name': ownApplicationName,
             'consuming-application-release-number': ownApplicationReleaseNumber
@@ -1051,8 +1051,8 @@ function getAllOperationServerNameAsync(logicalTerminationPoints) {
     let protocolName = protocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
     if (LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER === protocolName) {
       let operationServerPac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-      let operationServerCapability = operationServerPac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-      operationServerNames.push(operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME]);
+      let operationServerConfiguration = operationServerPac[onfAttributes.OPERATION_SERVER.CONFIGURATION];
+      operationServerNames.push(operationServerConfiguration[onfAttributes.OPERATION_SERVER.OPERATION_NAME]);
     }
   }
   return operationServerNames;
