@@ -7,11 +7,7 @@
 
 'use strict';
 
-const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
-const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
-const ControlConstructService = require('../individualServices/ControlConstructService');
-const LinkServices = require('../individualServices/LinkServices');
 const LinkPort = require('./LinkPort');
 const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 const {
@@ -55,106 +51,6 @@ class Link {
 
     getLinkPorts() {
         return this.linkPort;
-    }
-
-    static isLinkExistsAsync(servingOperationUuid, consumingOperationuuid) {
-        return new Promise(async function (resolve, reject) {
-            let isLinkExists = false;
-            try {
-                let linkList = await (LinkServices.getLinkListAsync()).links;
-                for (let i = 0; i < linkList.length; i++) {
-                    let isServingOperationUuidExists = false;
-                    let isConsumingOperationuuid = false;
-                    let link = linkList[i];
-                    let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-                    for (let j = 0; j < linkPortList.length; j++) {
-                        let linkPort = linkPortList[j];
-                        let linkPortLogicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-                        let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-                        if (portDirection == LinkPort.portDirectionEnum.INPUT && linkPortLogicalTerminationPoint == consumingOperationuuid) {
-                            isConsumingOperationuuid = true;
-                        } else if (portDirection == LinkPort.portDirectionEnum.OUTPUT && linkPortLogicalTerminationPoint == servingOperationUuid) {
-                            isServingOperationUuidExists = true;
-                        }
-                    }
-                    if (isServingOperationUuidExists && isConsumingOperationuuid) {
-                        isLinkExists = true;
-                    }
-                }
-                resolve(isLinkExists);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    static isConsumingServiceExistsAsync(linkUuid, consumingOperationuuid) {
-        return new Promise(async function (resolve, reject) {
-            let isConsumingServiceExists = false;
-            try {
-                let link = (await LinkServices.getLinkAsync(linkUuid)).link;
-                let linkPortList = link["link-port"];
-                for (let j = 0; j < linkPortList.length; j++) {
-                    let linkPort = linkPortList[j];
-                    let linkPortLogicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-                    let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-                    if (portDirection == LinkPort.portDirectionEnum.INPUT && linkPortLogicalTerminationPoint == consumingOperationuuid) {
-                        isConsumingServiceExists = true;
-                    }
-                }
-                resolve(isConsumingServiceExists);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    static getLinkUuidOfTheServingOperationAsync(servingOperationUuid) {
-        return new Promise(async function (resolve, reject) {
-            let linkUuidOfTheServingOperation;
-            try {
-                let linkList = (await LinkServices.getLinkListAsync()).links;
-                for (let i = 0; i < linkList.length; i++) {
-                    let link = linkList[i];
-                    let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-                    for (let j = 0; j < linkPortList.length; j++) {
-                        let linkPort = linkPortList[j];
-                        let linkPortLogicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-                        let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-                        if (portDirection == LinkPort.portDirectionEnum.OUTPUT && linkPortLogicalTerminationPoint == servingOperationUuid) {
-                            linkUuidOfTheServingOperation = link[onfAttributes.GLOBAL_CLASS.UUID];
-                        }
-                    }
-                }
-                resolve(linkUuidOfTheServingOperation);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
-    static getLinkUuidOfTheConsumingOperationAsync(clientOperationUuid) {
-        return new Promise(async function (resolve, reject) {
-            let linkUuidOfTheConsumingOperation;
-            try {
-                let linkList = (await LinkServices.getLinkListAsync()).links;
-                for (let i = 0; i < linkList.length; i++) {
-                    let link = linkList[i];
-                    let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-                    for (let j = 0; j < linkPortList.length; j++) {
-                        let linkPort = linkPortList[j];
-                        let linkPortLogicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-                        let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-                        if (portDirection == LinkPort.portDirectionEnum.INPUT && linkPortLogicalTerminationPoint == clientOperationUuid) {
-                            linkUuidOfTheConsumingOperation = link[onfAttributes.GLOBAL_CLASS.UUID];
-                        }
-                    }
-                }
-                resolve(linkUuidOfTheConsumingOperation);
-            } catch (error) {
-                reject(error);
-            }
-        });
     }
 
     /**
