@@ -25,12 +25,36 @@ class Link {
     linkPort;
     /**
      * constructor 
-     * @param {uuid} uuid of the link
-     * @param {linkPort} linkPort object
+     *  @param {String} uuid of the link
+     * @param {LinkPort} linkPort object
      */
     constructor(uuid, linkPort) {
         this.uuid = uuid;
         this.linkPort = linkPort;
+    }
+
+    /**
+     * Creates a Link object out of JSON.
+     * @param {Object} link
+     */
+    static createFromObject(link) {
+        let linkPort = [];
+        for (let lp of link[onfAttributes.LINK.LINK_PORT]) {
+            linkPort.push(new LinkPort(
+                lp[onfAttributes.LOCAL_CLASS.LOCAL_ID],
+                lp[onfAttributes.LINK.PORT_DIRECTION],
+                lp[onfAttributes.LINK.LOGICAL_TERMINATION_POINT]
+            ));
+        }
+        return new Link(link[onfAttributes.GLOBAL_CLASS.UUID], linkPort);
+    }
+
+    addNewLinkPort(linkPort) {
+        this.linkPort.push(linkPort);
+    }
+
+    getLinkPorts() {
+        return this.linkPort;
     }
 
     static isLinkExistsAsync(servingOperationUuid, consumingOperationuuid) {
@@ -133,25 +157,21 @@ class Link {
         });
     }
 
-    static getLocalIdOfTheConsumingOperationAsync(linkUuid, clientOperationUuid) {
-        return new Promise(async function (resolve, reject) {
-            let linkPortLocalIdOfTheConsumingOperation;
-            try {
-                let link = (await LinkServices.getLinkAsync(linkUuid)).link;
-                let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-                for (let i = 0; i < linkPortList.length; i++) {
-                    let linkPort = linkPortList[i];
-                    let linkPortLogicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-                    let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-                    if (portDirection == LinkPort.portDirectionEnum.INPUT && linkPortLogicalTerminationPoint == clientOperationUuid) {
-                        linkPortLocalIdOfTheConsumingOperation = linkPort[onfAttributes.LOCAL_CLASS.LOCAL_ID];
-                    }
-                }
-                resolve(linkPortLocalIdOfTheConsumingOperation);
-            } catch (error) {
-                reject(error);
+    /**
+     * @description Returns Local ID of consuming operation client UUID.
+     * @param {Link} link
+     * @param {String} clientOperationUuid
+     * @returns localId
+     */
+    static getLocalIdOfTheConsumingOperation(link, clientOperationUuid) {
+        let linkPortList = link[onfAttributes.LINK.LINK_PORT];
+        for (let linkPort of linkPortList) {
+            let linkPortLogicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
+            let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
+            if (portDirection === LinkPort.portDirectionEnum.INPUT && linkPortLogicalTerminationPoint === clientOperationUuid) {
+                return linkPort[onfAttributes.LOCAL_CLASS.LOCAL_ID];
             }
-        });
+        }
     }
 
     /**
