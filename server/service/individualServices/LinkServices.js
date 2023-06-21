@@ -131,7 +131,7 @@ async function getLinkOfTheOperationAsync(operationUuid, portDirection) {
     let links = createResultArray(res);
     for (let link of links) {
         let linkPorts = link[onfAttributes.LINK.LINK_PORT];
-        let found = linkPorts.find(item => item['port-direction'] === portDirection &&
+        let found = linkPorts.find(item => item[onfAttributes.LINK.PORT_DIRECTION] === portDirection &&
             item[onfAttributes.LINK.LOGICAL_TERMINATION_POINT] === operationUuid);
         if (found) {
             return { "link" : link, "took": res.body.took };
@@ -287,8 +287,8 @@ exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function (operationC
         return {};
     }
     let correctLink = res.body.hits.hits[0]._source;
-    let linkPorts = correctLink['link-port'];
-    return linkPorts.find(item => item['port-direction'] === LinkPort.portDirectionEnum.OUTPUT);
+    let linkPorts = correctLink[onfAttributes.LINK.LINK_PORT];
+    return linkPorts.find(item => item[onfAttributes.LINK.PORT_DIRECTION] === LinkPort.portDirectionEnum.OUTPUT);
 }
 
 exports.deleteDependentLinkPorts = async function (uuid) {
