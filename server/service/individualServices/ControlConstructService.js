@@ -315,10 +315,10 @@ class ControlConstructService {
   }
 
   /**
-   * Provides operationClientUuid for the operationClientName
-   * @param {*} controlConstruct complete control-construct instance
-   * @param {*} operationClientName operation name of the operation client
-   * @returns operationClientUuid
+   * Provides operationClientUuid for the operationClientName.
+   * @param {Object} controlConstruct complete control-construct instance
+   * @param {String} operationClientName operation name of the operation client
+   * @returns {String|undefined} operationClientUuid
    */
   static getOperationClientUuid(controlConstruct, operationClientName, consumingApplicationName, consumingApplicationReleaseNumber) {
     let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
