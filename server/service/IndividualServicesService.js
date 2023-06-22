@@ -204,16 +204,16 @@ exports.deleteLtpAndDependents = async function (body) {
   switch (layerProtocolName) {
     case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT:
       let delFcResponse = await ForwardingService.deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
-      took += delFcResponse;
+      took += delFcResponse.took;
       let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(ltpToBeRemovedUuid);
-      took += delLPResponse;
+      took += delLPResponse.took;
       break;
     case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT:
       ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
         let delFcResponse = await ForwardingService.deleteDependentFcPorts(controlConstruct, clientUUID);
-        took += delFcResponse;
+        took += delFcResponse.took;
         let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
-        took += delLPResponse;
+        took += delLPResponse.took;
         ControlConstructService.deleteLtpFromCCObject(controlConstruct, clientUUID);
       });
       ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].forEach(async(serverUUID) => {
@@ -226,9 +226,9 @@ exports.deleteLtpAndDependents = async function (body) {
       if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
         httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
           let delFcResponse = await ForwardingService.deleteDependentFcPorts(controlConstruct, clientUUID);
-          took += delFcResponse;
+          took += delFcResponse.took;
           let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
-          took += delLPResponse;
+          took += delLPResponse.took;
           ControlConstructService.deleteLtpFromCCObject(controlConstruct, clientUUID);
         });
         ControlConstructService.deleteLtpFromCCObject(controlConstruct, httpClientUuid);
