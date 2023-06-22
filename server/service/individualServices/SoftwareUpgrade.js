@@ -394,13 +394,13 @@ async function promptForBequeathingDataCausesRequestForBroadcastingInfoAboutServ
              * Preparing requestBody 
              ************************************************************************************/
             try {
-                let newHttpClientUuid = await LogicalTerminationPointService.resolveHttpTcpAndOperationClientUuidFromForwardingName()
-                let newReleaseHttpClientUuid = newHttpClientUuid.httpClientUui
+                let newHttpClientUuid = await LogicalTerminationPointService.resolveHttpTcpAndOperationClientUuidOfNewRelease();
+                let newReleaseHttpClientUuid = newHttpClientUuid.httpClientUuid;
                 let newReleaseTcpClientUuid = (await logicalTerminationPoint.getServerLtpListAsync(newReleaseHttpClientUuid))[0];
 
                 let applicationName = await httpServerInterface.getApplicationNameAsync();
                 let oldReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-                let newApplicationName = await HttpClientInterface.getApplicationNameAsync(newReleaseHttpClientUuid)
+                let newApplicationName = await httpClientInterface.getApplicationNameAsync(newReleaseHttpClientUuid)
                 let newReleaseNumber = await httpClientInterface.getReleaseNumberAsync(newReleaseHttpClientUuid);
                 let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(newReleaseTcpClientUuid);
                 let applicationPort = await tcpClientInterface.getRemotePortAsync(newReleaseTcpClientUuid);
