@@ -94,6 +94,9 @@ async function getServingOperationUuidAsync(EndPoints) {
     let servingApplicationCCResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
         servingApplicationName,
         servingApplicationReleaseNumber);
+    if (!servingApplicationCCResponse.controlConstruct) {
+        return { "servingOperationUuid": undefined, "took": servingApplicationCCResponse.took };
+    }
     let servingOperationUuid = ControlConstructService.getOperationServerUuid(
         servingApplicationCCResponse.controlConstruct,
         operationName);
@@ -109,6 +112,9 @@ async function getConsumingOperationUuidAsync(EndPoints) {
     let consumingApplicationCCResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
         consumingApplicationName,
         consumingApplicationReleaseNumber);
+    if (!consumingApplicationCCResponse.controlConstruct) {
+        return { "consumingOperationUuid": undefined, "took": consumingApplicationCCResponse.took };
+    }
     let consumingOperationUuid = ControlConstructService.getOperationClientUuid(
         consumingApplicationCCResponse.controlConstruct,
         operationName,

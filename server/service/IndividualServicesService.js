@@ -173,7 +173,7 @@ exports.deleteFcPort = async function (body) {
   let forwardingConstructUuid = body["fc-uuid"];
   let fcPortLocalId = body["fc-port-local-id"];
   let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-  return forwardingService.deleteFcPort(fcPortLocalId, forwardingConstructUuid, controlConstructUuid);
+  return await forwardingService.deleteFcPort(fcPortLocalId, forwardingConstructUuid, controlConstructUuid);
 }
 
 /**
@@ -186,8 +186,9 @@ exports.deleteLtpAndDependents = async function (body) {
   let ltpToBeRemovedUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
   let controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(ltpToBeRemovedUuid);
   let controlConstruct = controlConstructResponse.controlConstruct;
+  let took = controlConstructResponse.took;
   if (!controlConstruct) {
-    return;
+    return { "took" : took };;
   }
 
   let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
@@ -831,17 +832,19 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
 exports.removeOperationClientFromLink = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
   let response = await LinkServices.deleteOperationClientFromTheEndPointsAsync(body);
   let linkUuid = response.linkUuid;
-  let forwardingAutomationInputList = await prepareForwardingAutomation.removeOperationClientFromLink(
-    linkUuid
-  );
-  ForwardingAutomationService.automateForwardingConstructAsync(
-    operationServerName,
-    forwardingAutomationInputList,
-    user,
-    xCorrelator,
-    traceIndicator,
-    customerJourney
-  );
+  if (linkUuid) {
+    let forwardingAutomationInputList = await prepareForwardingAutomation.removeOperationClientFromLink(
+      linkUuid
+    );
+    ForwardingAutomationService.automateForwardingConstructAsync(
+      operationServerName,
+      forwardingAutomationInputList,
+      user,
+      xCorrelator,
+      traceIndicator,
+      customerJourney
+    );
+  }
   return { "took" : response.took };
 }
 
