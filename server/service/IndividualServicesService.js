@@ -5,10 +5,11 @@ const LogicalTerminationPointService = require('onf-core-model-ap/applicationPat
 
 const LinkServices = require('./individualServices/LinkServices');
 const forwardingService = require('./individualServices/ForwardingService');
-const LogicalTerminationPointServiceOfUtility = require("onf-core-model-ap-bs/basicServices/utility/LogicalTerminationPoint")
+const LogicalTerminationPointServiceOfUtility = require('onf-core-model-ap-bs/basicServices/utility/LogicalTerminationPoint');
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
+const ForwardingAutomationServiceWithResponse = require('./individualServices/ForwardingAutomationServiceWithResponse');
 const FcPort = require('onf-core-model-ap/applicationPattern/onfModel/models/FcPort');
 
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
@@ -827,16 +828,15 @@ exports.regardApplication = function (body, user, originator, xCorrelator, trace
           applicationName,
           releaseNumber
         );
-        let response = await ForwardingAutomationService.automateForwardingConstructAsync(
-          operationServerName,
+        let headers = {
+          user, xCorrelator, traceIndicator, customerJourney
+        }
+        let response = await ForwardingAutomationServiceWithResponse.automateForwardingConstructAsync(
           forwardingAutomationInputList,
-          user,
-          xCorrelator,
-          traceIndicator,
-          customerJourney
+          headers
         );
 
-        if (response === undefined || Object.keys(response).length === 0) {
+        if (response === undefined || response.data === undefined) {
           resolve();
         }
         // response is full control construct of regarded application
