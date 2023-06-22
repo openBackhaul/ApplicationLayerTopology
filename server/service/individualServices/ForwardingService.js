@@ -13,6 +13,7 @@ class ForwardingService {
         let indexAlias = await getIndexAliasAsync(esUuid);
         let response = await client.updateByQuery({
             index: indexAlias,
+            refresh: true,
             body: {
                 script: {
                     source: `ctx._source['forwarding-domain'][0]['forwarding-construct'].removeIf(fc -> fc['uuid'] == params['uuid']);
@@ -42,6 +43,7 @@ class ForwardingService {
         let indexAlias = await getIndexAliasAsync(esUuid);
         let response = await client.updateByQuery({
             index: indexAlias,
+            refresh: true,
             body: {
                 script: {
                     source: `def fwDomain = ctx._source['forwarding-domain'];
@@ -89,6 +91,7 @@ class ForwardingService {
         let response = await client.updateByQuery(
             {
                 index: indexAlias,
+                refresh: true,
                 body: {
                     "script": {
                         "source": `def fwDomain = ctx._source['forwarding-domain'];
@@ -115,11 +118,7 @@ class ForwardingService {
                 }
             }
         );
-        if (response && response.body.updated === 1) {
-            return { "took": response.body.took };
-        } else {
-            throw new Error('fc-port was not deleted');
-        }
+        return { "took": response.body.took };
     }
 
     /**
