@@ -44,9 +44,9 @@ module.exports.putHttpClientReleaseNumber = async function putHttpClientReleaseN
   oamLogService.recordOamRequest(req.url, req.body, responseCode, req.headers.authorization, req.method);
 };
 
-module.exports.putHttpClientApplicationName = function putHttpClientApplicationName(req, res, next, body, uuid) {
+module.exports.putHttpClientApplicationName = async function putHttpClientApplicationName(req, res, next, body, uuid) {
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  HttpClient.putHttpClientApplicationName(body, req.url, uuid)
+  await HttpClient.putHttpClientApplicationName(body, req.url, uuid)
     .then(function (response) {
       responseBuilder.buildResponse(res, responseCode, response);
     })

@@ -277,8 +277,8 @@ module.exports.notifyLinkUpdates = async function notifyLinkUpdates (req, res, n
   } catch (error) {}
 };
 
-module.exports.provideCurrentOperationKey = function provideCurrentOperationKey (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  IndividualServices.provideCurrentOperationKey(body, user, originator, xCorrelator, traceIndicator, customerJourney)
+module.exports.provideCurrentOperationKey = async function provideCurrentOperationKey(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+  await IndividualServices.provideCurrentOperationKey(body, user, originator, xCorrelator, traceIndicator, customerJourney)
     .then(function (response) {
       utils.writeJson(res, response);
     })

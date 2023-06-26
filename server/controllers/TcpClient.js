@@ -61,9 +61,9 @@ module.exports.getTcpClientRemoteProtocol = async function getTcpClientRemotePro
   oamLogService.recordOamRequest(req.url, req.body, responseCode, req.headers.authorization, req.method);
 };
 
-module.exports.putTcpClientRemoteAddress = function putTcpClientRemoteAddress(req, res, next, body, uuid) {
+module.exports.putTcpClientRemoteAddress = async function putTcpClientRemoteAddress(req, res, next, body, uuid) {
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  TcpClient.putTcpClientRemoteAddress(body, uuid)
+  await TcpClient.putTcpClientRemoteAddress(body, uuid)
     .then(function (response) {
       responseBuilder.buildResponse(res, responseCode, response);
     })
@@ -74,9 +74,9 @@ module.exports.putTcpClientRemoteAddress = function putTcpClientRemoteAddress(re
   oamLogService.recordOamRequest(req.url, req.body, responseCode, req.headers.authorization, req.method);
 };
 
-module.exports.putTcpClientRemoteProtocol = function putTcpClientRemoteProtocol(req, res, next, body, uuid) {
+module.exports.putTcpClientRemoteProtocol = async function putTcpClientRemoteProtocol(req, res, next, body, uuid) {
   let responseCode = responseCodeEnum.code.NO_CONTENT;
-  TcpClient.putTcpClientRemoteProtocol(body, uuid)
+  await TcpClient.putTcpClientRemoteProtocol(body, uuid)
     .then(function (response) {
       responseBuilder.buildResponse(res, responseCode, response);
     })
