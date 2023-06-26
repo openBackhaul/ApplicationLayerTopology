@@ -4,6 +4,7 @@ const {
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
+const BadRequestHttpException = require('onf-core-model-ap/applicationPattern/rest/server/HttpException');
 
 class ForwardingService {
 
@@ -33,6 +34,9 @@ class ForwardingService {
         if (response.body.updated === 1) {
             return { "took": response.body.took };
         } else {
+            if(response.body.total === 0){
+               throw new BadRequestHttpException("requested uuid does not exit")
+            }
             throw new Error("Forwarding Construct was not updated")
         }
     }
@@ -73,6 +77,9 @@ class ForwardingService {
         if (response.body.updated === 1) {
             return { "took": response.body.took };
         } else {
+            if(response.body.total === 0){
+                throw new BadRequestHttpException("requested uuid does not exit")
+             }
             throw new Error("FCPort was not updated")
         }
     }

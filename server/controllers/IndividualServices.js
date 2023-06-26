@@ -6,6 +6,7 @@ var responseCodeEnum = require('onf-core-model-ap/applicationPattern/rest/server
 var restResponseHeader = require('onf-core-model-ap/applicationPattern/rest/server/ResponseHeader');
 var restResponseBuilder = require('onf-core-model-ap/applicationPattern/rest/server/ResponseBuilder');
 var executionAndTraceService = require('onf-core-model-ap/applicationPattern/services/ExecutionAndTraceService');
+const BadRequestHttpException = require('onf-core-model-ap/applicationPattern/rest/server/HttpException');
 
 module.exports.addOperationClientToLink = async function addOperationClientToLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
@@ -345,7 +346,7 @@ module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs (req, re
   executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
 };
 
-module.exports.updateFc = async function updateFc (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+module.exports.updateFc = async function updateFc(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
@@ -357,15 +358,19 @@ module.exports.updateFc = async function updateFc (req, res, next, body, user, o
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
-        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        if (responseBody instanceof BadRequestHttpException) {
+          responseCode = responseCodeEnum.code.BAD_REQUEST;
+        } else {
+          responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        }
         let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       });
     executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
-  } catch (error) {}
+  } catch (error) { }
 };
 
-module.exports.updateFcPort = async function updateFcPort (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+module.exports.updateFcPort = async function updateFcPort(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
@@ -377,12 +382,16 @@ module.exports.updateFcPort = async function updateFcPort (req, res, next, body,
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
-        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        if (responseBody instanceof BadRequestHttpException) {
+          responseCode = responseCodeEnum.code.BAD_REQUEST;
+        } else {
+          responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
+        }
         let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       });
     executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
-  } catch (error) {}
+  } catch (error) { }
 };
 
 module.exports.updateLtp = async function updateLtp (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
