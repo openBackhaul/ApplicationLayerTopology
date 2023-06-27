@@ -57,7 +57,7 @@ exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
 /**
  * @description This function deletes a operation client from the link 
  * @param {String} EndPoints : EndPoint details of the link
- * @return {Promise<String>} linkUuid
+ * @return {Promise<Objec>} { linkUuid, took }
  **/
 exports.deleteOperationClientFromTheEndPointsAsync = async function (EndPoints) {
     let linkUuid;
@@ -151,7 +151,7 @@ async function getLinkOfTheOperationAsync(operationUuid, portDirection) {
         }
     });
     if (res.body.hits.length === 0) {
-        return {};
+        return { "took": res.body.took };
     }
     let links = createResultArray(res);
     for (let link of links) {
@@ -169,7 +169,7 @@ async function getLinkOfTheOperationAsync(operationUuid, portDirection) {
  * @description This function updates a link
  * @param {String} link
  * @param {String} consumingOperationuuid : logical-termination-point of the link-port
- * @return {Promise<Object>} { took }
+ * @return {Promise<Object>} { linkPort, took }
  **/
 async function updateLinkAsync(link, consumingOperationuuid) {
     let isLinkExistsAsync = isConsumingServiceExists(link, consumingOperationuuid);
@@ -255,7 +255,7 @@ async function addLinkAsync(link) {
  * @description Retrieves output link-port object from link, where
  * where input link-ports contain given operation-client UUID.
  * @param {String} operationClientUuid
- * @returns {Promise<Object>} output link-port
+ * @returns {Promise<Object>} { linkPort, took }
  */
 exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function (operationClientUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
@@ -263,7 +263,7 @@ exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function (operationC
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
         index: indexAlias,
-        filter_path: 'hits.hits._source.uuid,hits.hits._source.link-port',
+        filter_path: 'took,hits.hits._source.uuid,hits.hits._source.link-port',
         body: {
             "query": {
                 "nested": {
@@ -277,12 +277,13 @@ exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function (operationC
             }
         }
     });
-    if (Object.keys(res.body).length === 0) {
-        return {};
+    if (res.body.hits.length === 0) {
+        return { took: res.body.took };
     }
     let correctLink = res.body.hits.hits[0]._source;
     let linkPorts = correctLink[onfAttributes.LINK.LINK_PORT];
-    return linkPorts.find(item => item[onfAttributes.LINK.PORT_DIRECTION] === LinkPort.portDirectionEnum.OUTPUT);
+    let found = linkPorts.find(item => item[onfAttributes.LINK.PORT_DIRECTION] === LinkPort.portDirectionEnum.OUTPUT);
+    return { "linkPort" : found, "took": res.body.took };
 }
 
 /**
@@ -311,7 +312,7 @@ exports.deleteDependentLinkPortsAsync = async function (ltpUuid) {
             }
         }
     });
-    if (Object.keys(res.body).length === 1) {
+    if (res.body.hits.length === 0) {
         return { "took" : res.body.took };
     }
     let took = res.body.took;

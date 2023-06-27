@@ -927,7 +927,9 @@ exports.updateLtp = async function (body) {
     }
     existingLtps.splice(existingIndex, 1, body);
     // deal with forwardings
-    forwardingAutomationInputList = await prepareForwardingAutomation.updateLtp(existingLtp, body);
+    let forwardingAutomationInputListResponse = await prepareForwardingAutomation.updateLtp(existingLtp, body);
+    forwardingAutomationInputList = forwardingAutomationInputListResponse.forwardingAutomationInputList;
+    took += forwardingAutomationInputListResponse.took;
   } catch (err) {
     // we did not find existing LTP with this name, figure out CC by UUID
     let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
