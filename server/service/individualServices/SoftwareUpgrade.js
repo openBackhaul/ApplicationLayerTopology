@@ -119,7 +119,7 @@ async function PromptForBequeathingDataCausesTransferOfListOfApplications(user, 
                         requestBody,
                         user,
                         xCorrelator,
-                        traceIndicator + "." + traceIndicatorIncrementer++,
+                        traceIndicator + "." + traceIncrementer++,
                         customerJourney
                     );
                     if (!result) {
@@ -185,7 +185,7 @@ async function PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOf
                     requestBody,
                     user,
                     xCorrelator,
-                    traceIndicator + "." + traceIndicatorIncrementer++,
+                    traceIndicator + "." + traceIncrementer++,
                     customerJourney
                 );
                 if (!result) {
@@ -250,7 +250,7 @@ async function PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnAp
                     requestBody,
                     user,
                     xCorrelator,
-                    traceIndicator + "." + traceIndicatorIncrementer++,
+                    traceIndicator + "." + traceIncrementer++,
                     customerJourney
                 );
                 if (!result) {
@@ -310,7 +310,7 @@ async function PromptForBequeathingDataCausesRObeingRequestedToStopNotifications
                         requestBody,
                         user,
                         xCorrelator,
-                        traceIndicator + "." + traceIndicatorIncrementer++,
+                        traceIndicator + "." + traceIncrementer++,
                         customerJourney
                     );
                     if (!result) {
@@ -378,7 +378,7 @@ async function promptForBequeathingDataCausesRequestForBroadcastingInfoAboutServ
                     requestBody,
                     user,
                     xCorrelator,
-                    traceIndicator + "." + traceIndicatorIncrementer++,
+                    traceIndicator + "." + traceIncrementer++,
                     customerJourney
                 );
                 if (!result) {
@@ -434,7 +434,7 @@ async function promptForBequeathingDataCausesRequestForDeregisteringOfOldRelease
                         requestBody,
                         user,
                         xCorrelator,
-                        traceIndicator + "." + traceIndicatorIncrementer++,
+                        traceIndicator + "." + traceIncrementer++,
                         customerJourney
                     );
                     if (!result) {
