@@ -203,7 +203,7 @@ class ControlConstructService {
    * @description Given any LTP uuid from any control-construct, find proper control-construct
    * and extract http-server-capability (this contains application-name and release-number).
    * @param {String} ltpUuid
-   * @returns {Promise<Object>} http-server-capability
+   * @returns {Promise<Object>} { http-server-capability, took }
    */
   static async findHttpServerCapabilityFromLtpUuidAsync(ltpUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
