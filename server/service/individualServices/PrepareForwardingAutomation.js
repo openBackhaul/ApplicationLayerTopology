@@ -207,33 +207,55 @@ exports.removeOperationClientFromLink = function (linkUuid) {
 }
 
 exports.updateLtp = async function(existingLtp, newLtp) {
-    let consumingHttpServerCapability = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(existingLtp.uuid);
+    let consumingHttpServerCapabilityResponse = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(existingLtp.uuid);
+    let consumingHttpServerCapability = consumingHttpServerCapabilityResponse.httpServerCapability;
+    let took = consumingHttpServerCapabilityResponse.took;
     let protocols = newLtp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
     let protocol = protocols[0];
     let protocolName = protocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
     if (LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT === protocolName) {
-        return await updateOperationClientLtp(existingLtp, newLtp, consumingHttpServerCapability);
+        let forwardingConstructAutomationListResponse = await updateOperationClientLtp(existingLtp, newLtp, consumingHttpServerCapability);
+        took += forwardingConstructAutomationListResponse.took;
+        return {
+            "forwardingAutomationInputList" : forwardingConstructAutomationListResponse.forwardingConstructAutomationList,
+            "took": took
+        };
     } else if (LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT === protocolName) {
-        return await updateHttpClientLtp(existingLtp, newLtp, consumingHttpServerCapability);
+        let forwardingConstructAutomationListResponse = await updateHttpClientLtp(existingLtp, newLtp, consumingHttpServerCapability);
+        took += forwardingConstructAutomationListResponse.took;
+        return {
+            "forwardingAutomationInputList" : forwardingConstructAutomationListResponse.forwardingConstructAutomationList,
+            "took": took
+        };
     }
-    return [];
+    return {
+        "forwardingAutomationInputList" : [],
+        "took": took
+    };
 }
 
 async function updateHttpClientLtp(existingLtp, newLtp, consumingHttpServerCapability) {
-    let forwardingConstructAutomationList = [];
+    let returnObject = {
+        forwardingConstructAutomationList: [],
+        took: 0
+    }
     let existingReleaseNumber = consumingHttpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
     let newReleaseNumber = getReleaseNumberFromHttpClient(newLtp);
     if (existingReleaseNumber === newReleaseNumber) {
-        return forwardingConstructAutomationList;
+        return returnObject;
     }
     for (let existingOperationClientUuid of existingLtp[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]) {
-        let linkOutput = await LinkServices.getOutputLinkPortFromInputLinkPortUuidAsync(existingOperationClientUuid);
-        if (!linkOutput) {
+        let linkOutputResponse = await LinkServices.getOutputLinkPortFromInputLinkPortUuidAsync(existingOperationClientUuid);
+        let linkPort = linkOutputResponse.linkPort;
+        returnObject.took += linkOutputResponse.took;
+        if (!linkPort) {
             continue;
         }
         let operationClientName = await findOperationClientNameAsync(existingOperationClientUuid);
-        let operationServerUuid = linkOutput[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-        let servingHttpServerCapability = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(operationServerUuid);
+        let operationServerUuid = linkPort[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+        let servingHttpServerCapabilityResponse = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(operationServerUuid);
+        let servingHttpServerCapability = servingHttpServerCapabilityResponse.httpServerCapability;
+        returnObject.took = servingHttpServerCapability.took;
         let servingApplicationReleaseNumber = servingHttpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
         if (newReleaseNumber !== servingApplicationReleaseNumber) {
             let forwardingAutomation = createForwarding(
@@ -241,7 +263,7 @@ async function updateHttpClientLtp(existingLtp, newLtp, consumingHttpServerCapab
                 operationClientName,
                 "LtpUpdateMightCauseOperationClientBeingRemovedFromLink", 
                 consumingHttpServerCapability);
-            forwardingConstructAutomationList.push(forwardingAutomation);
+            returnObject.forwardingConstructAutomationList.push(forwardingAutomation);
         }
         if (operationServerUuid) {
             servingHttpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER] = newReleaseNumber;
@@ -253,29 +275,36 @@ async function updateHttpClientLtp(existingLtp, newLtp, consumingHttpServerCapab
                 operationClientName,
                 "LtpUpdateMightCauseOperationClientBeingAddedToLink", 
                 consumingHttpServerCapability);
-            forwardingConstructAutomationList.push(forwardingAutomation);
+            returnObject.forwardingConstructAutomationList.push(forwardingAutomation);
         }
     }
-    return forwardingConstructAutomationList;
+    return returnObject;
 }
 
 async function updateOperationClientLtp(existingLtp, newLtp, consumingHttpServerCapability) {
-    let forwardingConstructAutomationList = [];
+    let returnObject = {
+        forwardingConstructAutomationList: [],
+        took: 0
+    }
     let operationClientNewName = getOperationClientNameFromLtp(newLtp);
     let operationClientExistingName = getOperationClientNameFromLtp(existingLtp);
     if (operationClientNewName === operationClientExistingName) {
-        return forwardingConstructAutomationList;
+        return returnObject;
     }
-    let linkOutput = await LinkServices.getOutputLinkPortFromInputLinkPortUuidAsync(existingLtp.uuid);
-    if (!linkOutput) {
-        return forwardingConstructAutomationList;
+    let linkOutputResponse = await LinkServices.getOutputLinkPortFromInputLinkPortUuidAsync(existingLtp.uuid);
+    let linkPort = linkOutputResponse.linkPort;
+    returnObject.took += linkOutputResponse.took;
+    if (!linkPort) {
+        return returnObject;
     }
-    let operationServerUuid = linkOutput[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    let operationServerUuid = linkPort[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let operationServerName = await findOperationServerNameAsync(operationServerUuid);
     if (operationClientNewName === operationServerName) {
-        return forwardingConstructAutomationList;
+        return returnObject;
     }
-    let servingHttpServerCapability = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(operationServerUuid);
+    let servingHttpServerCapabilityResponse = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(operationServerUuid);
+    returnObject.took += servingHttpServerCapabilityResponse.took;
+    let servingHttpServerCapability = servingHttpServerCapabilityResponse.servingHttpServerCapability;
     /**************************************************************************************************************
      * LtpUpdateMightCauseOperationClientBeingRemovedFromLink /v1/update-ltp -> /v1/remove-operation-client-to-link
      *************************************************************************************************************/
@@ -284,7 +313,7 @@ async function updateOperationClientLtp(existingLtp, newLtp, consumingHttpServer
         operationClientExistingName,
         "LtpUpdateMightCauseOperationClientBeingRemovedFromLink", 
         consumingHttpServerCapability);
-    forwardingConstructAutomationList.push(forwardingAutomation);
+    returnObject.forwardingConstructAutomationList.push(forwardingAutomation);
     // send add
     if (operationServerName.length !== 0) {
         /**************************************************************************************************************
@@ -295,9 +324,9 @@ async function updateOperationClientLtp(existingLtp, newLtp, consumingHttpServer
             operationClientNewName,
             "LtpUpdateMightCauseOperationClientBeingAddedToLink", 
             consumingHttpServerCapability);
-        forwardingConstructAutomationList.push(forwardingAutomation);
+        returnObject.forwardingConstructAutomationList.push(forwardingAutomation);
     }
-    return forwardingConstructAutomationList;
+    return returnObject;
 }
 
 function createForwarding(servingHttpServerCapability, operationName, forwardingName, consumingHttpServerCapability) {

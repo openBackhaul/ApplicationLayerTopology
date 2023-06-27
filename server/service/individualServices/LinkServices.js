@@ -151,7 +151,7 @@ async function getLinkOfTheOperationAsync(operationUuid, portDirection) {
         }
     });
     if (res.body.hits.length === 0) {
-        return {};
+        return { took: res.body.took };
     }
     let links = createResultArray(res);
     for (let link of links) {
@@ -263,7 +263,7 @@ exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function (operationC
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
         index: indexAlias,
-        filter_path: 'hits.hits._source.uuid,hits.hits._source.link-port',
+        filter_path: 'took,hits.hits._source.uuid,hits.hits._source.link-port',
         body: {
             "query": {
                 "nested": {
@@ -277,12 +277,13 @@ exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function (operationC
             }
         }
     });
-    if (Object.keys(res.body).length === 0) {
-        return {};
+    if (res.body.hits.length === 0) {
+        return { took: res.body.took };
     }
     let correctLink = res.body.hits.hits[0]._source;
     let linkPorts = correctLink[onfAttributes.LINK.LINK_PORT];
-    return linkPorts.find(item => item[onfAttributes.LINK.PORT_DIRECTION] === LinkPort.portDirectionEnum.OUTPUT);
+    let found = linkPorts.find(item => item[onfAttributes.LINK.PORT_DIRECTION] === LinkPort.portDirectionEnum.OUTPUT);
+    return { linkPort : found, took: res.body.took };
 }
 
 /**
