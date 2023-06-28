@@ -6,7 +6,6 @@ var responseCodeEnum = require('onf-core-model-ap/applicationPattern/rest/server
 var restResponseHeader = require('onf-core-model-ap/applicationPattern/rest/server/ResponseHeader');
 var restResponseBuilder = require('onf-core-model-ap/applicationPattern/rest/server/ResponseBuilder');
 var executionAndTraceService = require('onf-core-model-ap/applicationPattern/services/ExecutionAndTraceService');
-const BadRequestHttpException = require('onf-core-model-ap/applicationPattern/rest/server/HttpException');
 
 module.exports.addOperationClientToLink = async function addOperationClientToLink (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
@@ -358,11 +357,7 @@ module.exports.updateFc = async function updateFc(req, res, next, body, user, or
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
-        if (responseBody instanceof BadRequestHttpException) {
-          responseCode = responseCodeEnum.code.BAD_REQUEST;
-        } else {
-          responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
-        }
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
         let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       });
@@ -382,11 +377,7 @@ module.exports.updateFcPort = async function updateFcPort(req, res, next, body, 
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
-        if (responseBody instanceof BadRequestHttpException) {
-          responseCode = responseCodeEnum.code.BAD_REQUEST;
-        } else {
-          responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
-        }
+        responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
         let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       });
@@ -406,11 +397,7 @@ module.exports.updateLtp = async function updateLtp (req, res, next, body, user,
       })
       .catch(async function (responseBody) {
         responseBodyToDocument = responseBody;
-        if(responseBody.message == "controlConstructNotFound"){
-          responseCode = responseCodeEnum.code.BAD_REQUEST;
-        }else{
         responseCode = responseCodeEnum.code.INTERNAL_SERVER_ERROR;
-        }
         let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
         restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
       });
