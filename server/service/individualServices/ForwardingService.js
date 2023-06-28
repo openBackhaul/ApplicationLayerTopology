@@ -33,8 +33,8 @@ class ForwardingService {
         if (response.body.updated === 1) {
             return { "took": response.body.took };
         } else {
-            if(response.body.total === 0){
-               throw new createHttpError.BadRequest("requested uuid does not exit")
+            if (response.body.total === 0) {
+                throw new createHttpError.BadRequest(`CC with uuid ${controlConstructUuid} does not exist.`)
             }
             throw new Error("Forwarding Construct was not updated")
         }
@@ -76,9 +76,9 @@ class ForwardingService {
         if (response.body.updated === 1) {
             return { "took": response.body.took };
         } else {
-            if(response.body.total === 0){
-                throw new createHttpError.BadRequest("requested uuid does not exit")
-             }
+            if (response.body.total === 0) {
+                throw new createHttpError.BadRequest(`CC with uuid ${controlConstructUuid} does not exist.`)
+            }
             throw new Error("FCPort was not updated")
         }
     }
