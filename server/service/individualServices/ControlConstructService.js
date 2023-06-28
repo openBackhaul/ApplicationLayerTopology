@@ -40,7 +40,7 @@ class ControlConstructService {
     })
     if (res.body.hits === undefined) {
       console.log(`Could not find existing control-construct with UUID ${controlConstructUuid}`);
-      return { "controlConstruct": undefined, "took": res.body.took };
+      return { "took": res.body.took };
     }
     let controlConstruct = createResultArray(res);
     return { "controlConstruct": controlConstruct[0], "took": res.body.took };
@@ -65,10 +65,10 @@ class ControlConstructService {
           }
         }
       }
-    })
+    });
     if (res.body.hits === undefined) {
       console.log(`Could not find existing control-construct with LTP UUID ${ltpUuid}`);
-      return { "controlConstruct" : undefined, "took" : res.body.took };
+      return { "took" : res.body.took };
     }
     let controlConstruct = createResultArray(res);
     return { "controlConstruct" : controlConstruct[0], "took" : res.body.took };
@@ -95,7 +95,7 @@ class ControlConstructService {
       }
     });
     if (res.body.hits === undefined) {
-      return { "id": undefined, "took" : res.body.took };
+      return { "took" : res.body.took };
     }
     return { "id": res.body.hits.hits[0]._id, "took" : res.body.took }
   }
@@ -134,7 +134,7 @@ class ControlConstructService {
     })
     if (res.body.hits.hits.length === 0) {
       console.log(`Could not find existing control-construct with ${applicationName} and ${releaseNumber}`);
-      return { "controlConstruct": undefined, "took": res.body.took };
+      return { "took": res.body.took };
     }
     let controlConstruct = createResultArray(res);
     return { "controlConstruct": controlConstruct[0], "took": res.body.took };
@@ -203,7 +203,7 @@ class ControlConstructService {
    * @description Given any LTP uuid from any control-construct, find proper control-construct
    * and extract http-server-capability (this contains application-name and release-number).
    * @param {String} ltpUuid
-   * @returns {Promise<Object>} http-server-capability
+   * @returns {Promise<Object>} { http-server-capability, took }
    */
   static async findHttpServerCapabilityFromLtpUuidAsync(ltpUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
@@ -211,7 +211,7 @@ class ControlConstructService {
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
         index: indexAlias,
-        filter_path: '**.http-server-interface-capability.application-name,' +
+        filter_path: 'took,**.http-server-interface-capability.application-name,' +
         '**.http-server-interface-capability.release-number',
         body: {
             "query": {
@@ -219,16 +219,18 @@ class ControlConstructService {
             }
         }
     });
-    if (Object.keys(res.body).length === 0) {
+    if (res.body.hits.length === 0) {
         throw new Error('Http server capability not found!');
     }
     let filteredLtps = res.body.hits.hits[0]._source['logical-termination-point'];
     for (let ltp of filteredLtps) {
         let layerProtocol = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
         if (onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC in layerProtocol) {
-            return layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC][onfAttributes.HTTP_SERVER.CAPABILITY];
+          let httpServerCapability = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC][onfAttributes.HTTP_SERVER.CAPABILITY];
+            return { "httpServerCapability": httpServerCapability, "took": res.body.took };
         }
     };
+    return { "took": res.body.took };
   }
 
   /**

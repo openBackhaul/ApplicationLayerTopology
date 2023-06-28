@@ -31,6 +31,7 @@ const LinkPort = require('./models/LinkPort');
 const ControlConstructService = require('./individualServices/ControlConstructService');
 const isEqual = require('lodash.isequal');
 const ForwardingService = require('./individualServices/ForwardingService');
+const createHttpError = require('http-errors');
 
 /**
  * Connects an OperationClient to an OperationServer
@@ -87,8 +88,6 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
        * Prepare logicalTerminatinPointConfigurationInput object to 
        * configure logical-termination-point
        ****************************************************************************************/
-      let isdataTransferRequired = true;
-      
       let httpClientUuidList = await LogicalTerminationPointServiceOfUtility.resolveHttpTcpAndOperationClientUuidOfNewRelease()
       let newReleaseHttpClientLtpUuid = httpClientUuidList.httpClientUuid
       let tcpclientUuid = httpClientUuidList.tcpClientUuid
@@ -153,7 +152,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
           );
         }
       }
-      softwareUpgrade.upgradeSoftwareVersion(isdataTransferRequired, user, xCorrelator, traceIndicator, customerJourney)
+      softwareUpgrade.upgradeSoftwareVersion(user, xCorrelator, traceIndicator, customerJourney, forwardingAutomationInputList.length)
         .catch(err => console.log(`upgradeSoftwareVersion failed with error: ${err}`));
       resolve();
     } catch (error) {
@@ -913,14 +912,14 @@ exports.updateLtp = async function (body) {
   controlConstruct = controlConstructResponse.controlConstruct;
   took += controlConstructResponse.took;
   if (!controlConstruct) {
-    throw new Error("controlConstructNotFound")
+    throw new createHttpError.BadRequest(`CC with LTP UUID ${logicalTerminationPointUuid} could not be found.`)
   }
   try {
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let existingIndex = existingLtps.findIndex(item => item[onfAttributes.GLOBAL_CLASS.UUID] === logicalTerminationPointUuid);
     let existingLtp = existingLtps[existingIndex];
     if (!existingLtp) {
-      throw new Error(`LTP with UUID ${logicalTerminationPointUuid} could not be found.`);
+      throw new createHttpError.BadRequest(`LTP with UUID ${logicalTerminationPointUuid} could not be found.`);
     }
     if (isEqual(existingLtp, body)) {
       console.log('LTP is already in database.');
@@ -928,7 +927,9 @@ exports.updateLtp = async function (body) {
     }
     existingLtps.splice(existingIndex, 1, body);
     // deal with forwardings
-    forwardingAutomationInputList = await prepareForwardingAutomation.updateLtp(existingLtp, body);
+    let forwardingAutomationInputListResponse = await prepareForwardingAutomation.updateLtp(existingLtp, body);
+    forwardingAutomationInputList = forwardingAutomationInputListResponse.forwardingAutomationInputList;
+    took += forwardingAutomationInputListResponse.took;
   } catch (err) {
     // we did not find existing LTP with this name, figure out CC by UUID
     let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
@@ -936,7 +937,7 @@ exports.updateLtp = async function (body) {
     controlConstruct = controlConstructResponse.controlConstruct;
     took += controlConstructResponse.took;
     if (!controlConstruct) {
-      throw new Error("controlConstructNotFound")
+      throw new createHttpError.BadRequest(`CC with LTP UUID ${logicalTerminationPointUuid} could not be found.`)
     }
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     existingLtps.push(body);
