@@ -345,7 +345,7 @@ module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs (req, re
   executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
 };
 
-module.exports.updateFc = async function updateFc (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+module.exports.updateFc = async function updateFc(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
@@ -362,10 +362,10 @@ module.exports.updateFc = async function updateFc (req, res, next, body, user, o
         responseBodyToDocument = sentResp.body;
       });
     executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
-  } catch (error) {}
+  } catch (error) { }
 };
 
-module.exports.updateFcPort = async function updateFcPort (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
+module.exports.updateFcPort = async function updateFcPort(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   try {
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
@@ -382,7 +382,7 @@ module.exports.updateFcPort = async function updateFcPort (req, res, next, body,
         responseBodyToDocument = sentResp.body;
       });
     executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
-  } catch (error) {}
+  } catch (error) { }
 };
 
 module.exports.updateLtp = async function updateLtp (req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {

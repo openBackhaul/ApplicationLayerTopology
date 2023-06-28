@@ -4,7 +4,7 @@ const {
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
-
+const createHttpError = require('http-errors');
 class ForwardingService {
 
     static async updateForwardingConstruct(controlConstructUuid, newForwardingConstruct) {
@@ -33,6 +33,9 @@ class ForwardingService {
         if (response.body.updated === 1) {
             return { "took": response.body.took };
         } else {
+            if (response.body.total === 0) {
+                throw new createHttpError.BadRequest(`CC with uuid ${controlConstructUuid} does not exist.`)
+            }
             throw new Error("Forwarding Construct was not updated")
         }
     }
@@ -73,6 +76,9 @@ class ForwardingService {
         if (response.body.updated === 1) {
             return { "took": response.body.took };
         } else {
+            if (response.body.total === 0) {
+                throw new createHttpError.BadRequest(`CC with uuid ${controlConstructUuid} does not exist.`)
+            }
             throw new Error("FCPort was not updated")
         }
     }
