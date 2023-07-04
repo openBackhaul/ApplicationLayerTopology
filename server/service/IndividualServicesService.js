@@ -794,14 +794,14 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     return { "took": took };
   }
 
+  // response is full control construct of regarded application
+  let cc = response["data"]["core-model-1-4:control-construct"];
+  let res = await ControlConstructService.createOrUpdateControlConstructAsync(cc);
+  took += res.took;
+
   let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
   let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
   if (!(applicationName === ownApplicationName && releaseNumber === ownApplicationReleaseNumber)) {
-    // response is full control construct of regarded application
-    let cc = response["data"]["core-model-1-4:control-construct"];
-    let res = await ControlConstructService.createOrUpdateControlConstructAsync(cc);
-    took += res.took;
-
     let logicalTerminationPoints = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
     for (let operationServerName of operationServerNames) {
