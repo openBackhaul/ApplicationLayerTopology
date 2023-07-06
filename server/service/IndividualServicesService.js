@@ -905,16 +905,10 @@ exports.updateLtp = async function (body) {
   let logicalTerminationPointUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
   let existingLtps = [];
   let forwardingAutomationInputList = [];
-  let controlConstruct;
-  let controlConstructResponse;
-  let took = 0;
-  controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
-  controlConstruct = controlConstructResponse.controlConstruct;
-  took += controlConstructResponse.took;
-  if (!controlConstruct) {
-    throw new createHttpError.BadRequest(`CC with LTP UUID ${logicalTerminationPointUuid} could not be found.`)
-  }
-  try {
+  let controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  let took = controlConstructResponse.took;
+  if (controlConstruct) {
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let existingIndex = existingLtps.findIndex(item => item[onfAttributes.GLOBAL_CLASS.UUID] === logicalTerminationPointUuid);
     let existingLtp = existingLtps[existingIndex];
@@ -930,14 +924,14 @@ exports.updateLtp = async function (body) {
     let forwardingAutomationInputListResponse = await prepareForwardingAutomation.updateLtp(existingLtp, body);
     forwardingAutomationInputList = forwardingAutomationInputListResponse.forwardingAutomationInputList;
     took += forwardingAutomationInputListResponse.took;
-  } catch (err) {
+  } else {
     // we did not find existing LTP with this name, figure out CC by UUID
     let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
     controlConstructResponse = await ControlConstructService.getControlConstructAsync(controlConstructUuid);
     controlConstruct = controlConstructResponse.controlConstruct;
     took += controlConstructResponse.took;
     if (!controlConstruct) {
-      throw new createHttpError.BadRequest(`CC with LTP UUID ${logicalTerminationPointUuid} could not be found.`)
+      throw new createHttpError.BadRequest(`CC with UUID ${controlConstructUuid} could not be found.`)
     }
     existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     existingLtps.push(body);
