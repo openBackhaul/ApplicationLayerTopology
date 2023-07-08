@@ -33,6 +33,8 @@ const isEqual = require('lodash.isequal');
 const ForwardingService = require('./individualServices/ForwardingService');
 const createHttpError = require('http-errors');
 
+const NEW_RELEASE_FORWARDING_NAME = 'PromptForBequeathingDataCausesTransferOfListOfApplications';
+
 /**
  * Connects an OperationClient to an OperationServer
  *
@@ -276,7 +278,8 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
 
         let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.deleteApplicationInformationAsync(
           applicationName,
-          applicationReleaseNumber
+          applicationReleaseNumber,
+          NEW_RELEASE_FORWARDING_NAME
         );
 
         /****************************************************************************************
@@ -756,7 +759,8 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     individualServicesOperationsMapping.individualServicesOperationsMapping
   );
   let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.findOrCreateApplicationInformationAsync(
-    logicalTerminatinPointConfigurationInput
+    logicalTerminatinPointConfigurationInput,
+    NEW_RELEASE_FORWARDING_NAME
   );
 
   let forwardingConfigurationInputList = [];
