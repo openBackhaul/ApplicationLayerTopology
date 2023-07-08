@@ -277,7 +277,8 @@ exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function (operationC
             }
         }
     });
-    if (res.body.hits.length === 0) {
+    // if there is no hits , then response body will not contains a hit. So this shall be also considered as hits with 0 length 
+    if (res.body.hits == undefined || res.body.hits.length === 0) {
         return { took: res.body.took };
     }
     let correctLink = res.body.hits.hits[0]._source;
