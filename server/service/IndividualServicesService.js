@@ -759,47 +759,48 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     logicalTerminatinPointConfigurationInput
   );
 
+  let forwardingConfigurationInputList = [];
+  let forwardingConstructConfigurationStatus;
+  let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
+
+  if (operationClientConfigurationStatusList) {
+    forwardingConfigurationInputList = await prepareForwardingConfiguration.regardApplication(
+      operationClientConfigurationStatusList,
+      redirectTopologyInformationOperation
+    );
+    forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
+      configureForwardingConstructAsync(
+        operationServerName,
+        forwardingConfigurationInputList
+      );
+  }
+
+  let forwardingAutomationInputList = await prepareForwardingAutomation.regardApplication(
+    logicalTerminationPointconfigurationStatus,
+    forwardingConstructConfigurationStatus,
+    applicationName,
+    releaseNumber
+  );
+  let headers = {
+    user, xCorrelator, traceIndicator, customerJourney
+  }
+  let response = await ForwardingAutomationServiceWithResponse.automateForwardingConstructAsync(
+    forwardingAutomationInputList,
+    headers
+  );
+
+  if (response === undefined || Object.keys(response).length === 0) {
+    return { "took": took };
+  }
+
+  // response is full control construct of regarded application
+  let cc = response["data"]["core-model-1-4:control-construct"];
+  let res = await ControlConstructService.createOrUpdateControlConstructAsync(cc);
+  took += res.took;
+
   let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
   let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-  if (!(applicationName == ownApplicationName && releaseNumber == ownApplicationReleaseNumber)) {
-    let forwardingConfigurationInputList = [];
-    let forwardingConstructConfigurationStatus;
-    let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
-
-    if (operationClientConfigurationStatusList) {
-      forwardingConfigurationInputList = await prepareForwardingConfiguration.regardApplication(
-        operationClientConfigurationStatusList,
-        redirectTopologyInformationOperation
-      );
-      forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-        configureForwardingConstructAsync(
-          operationServerName,
-          forwardingConfigurationInputList
-        );
-    }
-
-    let forwardingAutomationInputList = await prepareForwardingAutomation.regardApplication(
-      logicalTerminationPointconfigurationStatus,
-      forwardingConstructConfigurationStatus,
-      applicationName,
-      releaseNumber
-    );
-    let headers = {
-      user, xCorrelator, traceIndicator, customerJourney
-    }
-    let response = await ForwardingAutomationServiceWithResponse.automateForwardingConstructAsync(
-      forwardingAutomationInputList,
-      headers
-    );
-
-    if (response === undefined || Object.keys(response).length === 0) {
-      return { "took": took };
-    }
-    // response is full control construct of regarded application
-    let cc = response["data"]["core-model-1-4:control-construct"];
-    let res = await ControlConstructService.createOrUpdateControlConstructAsync(cc);
-    took += res.took;
-
+  if (!(applicationName === ownApplicationName && releaseNumber === ownApplicationReleaseNumber)) {
     let logicalTerminationPoints = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
     for (let operationServerName of operationServerNames) {
