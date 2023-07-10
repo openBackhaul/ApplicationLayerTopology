@@ -313,7 +313,7 @@ exports.deleteDependentLinkPortsAsync = async function (ltpUuid) {
             }
         }
     });
-    if (res.body.hits.length === 0) {
+    if (res.body.hits == undefined || res.body.hits.length === 0) {
         return { "took" : res.body.took };
     }
     let took = res.body.took;
