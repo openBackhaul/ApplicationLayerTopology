@@ -30,7 +30,7 @@ exports.automateForwardingConstructAsync = async function (forwardingAutomationI
     let fcOutputPortList = fcPortList.filter(fcp =>
         fcp[onfAttributes.FC_PORT.PORT_DIRECTION] === FcPort.portDirectionEnum.OUTPUT
     );
-    let found = fcOutputPortList.find(fcPort => isOutputMatchesContextAsync(fcPort, forwardingAutomationInput.context));
+    let found = await findOutputMatchesContextAsync(fcOutputPortList, forwardingAutomationInput.context);
     return await dispatchEvent(
         found[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT],
         forwardingAutomationInput.attributeList,
@@ -42,16 +42,24 @@ exports.automateForwardingConstructAsync = async function (forwardingAutomationI
 }
 
 /**
- * @param {String} fcPort
+ * @param {Array} fcPortList
  * @param {String} context
  **/
-async function isOutputMatchesContextAsync(fcPort, context) {
-    let fcLogicalTerminationPoint = fcPort["logical-termination-point"];
-    let serverLtpList = await LogicalTerminationPoint.getServerLtpListAsync(fcLogicalTerminationPoint);
-    let httpClientUuid = serverLtpList[0];
-    let applicationName = await HttpClientInterface.getApplicationNameAsync(httpClientUuid);
-    let releaseNumber = await HttpClientInterface.getReleaseNumberAsync(httpClientUuid);
-    return context === (applicationName + releaseNumber);
+async function findOutputMatchesContextAsync(fcPortList, context) {
+    let found;
+    for (let index = 0; index < fcPortList.length; index++) {
+        const fcPort = fcPortList[index];
+        let fcLogicalTerminationPoint = fcPort["logical-termination-point"];
+        let serverLtpList = await LogicalTerminationPoint.getServerLtpListAsync(fcLogicalTerminationPoint);
+        let httpClientUuid = serverLtpList[0];
+        let applicationName = await HttpClientInterface.getApplicationNameAsync(httpClientUuid);
+        let releaseNumber = await HttpClientInterface.getReleaseNumberAsync(httpClientUuid);
+        let contextToBeChecked = applicationName + releaseNumber;
+        if (contextToBeChecked == context) {
+            found = fcPort;
+        }
+    }
+    return found;
 }
 
 /**

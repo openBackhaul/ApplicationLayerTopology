@@ -29,7 +29,7 @@ const ElasticsearchPreparation = require('./ElasticsearchPreparation');
  **/
 exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
     let took = 0;
-    let link;
+    let link = {};
     let servingEndpointResponse = await getServingOperationUuidAsync(EndPoints);
     took += servingEndpointResponse.took;
     let servingOperationUuid = servingEndpointResponse.servingOperationUuid;
