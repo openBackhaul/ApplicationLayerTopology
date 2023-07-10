@@ -793,7 +793,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     headers
   );
 
-  if (response === undefined || Object.keys(response).length === 0) {
+  if (response === undefined || response.data === undefined || Object.keys(response).length === 0 ) {
     return { "took": took };
   }
 
