@@ -47,6 +47,7 @@ class Link {
         let indexAlias = await getIndexAliasAsync(esUuid);
         let response = await client.updateByQuery({
             index: indexAlias,
+            refresh: true,
             body: {
                 script: {
                     source: "ctx._source['link-port'].add(params['link-port'])",
@@ -81,6 +82,7 @@ class Link {
         let indexAlias = await getIndexAliasAsync(esUuid);
         let response = await client.updateByQuery({
             index: indexAlias,
+            refresh: true,
             body: {
                 script: {
                     source: "ctx._source['link-port'].removeIf(port -> port['local-id'] == params['local-id'])",
