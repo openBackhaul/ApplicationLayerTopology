@@ -133,15 +133,15 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
             tcpclientUuid,
             undefined,
             true);
-          logicalTerminationPointConfigurationStatus.tcpClientConfigurationStatusList = [configurationStatus];
-          
+          logicalTerminationPointConfigurationStatus.tcpClientConfigurationStatusList = [configurationStatus];          
         }
+        let forwardingAutomationInputList = [];
         if (logicalTerminationPointConfigurationStatus != undefined) {
 
           /****************************************************************************************
            * Prepare attributes to automate forwarding-construct
            ****************************************************************************************/
-          let forwardingAutomationInputList = await prepareForwardingAutomation.bequeathYourDataAndDie(
+          forwardingAutomationInputList = await prepareForwardingAutomation.bequeathYourDataAndDie(
             logicalTerminationPointConfigurationStatus
           );
           ForwardingAutomationService.automateForwardingConstructAsync(
@@ -153,9 +153,9 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
             customerJourney
           );
         }
-      }
-      softwareUpgrade.upgradeSoftwareVersion(user, xCorrelator, traceIndicator, customerJourney, forwardingAutomationInputList.length)
+        softwareUpgrade.upgradeSoftwareVersion(user, xCorrelator, traceIndicator, customerJourney, forwardingAutomationInputList.length)
         .catch(err => console.log(`upgradeSoftwareVersion failed with error: ${err}`));
+      }      
       resolve();
     } catch (error) {
       reject(error);
