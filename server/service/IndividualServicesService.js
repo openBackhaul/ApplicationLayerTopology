@@ -2,6 +2,7 @@
 
 const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
 const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
+const prepareALTForwardingAutomation = require('onf-core-model-ap-bs/basicServices/services/PrepareALTForwardingAutomation');
 
 const LinkServices = require('./individualServices/LinkServices');
 const forwardingService = require('./individualServices/ForwardingService');
@@ -819,17 +820,42 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     applicationName,
     releaseNumber
   );
+
   let headers = {
     user,
     xCorrelator,
     traceIndicator,
     customerJourney
   }
-  let response = await ForwardingAutomationServiceWithResponse.automateForwardingConstructAsync(
-    forwardingAutomationInputList,
-    headers
+
+  automateForwarding(forwardingAutomationInputList[0], headers, applicationName, releaseNumber)
+
+
+  /***********************************************************************************
+   * forwardings for application layer topology
+   ************************************************************************************/
+  let applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputAsync(
+    logicalTerminationPointconfigurationStatus,
+    forwardingConstructConfigurationStatus
   );
 
+  ForwardingAutomationService.automateForwardingConstructAsync(
+    operationServerName,
+    applicationLayerTopologyForwardingInputList,
+    user,
+    xCorrelator,
+    traceIndicator,
+    customerJourney
+  );
+
+}
+
+async function automateForwarding(forwardingAutomationInput, headers, applicationName, releaseNumber) {
+  let response = await ForwardingAutomationServiceWithResponse.automateForwardingConstructAsync(
+    forwardingAutomationInput,
+    headers
+  );
+  let took = 0;
   if (response === undefined || response.data === undefined || Object.keys(response).length === 0) {
     return {
       "took": took
@@ -850,7 +876,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
       let endPointDetails = {
         'serving-application-name': applicationName,
         'serving-application-release-number': releaseNumber,
-        'operationServerName': operationServerName,
+        'operation-name': operationServerName,
         'consuming-application-name': ownApplicationName,
         'consuming-application-release-number': ownApplicationReleaseNumber
       }
@@ -858,11 +884,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
       took += linkResponse.took;
     }
   }
-  return {
-    "took": took
-  };
 }
-
 
 /**
  * Disconnects an OperationClient
