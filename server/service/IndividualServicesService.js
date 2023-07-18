@@ -2,6 +2,7 @@
 
 const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
 const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
+const prepareALTForwardingAutomation = require('onf-core-model-ap-bs/basicServices/services/PrepareALTForwardingAutomation');
 
 const LinkServices = require('./individualServices/LinkServices');
 const forwardingService = require('./individualServices/ForwardingService');
@@ -24,7 +25,7 @@ const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/on
 const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
 const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
-const LogicalTerminationPointConfigurationStatus = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
+
 const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
@@ -59,7 +60,9 @@ exports.addOperationClientToLink = async function (body, user, xCorrelator, trac
     traceIndicator,
     customerJourney
   );
-  return { "took" : response.took };
+  return {
+    "took": response.took
+  };
 }
 
 /**
@@ -108,7 +111,15 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
         if (applicationName != currentNewReleaseApplicationName) {
           update.isApplicationNameUpdated = await httpClientInterface.setApplicationNameAsync(newReleaseHttpClientLtpUuid, applicationName);
         }
+        if (update.isReleaseUpdated || update.isApplicationNameUpdated) {
+          let configurationStatus = new ConfigurationStatus(
+            newReleaseHttpClientLtpUuid,
+            undefined,
+            true);
 
+          logicalTerminationPointConfigurationStatus.httpClientConfigurationStatus = configurationStatus;
+
+        }
         if (protocol != currentNewReleaseRemoteProtocol) {
           update.isProtocolUpdated = await tcpClientInterface.setRemoteProtocolAsync(tcpclientUuid, protocol);
         }
@@ -119,22 +130,14 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
           update.isPortUpdated = await tcpClientInterface.setRemotePortAsync(tcpclientUuid, port);
         }
 
-        let tcpClientConfigurationStatus = new ConfigurationStatus(
-          newReleaseHttpClientLtpUuid,
-          '',
-          (update.isProtocolUpdated || update.isAddressUpdated || update.isPortUpdated)
-        );
-        let httpClientConfigurationStatus = new ConfigurationStatus(
-          newReleaseHttpClientLtpUuid,
-          '',
-          (update.isReleaseUpdated || update.isApplicationNameUpdated)
-        );
-        logicalTerminationPointConfigurationStatus = new LogicalTerminationPointConfigurationStatus(
-          false,
-          httpClientConfigurationStatus,
-          [tcpClientConfigurationStatus]
-        );
 
+        if (update.isProtocolUpdated || update.isAddressUpdated || update.isPortUpdated) {
+          let configurationStatus = new ConfigurationStatus(
+            tcpclientUuid,
+            undefined,
+            true);
+          logicalTerminationPointConfigurationStatus.tcpClientConfigurationStatusList = [configurationStatus];
+        }
         let forwardingAutomationInputList = [];
         if (logicalTerminationPointConfigurationStatus != undefined) {
 
@@ -189,14 +192,18 @@ exports.deleteLtpAndDependents = async function (body) {
   let controlConstruct = controlConstructResponse.controlConstruct;
   let took = controlConstructResponse.took;
   if (!controlConstruct) {
-    return { "took" : took };;
+    return {
+      "took": took
+    };;
   }
 
   let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
   let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid);
   if (!ltpToBeRemoved) {
     console.log(`LTP with UUID ${ltpToBeRemovedUuid} could not be found.`);
-    return { "took" : took };
+    return {
+      "took": took
+    };
   }
 
   // do removal based on layerProtocol
@@ -210,14 +217,14 @@ exports.deleteLtpAndDependents = async function (body) {
       took += delLPResponse.took;
       break;
     case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT:
-      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
+      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async (clientUUID) => {
         let delFcResponse = await ForwardingService.deleteDependentFcPorts(controlConstruct, clientUUID);
         took += delFcResponse.took;
         let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
         took += delLPResponse.took;
         ControlConstructService.deleteLtpFromCCObject(controlConstruct, clientUUID);
       });
-      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].forEach(async(serverUUID) => {
+      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].forEach(async (serverUUID) => {
         ControlConstructService.deleteLtpFromCCObject(controlConstruct, serverUUID);
       });
       break;
@@ -225,7 +232,7 @@ exports.deleteLtpAndDependents = async function (body) {
       let httpClientUuid = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP][0];
       let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
       if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
-        httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async(clientUUID) => {
+        httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async (clientUUID) => {
           let delFcResponse = await ForwardingService.deleteDependentFcPorts(controlConstruct, clientUUID);
           took += delFcResponse.took;
           let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
@@ -244,7 +251,9 @@ exports.deleteLtpAndDependents = async function (body) {
   controlConstruct = ControlConstructService.deleteLtpFromCCObject(controlConstruct, ltpToBeRemovedUuid);
   let res = await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
   took += res.took;
-  return { "took" : took };
+  return {
+    "took": took
+  };
 }
 
 /**
@@ -295,10 +304,10 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
             operationClientConfigurationStatusList
           );
           forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-            unConfigureForwardingConstructAsync(
-              operationServerName,
-              forwardingConfigurationInputList
-            );
+          unConfigureForwardingConstructAsync(
+            operationServerName,
+            forwardingConfigurationInputList
+          );
         }
 
         /****************************************************************************************
@@ -343,7 +352,7 @@ exports.listApplications = function (user, originator, xCorrelator, traceIndicat
       /****************************************************************************************
        * Preparing response body
        ****************************************************************************************/
-      
+
       let applicationList = await LogicalTerminationPointServiceOfUtility.getAllApplicationList(forwardingName);
       /****************************************************************************************
        * Setting 'application/json' response body
@@ -392,7 +401,12 @@ exports.listEndPointsOfLink = async function (body) {
     linkEndPointList.push(linkEndPoint);
   }
   linkEndPointList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(linkEndPointList);
-  return { "body" : { "link-end-point-list": linkEndPointList }, "took" : took };
+  return {
+    "body": {
+      "link-end-point-list": linkEndPointList
+    },
+    "took": took
+  };
 }
 
 /**
@@ -404,7 +418,12 @@ exports.listLinkUuids = async function () {
   let linksResponse = await LinkServices.getLinkListAsync();
   let linkList = linksResponse.links;
   const linkUuidList = linkList.flatMap(link => link[onfAttributes.GLOBAL_CLASS.UUID]);
-  return { "body" : { "link-uuid-list": linkUuidList }, "took" : linksResponse.took };
+  return {
+    "body": {
+      "link-uuid-list": linkUuidList
+    },
+    "took": linksResponse.took
+  };
 }
 
 /**
@@ -415,48 +434,53 @@ exports.listLinkUuids = async function () {
  * returns inline_response_200_7
  **/
 exports.listLinksToOperationClientsOfApplication = async function (body) {
-    let operationServerList = [];
-    let took = 0;
-    let applicationName = body["application-name"];
-    let applicationReleaseNumber = body["release-number"];
+  let operationServerList = [];
+  let took = 0;
+  let applicationName = body["application-name"];
+  let applicationReleaseNumber = body["release-number"];
 
-    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-      applicationName,
-      applicationReleaseNumber);
-    let controlConstruct = controlConstructResponse.controlConstruct;
-    if (controlConstruct) {
-      took += controlConstructResponse.took;
+  let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+    applicationName,
+    applicationReleaseNumber);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  if (controlConstruct) {
+    took += controlConstructResponse.took;
 
-      let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-      let opertionClientUuidListWithLink = [];
-      let linkListResponse = await LinkServices.getLinkListAsync();
-      let linkList = linkListResponse.links;
-      took += linkListResponse.took;
-      for (let link of linkList) {
-        let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-        for (let linkPort of linkPortList) {
-          let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-          if (portDirection === LinkPort.portDirectionEnum.INPUT) {
-            let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-            let controlConstructUuidOfTheLTP = figureOutControlConstructUuid(logicalTerminationPoint);
-            if (controlConstructUuidOfTheLTP === controlConstructUuid) {
-              opertionClientUuidListWithLink.push(logicalTerminationPoint);
-            }
+    let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
+    let opertionClientUuidListWithLink = [];
+    let linkListResponse = await LinkServices.getLinkListAsync();
+    let linkList = linkListResponse.links;
+    took += linkListResponse.took;
+    for (let link of linkList) {
+      let linkPortList = link[onfAttributes.LINK.LINK_PORT];
+      for (let linkPort of linkPortList) {
+        let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
+        if (portDirection === LinkPort.portDirectionEnum.INPUT) {
+          let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
+          let controlConstructUuidOfTheLTP = figureOutControlConstructUuid(logicalTerminationPoint);
+          if (controlConstructUuidOfTheLTP === controlConstructUuid) {
+            opertionClientUuidListWithLink.push(logicalTerminationPoint);
           }
         }
       }
-
-      let operationClientInformationList = getClientsReactingOnOperationServerList(controlConstruct, opertionClientUuidListWithLink);
-      for (let operationClientInformation of operationClientInformationList) {
-        let servingApplication = {};
-        servingApplication.servingApplicationName = operationClientInformation.addressedApplicationName;
-        servingApplication.servingApplicationReleaseNumber = operationClientInformation.addressedApplicationReleaseNumber;
-        servingApplication.operationName = operationClientInformation.addressedOperationName;
-        servingApplication = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(servingApplication);
-        operationServerList.push(servingApplication);
-      }
     }
-    return { "body": { "operation-server-list": operationServerList }, "took" : took };
+
+    let operationClientInformationList = getClientsReactingOnOperationServerList(controlConstruct, opertionClientUuidListWithLink);
+    for (let operationClientInformation of operationClientInformationList) {
+      let servingApplication = {};
+      servingApplication.servingApplicationName = operationClientInformation.addressedApplicationName;
+      servingApplication.servingApplicationReleaseNumber = operationClientInformation.addressedApplicationReleaseNumber;
+      servingApplication.operationName = operationClientInformation.addressedOperationName;
+      servingApplication = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(servingApplication);
+      operationServerList.push(servingApplication);
+    }
+  }
+  return {
+    "body": {
+      "operation-server-list": operationServerList
+    },
+    "took": took
+  };
 }
 
 
@@ -468,55 +492,54 @@ exports.listLinksToOperationClientsOfApplication = async function (body) {
  * returns inline_response_200_3
  **/
 exports.listOperationClientsAtApplication = async function (body) {
-    let operationClientList = [];
-    let took = 0;
-    let applicationName = body["application-name"];
-    let applicationReleaseNumber = body["release-number"];
+  let operationClientList = [];
+  let took = 0;
+  let applicationName = body["application-name"];
+  let applicationReleaseNumber = body["release-number"];
 
-    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-      applicationName,
-      applicationReleaseNumber);
-    let controlConstruct = controlConstructResponse.controlConstruct;
-    if (controlConstruct) {
-      took += controlConstructResponse.took;
+  let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+    applicationName,
+    applicationReleaseNumber);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  if (controlConstruct) {
+    took += controlConstructResponse.took;
 
-      let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
 
-      for (let logicalTerminationPoint of logicalTerminationPointList) {
-        let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-        let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-        if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
-          let clientUuidList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+        let clientUuidList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
 
-          let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-          let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-          let clientApplicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
-          let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+        let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+        let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+        let clientApplicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+        let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
 
-          if (clientUuidList) {
+        if (clientUuidList) {
 
-            for (let clientUuid of clientUuidList) {
+          for (let clientUuid of clientUuidList) {
 
-              for (let clientLogicalTerminationPoint of logicalTerminationPointList) {
-                let clientlogicalTerminationPointUuid = clientLogicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+            for (let clientLogicalTerminationPoint of logicalTerminationPointList) {
+              let clientlogicalTerminationPointUuid = clientLogicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
 
-                if (clientlogicalTerminationPointUuid === clientUuid) {
-                  let clientLayerProtocol = clientLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-                  let clientLayerProtocolName = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+              if (clientlogicalTerminationPointUuid === clientUuid) {
+                let clientLayerProtocol = clientLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+                let clientLayerProtocolName = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
 
-                  if (clientLayerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
-                    let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-                    let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-                    let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+                if (clientLayerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
+                  let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+                  let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+                  let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
 
-                    let operationClient = {};
-                    operationClient.servingApplicationName = clientApplicationName;
-                    operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
-                    operationClient.operationName = operationName;
-                    operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
+                  let operationClient = {};
+                  operationClient.servingApplicationName = clientApplicationName;
+                  operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
+                  operationClient.operationName = operationName;
+                  operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
 
-                    operationClientList.push(operationClient);
-                  }
+                  operationClientList.push(operationClient);
                 }
               }
             }
@@ -524,7 +547,13 @@ exports.listOperationClientsAtApplication = async function (body) {
         }
       }
     }
-    return { "body": { "operation-client-list": operationClientList }, "took" : took };
+  }
+  return {
+    "body": {
+      "operation-client-list": operationClientList
+    },
+    "took": took
+  };
 }
 
 
@@ -536,33 +565,38 @@ exports.listOperationClientsAtApplication = async function (body) {
  * returns inline_response_200_4
  **/
 exports.listOperationClientsReactingOnOperationServer = async function (body) {
-    let operationClientList = [];
-    let took = 0;
-    let applicationName = body["receiving-application-name"];
-    let applicationReleaseNumber = body["receiving-application-release-number"];
-    let operationServerName = body["receiving-operation"];
+  let operationClientList = [];
+  let took = 0;
+  let applicationName = body["receiving-application-name"];
+  let applicationReleaseNumber = body["receiving-application-release-number"];
+  let operationServerName = body["receiving-operation"];
 
-    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-      applicationName,
-      applicationReleaseNumber);
-    let controlConstruct = controlConstructResponse.controlConstruct;
-    if (controlConstruct) {
-      took += controlConstructResponse.took;
+  let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+    applicationName,
+    applicationReleaseNumber);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  if (controlConstruct) {
+    took += controlConstructResponse.took;
 
-      let operationServerUuid = ControlConstructService.getOperationServerUuid(controlConstruct, operationServerName);
-      if (operationServerUuid) {
-        let operationClientsUuidsReactingOnOperationServerList = getOperationClientsUuidsReactingOnOperationServerList(
-          controlConstruct,
-          operationServerUuid
-        );
-        let clientsReactingOnOperationServerList = getClientsReactingOnOperationServerList(
-          controlConstruct,
-          operationClientsUuidsReactingOnOperationServerList
-        );
-        operationClientList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(clientsReactingOnOperationServerList);
-      }
+    let operationServerUuid = ControlConstructService.getOperationServerUuid(controlConstruct, operationServerName);
+    if (operationServerUuid) {
+      let operationClientsUuidsReactingOnOperationServerList = getOperationClientsUuidsReactingOnOperationServerList(
+        controlConstruct,
+        operationServerUuid
+      );
+      let clientsReactingOnOperationServerList = getClientsReactingOnOperationServerList(
+        controlConstruct,
+        operationClientsUuidsReactingOnOperationServerList
+      );
+      operationClientList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(clientsReactingOnOperationServerList);
     }
-    return { "body": { "operation-client-list": operationClientList }, "took": took };
+  }
+  return {
+    "body": {
+      "operation-client-list": operationClientList
+    },
+    "took": took
+  };
 }
 
 /**
@@ -572,32 +606,37 @@ exports.listOperationClientsReactingOnOperationServer = async function (body) {
  * returns inline_response_200_2
  **/
 exports.listOperationServersAtApplication = async function (body) {
-    let operationServerNameList = [];
-    let took = 0;
-    let applicationName = body["application-name"];
-    let applicationReleaseNumber = body["release-number"];
+  let operationServerNameList = [];
+  let took = 0;
+  let applicationName = body["application-name"];
+  let applicationReleaseNumber = body["release-number"];
 
-    let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-      applicationName,
-      applicationReleaseNumber);
-    let controlConstruct = controlConstructResponse.controlConstruct;
-    if (controlConstruct) {
-      took += controlConstructResponse.took;
+  let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+    applicationName,
+    applicationReleaseNumber);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  if (controlConstruct) {
+    took += controlConstructResponse.took;
 
-      let logicalTerminationPointFullList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-      let logicalTerminationPointList = logicalTerminationPointFullList.filter(ltp => {
-        let name = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-        return name === LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER;
-      });
-      for (let logicalTerminationPoint of logicalTerminationPointList) {
-        let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-        let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-        let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-        let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-        operationServerNameList.push(operationName);
-      }
+    let logicalTerminationPointFullList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    let logicalTerminationPointList = logicalTerminationPointFullList.filter(ltp => {
+      let name = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      return name === LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER;
+    });
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+      let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+      let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
+      operationServerNameList.push(operationName);
     }
-    return { "body": { "operation-server-name-list": operationServerNameList }, "took" : took };
+  }
+  return {
+    "body": {
+      "operation-server-name-list": operationServerNameList
+    },
+    "took": took
+  };
 }
 
 /**
@@ -622,13 +661,11 @@ exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, trace
       let releaseNumber = body["subscriber-release-number"];
       let subscriberOperation = body["subscriber-operation"];
 
-      let tcpServerList = [
-        {
-          protocol: body["subscriber-protocol"],
-          address: body["subscriber-address"],
-          port: body["subscriber-port"]
-        }
-      ];
+      let tcpServerList = [{
+        protocol: body["subscriber-protocol"],
+        address: body["subscriber-address"],
+        port: body["subscriber-port"]
+      }];
 
 
       let operationNamesByAttributes = new Map();
@@ -667,10 +704,10 @@ exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, trace
           subscriberOperation
         );
         forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-          configureForwardingConstructAsync(
-            operationServerName,
-            forwardingConfigurationInputList
-          );
+        configureForwardingConstructAsync(
+          operationServerName,
+          forwardingConfigurationInputList
+        );
       }
 
       /****************************************************************************************
@@ -737,13 +774,11 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
   let took = 0;
   let applicationName = body["application-name"];
   let releaseNumber = body["release-number"];
-  let tcpServerList = [
-    {
-      protocol: body["protocol"],
-      address: body["address"],
-      port: body["port"]
-    }
-  ];
+  let tcpServerList = [{
+    protocol: body["protocol"],
+    address: body["address"],
+    port: body["port"]
+  }];
 
   let redirectTopologyInformationOperation = "/v1/redirect-topology-change-information";
 
@@ -773,10 +808,10 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
       redirectTopologyInformationOperation
     );
     forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-      configureForwardingConstructAsync(
-        operationServerName,
-        forwardingConfigurationInputList
-      );
+    configureForwardingConstructAsync(
+      operationServerName,
+      forwardingConfigurationInputList
+    );
   }
 
   let forwardingAutomationInputList = await prepareForwardingAutomation.regardApplication(
@@ -785,16 +820,46 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     applicationName,
     releaseNumber
   );
+
   let headers = {
-    user, xCorrelator, traceIndicator, customerJourney
+    user,
+    xCorrelator,
+    traceIndicator,
+    customerJourney
   }
-  let response = await ForwardingAutomationServiceWithResponse.automateForwardingConstructAsync(
-    forwardingAutomationInputList,
-    headers
+
+  automateForwarding(forwardingAutomationInputList[0], headers, applicationName, releaseNumber)
+
+
+  /***********************************************************************************
+   * forwardings for application layer topology
+   ************************************************************************************/
+  let applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputAsync(
+    logicalTerminationPointconfigurationStatus,
+    forwardingConstructConfigurationStatus
   );
 
-  if (response === undefined || response.data === undefined || Object.keys(response).length === 0 ) {
-    return { "took": took };
+  ForwardingAutomationService.automateForwardingConstructAsync(
+    operationServerName,
+    applicationLayerTopologyForwardingInputList,
+    user,
+    xCorrelator,
+    traceIndicator,
+    customerJourney
+  );
+
+}
+
+async function automateForwarding(forwardingAutomationInput, headers, applicationName, releaseNumber) {
+  let response = await ForwardingAutomationServiceWithResponse.automateForwardingConstructAsync(
+    forwardingAutomationInput,
+    headers
+  );
+  let took = 0;
+  if (response === undefined || response.data === undefined || Object.keys(response).length === 0) {
+    return {
+      "took": took
+    };
   }
 
   // response is full control construct of regarded application
@@ -811,7 +876,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
       let endPointDetails = {
         'serving-application-name': applicationName,
         'serving-application-release-number': releaseNumber,
-        'operationServerName': operationServerName,
+        'operation-name': operationServerName,
         'consuming-application-name': ownApplicationName,
         'consuming-application-release-number': ownApplicationReleaseNumber
       }
@@ -819,9 +884,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
       took += linkResponse.took;
     }
   }
-  return { "took": took };
 }
-
 
 /**
  * Disconnects an OperationClient
@@ -849,7 +912,9 @@ exports.removeOperationClientFromLink = async function (body, user, xCorrelator,
       customerJourney
     );
   }
-  return { "took" : response.took };
+  return {
+    "took": response.took
+  };
 }
 
 
@@ -922,7 +987,9 @@ exports.updateLtp = async function (body) {
     }
     if (isEqual(existingLtp, body)) {
       console.log('LTP is already in database.');
-      return { "took" : took };
+      return {
+        "took": took
+      };
     }
     existingLtps.splice(existingIndex, 1, body);
     // deal with forwardings
@@ -959,7 +1026,9 @@ exports.updateLtp = async function (body) {
       customerJourney
     );
   }
-  return { "took" : took };
+  return {
+    "took": took
+  };
 }
 
 /****************************************************************************************
@@ -971,11 +1040,11 @@ exports.updateLtp = async function (body) {
  ****************** Funtions that are specific to the addOperationClientToLink ************
  ***************************************************************************************************************/
 
- /**
-  * Extracts operation server names from given list of LTPs.
-  * @param {Array} logicalTerminationPoints LTPs from which the operation server names should be extracted
-  * @returns {Array} of operation server names
-  */
+/**
+ * Extracts operation server names from given list of LTPs.
+ * @param {Array} logicalTerminationPoints LTPs from which the operation server names should be extracted
+ * @returns {Array} of operation server names
+ */
 function getAllOperationServerNameAsync(logicalTerminationPoints) {
   let operationServerNames = [];
   for (let logicalTerminationPoint of logicalTerminationPoints) {
@@ -1143,4 +1212,3 @@ async function checkIfApplicationExists(controlConstruct) {
     throw new Error(`Application ${applicationName} is not in the list of known applications.`);
   }
 }
-
