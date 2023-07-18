@@ -24,7 +24,7 @@ const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/on
 const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
 const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
-
+const LogicalTerminationPointConfigurationStatus = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
 const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
@@ -108,15 +108,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
         if (applicationName != currentNewReleaseApplicationName) {
           update.isApplicationNameUpdated = await httpClientInterface.setApplicationNameAsync(newReleaseHttpClientLtpUuid, applicationName);
         }
-        if (update.isReleaseUpdated || update.isApplicationNameUpdated) {
-          let configurationStatus = new ConfigurationStatus(
-            newReleaseHttpClientLtpUuid,
-            undefined,
-            true);
 
-          logicalTerminationPointConfigurationStatus.httpClientConfigurationStatus = configurationStatus;
-
-        }
         if (protocol != currentNewReleaseRemoteProtocol) {
           update.isProtocolUpdated = await tcpClientInterface.setRemoteProtocolAsync(tcpclientUuid, protocol);
         }
@@ -125,16 +117,24 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
         }
         if (port != currentNewReleaseRemotePort) {
           update.isPortUpdated = await tcpClientInterface.setRemotePortAsync(tcpclientUuid, port);
-        }      
-        
-
-        if (update.isProtocolUpdated || update.isAddressUpdated || update.isPortUpdated) {
-          let configurationStatus = new ConfigurationStatus(
-            tcpclientUuid,
-            undefined,
-            true);
-          logicalTerminationPointConfigurationStatus.tcpClientConfigurationStatusList = [configurationStatus];          
         }
+
+        let tcpClientConfigurationStatus = new ConfigurationStatus(
+          newReleaseHttpClientLtpUuid,
+          '',
+          (update.isProtocolUpdated || update.isAddressUpdated || update.isPortUpdated)
+        );
+        let httpClientConfigurationStatus = new ConfigurationStatus(
+          newReleaseHttpClientLtpUuid,
+          '',
+          (update.isReleaseUpdated || update.isApplicationNameUpdated)
+        );
+        logicalTerminationPointConfigurationStatus = new LogicalTerminationPointConfigurationStatus(
+          false,
+          httpClientConfigurationStatus,
+          [tcpClientConfigurationStatus]
+        );
+
         let forwardingAutomationInputList = [];
         if (logicalTerminationPointConfigurationStatus != undefined) {
 
@@ -154,8 +154,8 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
           );
         }
         softwareUpgrade.upgradeSoftwareVersion(user, xCorrelator, traceIndicator, customerJourney, forwardingAutomationInputList.length)
-        .catch(err => console.log(`upgradeSoftwareVersion failed with error: ${err}`));
-      }      
+          .catch(err => console.log(`upgradeSoftwareVersion failed with error: ${err}`));
+      }
       resolve();
     } catch (error) {
       reject(error);
