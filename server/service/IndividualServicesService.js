@@ -2,7 +2,6 @@
 
 const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
 const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
-const prepareALTForwardingAutomation = require('onf-core-model-ap-bs/basicServices/services/PrepareALTForwardingAutomation');
 
 const LinkServices = require('./individualServices/LinkServices');
 const forwardingService = require('./individualServices/ForwardingService');
@@ -25,7 +24,7 @@ const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/on
 const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
 const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
-
+const LogicalTerminationPointConfigurationStatus = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
 const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
@@ -111,15 +110,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
         if (applicationName != currentNewReleaseApplicationName) {
           update.isApplicationNameUpdated = await httpClientInterface.setApplicationNameAsync(newReleaseHttpClientLtpUuid, applicationName);
         }
-        if (update.isReleaseUpdated || update.isApplicationNameUpdated) {
-          let configurationStatus = new ConfigurationStatus(
-            newReleaseHttpClientLtpUuid,
-            undefined,
-            true);
 
-          logicalTerminationPointConfigurationStatus.httpClientConfigurationStatus = configurationStatus;
-
-        }
         if (protocol != currentNewReleaseRemoteProtocol) {
           update.isProtocolUpdated = await tcpClientInterface.setRemoteProtocolAsync(tcpclientUuid, protocol);
         }
@@ -130,14 +121,22 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
           update.isPortUpdated = await tcpClientInterface.setRemotePortAsync(tcpclientUuid, port);
         }
 
+        let tcpClientConfigurationStatus = new ConfigurationStatus(
+          newReleaseHttpClientLtpUuid,
+          '',
+          (update.isProtocolUpdated || update.isAddressUpdated || update.isPortUpdated)
+        );
+        let httpClientConfigurationStatus = new ConfigurationStatus(
+          newReleaseHttpClientLtpUuid,
+          '',
+          (update.isReleaseUpdated || update.isApplicationNameUpdated)
+        );
+        logicalTerminationPointConfigurationStatus = new LogicalTerminationPointConfigurationStatus(
+          false,
+          httpClientConfigurationStatus,
+          [tcpClientConfigurationStatus]
+        );
 
-        if (update.isProtocolUpdated || update.isAddressUpdated || update.isPortUpdated) {
-          let configurationStatus = new ConfigurationStatus(
-            tcpclientUuid,
-            undefined,
-            true);
-          logicalTerminationPointConfigurationStatus.tcpClientConfigurationStatusList = [configurationStatus];
-        }
         let forwardingAutomationInputList = [];
         if (logicalTerminationPointConfigurationStatus != undefined) {
 
@@ -820,42 +819,17 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     applicationName,
     releaseNumber
   );
-
   let headers = {
     user,
     xCorrelator,
     traceIndicator,
     customerJourney
   }
-
-  automateForwarding(forwardingAutomationInputList[0], headers, applicationName, releaseNumber)
-
-
-  /***********************************************************************************
-   * forwardings for application layer topology
-   ************************************************************************************/
-  let applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputAsync(
-    logicalTerminationPointconfigurationStatus,
-    forwardingConstructConfigurationStatus
-  );
-
-  ForwardingAutomationService.automateForwardingConstructAsync(
-    operationServerName,
-    applicationLayerTopologyForwardingInputList,
-    user,
-    xCorrelator,
-    traceIndicator,
-    customerJourney
-  );
-
-}
-
-async function automateForwarding(forwardingAutomationInput, headers, applicationName, releaseNumber) {
   let response = await ForwardingAutomationServiceWithResponse.automateForwardingConstructAsync(
-    forwardingAutomationInput,
+    forwardingAutomationInputList,
     headers
   );
-  let took = 0;
+
   if (response === undefined || response.data === undefined || Object.keys(response).length === 0) {
     return {
       "took": took
@@ -876,7 +850,7 @@ async function automateForwarding(forwardingAutomationInput, headers, applicatio
       let endPointDetails = {
         'serving-application-name': applicationName,
         'serving-application-release-number': releaseNumber,
-        'operation-name': operationServerName,
+        'operationServerName': operationServerName,
         'consuming-application-name': ownApplicationName,
         'consuming-application-release-number': ownApplicationReleaseNumber
       }
@@ -884,7 +858,11 @@ async function automateForwarding(forwardingAutomationInput, headers, applicatio
       took += linkResponse.took;
     }
   }
+  return {
+    "took": took
+  };
 }
+
 
 /**
  * Disconnects an OperationClient
