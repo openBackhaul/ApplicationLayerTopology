@@ -47,21 +47,6 @@ exports.regardApplication = function (logicalTerminationPointconfigurationStatus
             );
             forwardingConstructAutomationList.push(forwardingAutomation);
 
-            /***********************************************************************************
-             * forwardings for application layer topology
-             ************************************************************************************/
-            let applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputAsync(
-                logicalTerminationPointconfigurationStatus,
-                forwardingConstructConfigurationStatus
-            );
-
-            if (applicationLayerTopologyForwardingInputList) {
-                for (let i = 0; i < applicationLayerTopologyForwardingInputList.length; i++) {
-                    let applicationLayerTopologyForwardingInput = applicationLayerTopologyForwardingInputList[i];
-                    forwardingConstructAutomationList.push(applicationLayerTopologyForwardingInput);
-                }
-            }
-
             resolve(forwardingConstructAutomationList);
         } catch (error) {
             reject(error);

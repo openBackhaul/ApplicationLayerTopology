@@ -294,7 +294,7 @@ module.exports.regardApplication = async function regardApplication (req, res, n
       let responseBodyToDocument = undefined;
       await IndividualServices.regardApplication(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
         .then(async function (responseBody) {
-          let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
+          let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
           restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
         })
         .catch(async function (responseBody) {

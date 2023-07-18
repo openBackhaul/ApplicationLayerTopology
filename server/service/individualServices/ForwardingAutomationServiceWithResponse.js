@@ -21,9 +21,8 @@ var traceIndicatorIncrementer = 1;
  * @param {String} headers
  * @returns {Promise<Object>} Response from forwarding
  **/
-exports.automateForwardingConstructAsync = async function (forwardingAutomationInputList, headers) {
+exports.automateForwardingConstructAsync = async function (forwardingAutomationInput, headers) {
     traceIndicatorIncrementer = 1;
-    let forwardingAutomationInput = forwardingAutomationInputList[0];
     let forwardingConstruct = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(
         forwardingAutomationInput.forwardingName);
     let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
