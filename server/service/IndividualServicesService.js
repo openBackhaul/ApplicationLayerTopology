@@ -867,22 +867,16 @@ async function automateForwarding(forwardingAutomationInput, headers, applicatio
   let res = await ControlConstructService.createOrUpdateControlConstructAsync(cc);
   took += res.took;
 
-  let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
-  let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-  if (!(applicationName === ownApplicationName && releaseNumber === ownApplicationReleaseNumber)) {
-    let logicalTerminationPoints = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
-    for (let operationServerName of operationServerNames) {
-      let endPointDetails = {
-        'serving-application-name': applicationName,
-        'serving-application-release-number': releaseNumber,
-        'operation-name': operationServerName,
-        'consuming-application-name': ownApplicationName,
-        'consuming-application-release-number': ownApplicationReleaseNumber
-      }
-      let linkResponse = await LinkServices.findOrCreateLinkForTheEndPointsAsync(endPointDetails);
-      took += linkResponse.took;
+  let logicalTerminationPoints = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+  let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
+  for (let operationServerName of operationServerNames) {
+    let endPointDetails = {
+      'serving-application-name': applicationName,
+      'serving-application-release-number': releaseNumber,
+      'operation-name': operationServerName
     }
+    let linkResponse = await LinkServices.findOrCreateLinkForTheEndPointsAsync(endPointDetails);
+    took += linkResponse.took;
   }
 }
 
