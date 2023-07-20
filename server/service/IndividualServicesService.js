@@ -5,7 +5,6 @@ const LogicalTerminationPointService = require('onf-core-model-ap/applicationPat
 const prepareALTForwardingAutomation = require('onf-core-model-ap-bs/basicServices/services/PrepareALTForwardingAutomation');
 
 const LinkServices = require('./individualServices/LinkServices');
-const forwardingService = require('./individualServices/ForwardingService');
 const LogicalTerminationPointServiceOfUtility = require('onf-core-model-ap-bs/basicServices/utility/LogicalTerminationPoint');
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
@@ -31,7 +30,6 @@ const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/mod
 const LinkPort = require('./models/LinkPort');
 const ControlConstructService = require('./individualServices/ControlConstructService');
 const isEqual = require('lodash.isequal');
-const ForwardingService = require('./individualServices/ForwardingService');
 const createHttpError = require('http-errors');
 
 const NEW_RELEASE_FORWARDING_NAME = 'PromptForBequeathingDataCausesTransferOfListOfApplications';
@@ -177,7 +175,7 @@ exports.deleteFcPort = async function (body) {
   let forwardingConstructUuid = body["fc-uuid"];
   let fcPortLocalId = body["fc-port-local-id"];
   let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-  return await forwardingService.deleteFcPort(fcPortLocalId, forwardingConstructUuid, controlConstructUuid);
+  return await ControlConstructService.deleteFcPort(fcPortLocalId, forwardingConstructUuid, controlConstructUuid);
 }
 
 /**
@@ -211,14 +209,14 @@ exports.deleteLtpAndDependents = async function (body) {
   let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
   switch (layerProtocolName) {
     case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT:
-      let delFcResponse = await ForwardingService.deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
+      let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
       took += delFcResponse.took;
       let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(ltpToBeRemovedUuid);
       took += delLPResponse.took;
       break;
     case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT:
       ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async (clientUUID) => {
-        let delFcResponse = await ForwardingService.deleteDependentFcPorts(controlConstruct, clientUUID);
+        let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstruct, clientUUID);
         took += delFcResponse.took;
         let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
         took += delLPResponse.took;
@@ -233,7 +231,7 @@ exports.deleteLtpAndDependents = async function (body) {
       let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
       if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
         httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async (clientUUID) => {
-          let delFcResponse = await ForwardingService.deleteDependentFcPorts(controlConstruct, clientUUID);
+          let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstruct, clientUUID);
           took += delFcResponse.took;
           let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
           took += delLPResponse.took;
@@ -933,7 +931,7 @@ exports.updateAllLtpsAndFcs = async function (body) {
 exports.updateFc = async function (body) {
   let forwardingConstructUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
   let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-  let response = await forwardingService.updateForwardingConstruct(controlConstructUuid, body)
+  let response = await ControlConstructService.updateForwardingConstruct(controlConstructUuid, body)
   if (response) {
     return response;
   } else {
@@ -951,7 +949,7 @@ exports.updateFcPort = async function (body) {
   let forwardingConstructUuid = body["fc-uuid"];
   let fcPort = body["fc-port"];
   let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-  let response = await forwardingService.updateFCPort(controlConstructUuid, forwardingConstructUuid, fcPort);
+  let response = await ControlConstructService.updateFCPort(controlConstructUuid, forwardingConstructUuid, fcPort);
   if (response) {
     return response;
   } else {
