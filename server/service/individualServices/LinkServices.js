@@ -23,7 +23,8 @@ const {
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 
 /**
- * @description This function finds or creates a link.
+ * @description This function finds or creates a link. If the consuming application is not specified, it
+ * only creates a link with SOURCE part, not with SINK.
  * @param {Object} EndPoints details of the link
  * @return {Promise<Object>} { linkUuid, took }
  **/
@@ -38,7 +39,7 @@ exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
     took += consumingEndpointResponse.took;
     let consumingOperationUuid = consumingEndpointResponse.consumingOperationUuid;
 
-    if (servingOperationUuid && consumingOperationUuid) {
+    if (servingOperationUuid) {
         let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
         link = linkResponse.link;
         took += linkResponse.took;
@@ -109,6 +110,9 @@ async function getConsumingOperationUuidAsync(EndPoints) {
     let operationName = EndPoints["operation-name"];
     let consumingApplicationName = EndPoints["consuming-application-name"];
     let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
+    if (consumingApplicationName === undefined && consumingApplicationReleaseNumber === undefined) {
+        return { "consumingOperationUuid": undefined, "took": 0 };
+    }
     let consumingApplicationCCResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
         consumingApplicationName,
         consumingApplicationReleaseNumber);
@@ -204,24 +208,26 @@ function isConsumingServiceExists(link, consumingOperationUuid) {
  * @param {String} consumingOperationuuid : logical-termination-point of the link-port
  * @return {Promise<Object>} { link, took }
  **/
-async function createLinkAsync(consumingOperationuuid, servingOperationuuid) {
+async function createLinkAsync(consumingOperationUuid, servingOperationUuid) {
     let linkUuid = await uuidv4();
     let link = {
         [onfAttributes.GLOBAL_CLASS.UUID]: linkUuid,
         [onfAttributes.LINK.LINK_PORT]: []
     };
-    let consumingOperationLocalId = LinkPort.generateNextLocalId(link);
-    let consumingOperationLinkPort = {
-        [onfAttributes.LOCAL_CLASS.LOCAL_ID] : consumingOperationLocalId,
-        [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.INPUT,
-        [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : consumingOperationuuid
-    };
-    link[onfAttributes.LINK.LINK_PORT].push(consumingOperationLinkPort);
+    if (consumingOperationUuid !== undefined) {
+        let consumingOperationLocalId = LinkPort.generateNextLocalId(link);
+        let consumingOperationLinkPort = {
+            [onfAttributes.LOCAL_CLASS.LOCAL_ID] : consumingOperationLocalId,
+            [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.INPUT,
+            [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : consumingOperationUuid
+        };
+        link[onfAttributes.LINK.LINK_PORT].push(consumingOperationLinkPort);
+    }
     let servingOperationLocalId = LinkPort.generateNextLocalId(link);
     let servingOperationLinkPort = {
         [onfAttributes.LOCAL_CLASS.LOCAL_ID] : servingOperationLocalId,
         [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.OUTPUT,
-        [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : servingOperationuuid
+        [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : servingOperationUuid
     };
     link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
     return await addLinkAsync(link);
@@ -239,6 +245,7 @@ async function addLinkAsync(link) {
     let startTime = process.hrtime();
     let res = await client.index({
         index: indexAlias,
+        refresh: true,
         body: link
     });
     let backendTime = process.hrtime(startTime);
