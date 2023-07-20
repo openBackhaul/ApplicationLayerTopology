@@ -377,3 +377,42 @@ exports.getLinkListAsync = async function() {
     let linkList = createResultArray(res);
     return { "links" : linkList, "took" : res.body.took };
 }
+
+/**
+ * @description This function finds or creates a link.
+ * @param {Object} preApprovedLinks details of the link
+ **/
+exports.createPreApprovedLinks = async function (preApprovedLinks) {
+    let link = {};
+    let preApprovedLinkList = preApprovedLinks.links;
+    let count = 1;
+    for (let index = 0; index < preApprovedLinkList.length; index++) {
+        let preApprovedlink = preApprovedLinkList[index];
+        let servingOperationUuid = preApprovedlink.output;
+        let consumingOperationUuidList = [];
+
+        if (Array.isArray(preApprovedlink.input)) {
+            consumingOperationUuidList = preApprovedlink.input;
+        } else {
+            consumingOperationUuidList.push(preApprovedlink.input);
+        }
+
+        for (let uuidIndex = 0; uuidIndex < consumingOperationUuidList.length; uuidIndex++) {
+            let consumingOperationUuid = consumingOperationUuidList[uuidIndex];
+            if (servingOperationUuid) {
+                let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+                link = linkResponse.link;
+                let createOrUpdateResponse;
+                if (link) {
+                    createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
+                } else {
+                    createOrUpdateResponse = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
+                    link = createOrUpdateResponse.link;
+                }
+            }            
+            console.log("link : " +count++);
+            console.log(link);
+        }
+    }
+}
+
