@@ -5,6 +5,7 @@ var path = require('path');
 var http = require('http');
 var oas3Tools = require('openbackhaul-oas3-tools');
 var appCommons = require('onf-core-model-ap/applicationPattern/commons/AppCommons');
+var linkServices = require('./service/individualServices/LinkServices');
 var serverPort = 3005;
 
 const ElasticsearchPreparation = require('./service/individualServices/ElasticsearchPreparation');
@@ -33,6 +34,11 @@ http.createServer(app).listen(serverPort, function () {
 //setting the path to the database 
 global.databasePath = './database/load.json'
 
-ElasticsearchPreparation.prepareElasticsearch().then().catch(err => {
+ElasticsearchPreparation.prepareElasticsearch().then(
+    () => {
+        const preApprovedLinks = require('./utils/preApprovedLinks.json');
+        linkServices.createPreApprovedLinks(preApprovedLinks);
+    }
+).catch(err => {
     console.error(`Error preparing Elasticsearch : ${err}`);
 });
