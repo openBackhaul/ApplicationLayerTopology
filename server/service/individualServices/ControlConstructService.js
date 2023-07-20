@@ -15,6 +15,9 @@ const {
   createResultArray
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
+const AsyncLock = require('async-lock');
+
+const lock = new AsyncLock();
 
 class ControlConstructService {
 
@@ -22,25 +25,28 @@ class ControlConstructService {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
-    let response = await client.updateByQuery({
-      index: indexAlias,
-      refresh: true,
-      body: {
-        script: {
-          source: `ctx._source['forwarding-domain'][0]['forwarding-construct'].removeIf(fc -> fc['uuid'] == params['uuid']);
-                    ctx._source['forwarding-domain'][0]['forwarding-construct'].add(params['newForwardingConstruct'])`,
-          params: {
-            "newForwardingConstruct": newForwardingConstruct,
-            "uuid": newForwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID]
+    let response = await lock.acquire(controlConstructUuid, async () => {
+      let r = await client.updateByQuery({
+        index: indexAlias,
+        refresh: true,
+        body: {
+          script: {
+            source: `ctx._source['forwarding-domain'][0]['forwarding-construct'].removeIf(fc -> fc['uuid'] == params['uuid']);
+                        ctx._source['forwarding-domain'][0]['forwarding-construct'].add(params['newForwardingConstruct'])`,
+            params: {
+              "newForwardingConstruct": newForwardingConstruct,
+              "uuid": newForwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID]
+            }
+          },
+          query: {
+            term: {
+              "uuid": controlConstructUuid
+            }
           }
         },
-        query: {
-          term: {
-            "uuid": controlConstructUuid
-          }
-        }
-      },
-    });
+      });
+      return r;
+    })
     if (response.body.updated === 1) {
       return { "took": response.body.took };
     } else {
@@ -55,12 +61,13 @@ class ControlConstructService {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
-    let response = await client.updateByQuery({
-      index: indexAlias,
-      refresh: true,
-      body: {
-        script: {
-          source: `def fwDomain = ctx._source['forwarding-domain'];
+    let response = await lock.acquire(controlConstructUuid, async () => {
+      let r = await client.updateByQuery({
+        index: indexAlias,
+        refresh: true,
+        body: {
+          script: {
+            source: `def fwDomain = ctx._source['forwarding-domain'];
                 for (domain in fwDomain) {
                     def fcs = domain['forwarding-construct'];
                     for (fc in fcs) {
@@ -71,18 +78,20 @@ class ControlConstructService {
                     }
                     }
                 }`,
-          params: {
-            "new-fc-port": newFCPort,
-            "local-id": newFCPort[onfAttributes.LOCAL_CLASS.LOCAL_ID],
-            "fc-uuid": fcUuid
-          }
-        },
-        query: {
-          term: {
-            "uuid": controlConstructUuid
+            params: {
+              "new-fc-port": newFCPort,
+              "local-id": newFCPort[onfAttributes.LOCAL_CLASS.LOCAL_ID],
+              "fc-uuid": fcUuid
+            }
+          },
+          query: {
+            term: {
+              "uuid": controlConstructUuid
+            }
           }
         }
-      }
+      });
+      return r;
     });
     if (response.body.updated === 1) {
       return { "took": response.body.took };
@@ -105,13 +114,14 @@ class ControlConstructService {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
-    let response = await client.updateByQuery(
-      {
-        index: indexAlias,
-        refresh: true,
-        body: {
-          "script": {
-            "source": `def fwDomain = ctx._source['forwarding-domain'];
+    let response = await lock.acquire(controlConstructUuid, async () => {
+      let r = await client.updateByQuery(
+        {
+          index: indexAlias,
+          refresh: true,
+          body: {
+            "script": {
+              "source": `def fwDomain = ctx._source['forwarding-domain'];
                 for (domain in fwDomain) {
                     def fcs = domain['forwarding-construct'];
                     for (fc in fcs) {
@@ -122,19 +132,21 @@ class ControlConstructService {
                     }
                 }
                 `,
-            "params": {
-              "local-id": fcPortLocalId,
-              "fc-uuid": forwardingConstructUuid
-            }
-          },
-          "query": {
-            "term": {
-              "uuid": controlConstructUuid
+              "params": {
+                "local-id": fcPortLocalId,
+                "fc-uuid": forwardingConstructUuid
+              }
+            },
+            "query": {
+              "term": {
+                "uuid": controlConstructUuid
+              }
             }
           }
         }
-      }
-    );
+      )
+      return r;
+    });
     return { "took": response.body.took };
   }
 
@@ -304,20 +316,23 @@ class ControlConstructService {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
-    let res;
     let startTime = process.hrtime();
-    if (documentId) {
-      res = await client.index({
-        index: indexAlias,
-        id: documentId,
-        body: controlConstruct
-      });
-    } else {
-      res = await client.index({
-        index: indexAlias,
-        body: controlConstruct
-      });
-    }
+    let res = await lock.acquire(controlConstructUuid, async () => {
+      let r;
+      if (documentId) {
+        r = await client.index({
+          index: indexAlias,
+          id: documentId,
+          body: controlConstruct
+        });
+      } else {
+        r = await client.index({
+          index: indexAlias,
+          body: controlConstruct
+        });
+      }
+      return r;
+    });
     let backendTime = process.hrtime(startTime);
     let intermitent = (backendTime[0] * 1000 + backendTime[1] / 1000000);
     if (res.body.result === 'created' || res.body.result === 'updated') {
