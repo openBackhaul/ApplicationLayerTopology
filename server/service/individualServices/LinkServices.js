@@ -40,7 +40,7 @@ exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
     let consumingOperationUuid = consumingEndpointResponse.consumingOperationUuid;
 
     if (servingOperationUuid) {
-        let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.INPUT);
+        let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
         link = linkResponse.link;
         took += linkResponse.took;
         let createOrUpdateResponse;
@@ -218,7 +218,7 @@ async function createLinkAsync(consumingOperationUuid, servingOperationUuid) {
         let consumingOperationLocalId = LinkPort.generateNextLocalId(link);
         let consumingOperationLinkPort = {
             [onfAttributes.LOCAL_CLASS.LOCAL_ID] : consumingOperationLocalId,
-            [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.OUTPUT,
+            [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.INPUT,
             [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : consumingOperationUuid
         };
         link[onfAttributes.LINK.LINK_PORT].push(consumingOperationLinkPort);
@@ -226,7 +226,7 @@ async function createLinkAsync(consumingOperationUuid, servingOperationUuid) {
     let servingOperationLocalId = LinkPort.generateNextLocalId(link);
     let servingOperationLinkPort = {
         [onfAttributes.LOCAL_CLASS.LOCAL_ID] : servingOperationLocalId,
-        [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.INPUT,
+        [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.OUTPUT,
         [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : servingOperationUuid
     };
     link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
