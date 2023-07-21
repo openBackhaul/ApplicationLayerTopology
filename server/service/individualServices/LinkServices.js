@@ -45,12 +45,16 @@ exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
         took += linkResponse.took;
         let createOrUpdateResponse;
         if (link) {
+           if(consumingOperationUuid){
             createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
+            }
         } else {
             createOrUpdateResponse = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
             link = createOrUpdateResponse.link;
         }
-        took += createOrUpdateResponse.took;
+        if(createOrUpdateResponse){
+            took += createOrUpdateResponse.took;
+        }        
     }
     return { "linkUuid": link[onfAttributes.GLOBAL_CLASS.UUID], "took": took };
 }
@@ -213,7 +217,14 @@ async function createLinkAsync(consumingOperationUuid, servingOperationUuid) {
     let link = {
         [onfAttributes.GLOBAL_CLASS.UUID]: linkUuid,
         [onfAttributes.LINK.LINK_PORT]: []
+    };    
+    let servingOperationLocalId = LinkPort.generateNextLocalId(link);
+    let servingOperationLinkPort = {
+        [onfAttributes.LOCAL_CLASS.LOCAL_ID] : servingOperationLocalId,
+        [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.OUTPUT,
+        [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : servingOperationUuid
     };
+    link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
     if (consumingOperationUuid !== undefined) {
         let consumingOperationLocalId = LinkPort.generateNextLocalId(link);
         let consumingOperationLinkPort = {
@@ -223,13 +234,6 @@ async function createLinkAsync(consumingOperationUuid, servingOperationUuid) {
         };
         link[onfAttributes.LINK.LINK_PORT].push(consumingOperationLinkPort);
     }
-    let servingOperationLocalId = LinkPort.generateNextLocalId(link);
-    let servingOperationLinkPort = {
-        [onfAttributes.LOCAL_CLASS.LOCAL_ID] : servingOperationLocalId,
-        [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.OUTPUT,
-        [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : servingOperationUuid
-    };
-    link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
     return await addLinkAsync(link);
 }
 
