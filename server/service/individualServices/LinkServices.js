@@ -20,6 +20,9 @@ const {
     createResultArray
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
+const AsyncLock = require('async-lock');
+
+const lock = new AsyncLock();
 
 /**
  * @description This function finds or creates a link. If the consuming application is not specified, it
@@ -446,22 +449,25 @@ async function addLinkPortAsync(linkUuid, linkPort) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
     let client = await elasticsearchService.getClient(true, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
-    let response = await client.updateByQuery({
-        index: indexAlias,
-        refresh: true,
-        body: {
-            script: {
-                source: "ctx._source['link-port'].add(params['link-port'])",
-                params: {
-                    "link-port": linkPort
+    let response = await lock.acquire(linkUuid, async () => {
+        let r = await client.updateByQuery({
+            index: indexAlias,
+            refresh: true,
+            body: {
+                script: {
+                    source: "ctx._source['link-port'].add(params['link-port'])",
+                    params: {
+                        "link-port": linkPort
+                    }
+                },
+                query: {
+                    match: {
+                        "uuid": linkUuid
+                    }
                 }
             },
-            query: {
-                match: {
-                    "uuid": linkUuid
-                }
-            }
-        },
+        });
+        return r;
     });
     if (response && response.body.updated !== 0) {
         return { "took": response.body.took };
@@ -481,23 +487,26 @@ async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
-    let response = await client.updateByQuery({
-        index: indexAlias,
-        refresh: true,
-        body: {
-            script: {
-                source: "ctx._source['link-port'].removeIf(port -> port['local-id'] == params['local-id'])",
-                params: {
-                    "local-id": linkPortLocalId
+    let response = await lock.acquire(linkUuid, async () => {
+        let r = await client.updateByQuery({
+            index: indexAlias,
+            refresh: true,
+            body: {
+                script: {
+                    source: "ctx._source['link-port'].removeIf(port -> port['local-id'] == params['local-id'])",
+                    params: {
+                        "local-id": linkPortLocalId
+                    }
+                },
+                query: {
+                    match: {
+                        "uuid": linkUuid
+                    }
                 }
             },
-            query: {
-                match: {
-                    "uuid": linkUuid
-                }
-            }
-        },
-    });
+        });
+        return r;
+    })
     if (response && response.body.updated !== 0) {
         return { "took": response.body.took };
     } else {

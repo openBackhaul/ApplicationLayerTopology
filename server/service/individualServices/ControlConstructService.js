@@ -421,11 +421,13 @@ class ControlConstructService {
         r = await client.index({
           index: indexAlias,
           id: documentId,
+          refresh: true,
           body: controlConstruct
         });
       } else {
         r = await client.index({
           index: indexAlias,
+          refresh: true,
           body: controlConstruct
         });
       }
