@@ -7,7 +7,6 @@
 
 'use strict';
 
-const Link = require('../models/Link');
 const ControlConstructService = require('./ControlConstructService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const LinkPort = require('../models/LinkPort');
@@ -82,9 +81,9 @@ exports.deleteOperationClientFromTheEndPointsAsync = async function (EndPoints) 
         took += linkResponse.took;
         linkUuid = link[onfAttributes.GLOBAL_CLASS.UUID];
         if (link) {
-            let localId = Link.getLocalIdOfTheConsumingOperation(link, consumingOperationUuid)
+            let localId = getLocalIdOfTheConsumingOperation(link, consumingOperationUuid)
             if (localId) {
-                let deleteResponse = await Link.deleteLinkPortAsync(linkUuid, localId);
+                let deleteResponse = await deleteLinkPortAsync(linkUuid, localId);
                 took += deleteResponse.took;
             }
         }
@@ -167,7 +166,7 @@ async function getLinkOfTheOperationAsync(operationUuid, portDirection) {
         let found = linkPorts.find(item => item[onfAttributes.LINK.PORT_DIRECTION] === portDirection &&
             item[onfAttributes.LINK.LOGICAL_TERMINATION_POINT] === operationUuid);
         if (found) {
-            return { "link" : link, "took": res.body.took };
+            return { "link": link, "took": res.body.took };
         }
     }
     return { "took": res.body.took };
@@ -184,11 +183,11 @@ async function updateLinkAsync(link, consumingOperationuuid) {
     if (!isLinkExistsAsync) {
         let linkLocalId = LinkPort.generateNextLocalId(link);
         let linkPort = {
-            [onfAttributes.LOCAL_CLASS.LOCAL_ID] : linkLocalId,
-            [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.INPUT,
-            [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : consumingOperationuuid
+            [onfAttributes.LOCAL_CLASS.LOCAL_ID]: linkLocalId,
+            [onfAttributes.LINK.PORT_DIRECTION]: LinkPort.portDirectionEnum.INPUT,
+            [onfAttributes.LINK.LOGICAL_TERMINATION_POINT]: consumingOperationuuid
         };
-        return await Link.addLinkPortAsync(link[onfAttributes.GLOBAL_CLASS.UUID], linkPort);
+        return await addLinkPortAsync(link[onfAttributes.GLOBAL_CLASS.UUID], linkPort);
     }
     return { "took": 0 };
 }
@@ -228,9 +227,9 @@ async function createLinkAsync(consumingOperationUuid, servingOperationUuid) {
     if (consumingOperationUuid !== undefined) {
         let consumingOperationLocalId = LinkPort.generateNextLocalId(link);
         let consumingOperationLinkPort = {
-            [onfAttributes.LOCAL_CLASS.LOCAL_ID] : consumingOperationLocalId,
-            [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.INPUT,
-            [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : consumingOperationUuid
+            [onfAttributes.LOCAL_CLASS.LOCAL_ID]: consumingOperationLocalId,
+            [onfAttributes.LINK.PORT_DIRECTION]: LinkPort.portDirectionEnum.INPUT,
+            [onfAttributes.LINK.LOGICAL_TERMINATION_POINT]: consumingOperationUuid
         };
         link[onfAttributes.LINK.LINK_PORT].push(consumingOperationLinkPort);
     }
@@ -295,7 +294,7 @@ exports.getOutputLinkPortFromInputLinkPortUuidAsync = async function (operationC
     let correctLink = res.body.hits.hits[0]._source;
     let linkPorts = correctLink[onfAttributes.LINK.LINK_PORT];
     let found = linkPorts.find(item => item[onfAttributes.LINK.PORT_DIRECTION] === LinkPort.portDirectionEnum.OUTPUT);
-    return { "linkPort" : found, "took": res.body.took };
+    return { "linkPort": found, "took": res.body.took };
 }
 
 /**
@@ -325,17 +324,17 @@ exports.deleteDependentLinkPortsAsync = async function (ltpUuid) {
         }
     });
     if (res.body.hits == undefined || res.body.hits.length === 0) {
-        return { "took" : res.body.took };
+        return { "took": res.body.took };
     }
     let took = res.body.took;
     let linkPorts = res.body.hits.hits[0]._source[onfAttributes.LINK.LINK_PORT];
     let found = linkPorts.find(linkPort => linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT] === ltpUuid);
     let linkUuid = res.body.hits.hits[0]._source[onfAttributes.GLOBAL_CLASS.UUID];
     if (LinkPort.portDirectionEnum.INPUT === found[onfAttributes.LINK.PORT_DIRECTION]) {
-        let deleteResponse = await Link.deleteLinkPortAsync(linkUuid, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
+        let deleteResponse = await deleteLinkPortAsync(linkUuid, found[onfAttributes.LOCAL_CLASS.LOCAL_ID]);
         took += deleteResponse.took;
     }
-    return { "took" : took };
+    return { "took": took };
 }
 
 /**
@@ -343,18 +342,18 @@ exports.deleteDependentLinkPortsAsync = async function (ltpUuid) {
  * @param {String} linkUuid Link UUID
  * @returns {Promise<Object>} { link, took }
  **/
-exports.getLinkAsync = async function(linkUuid) {
+exports.getLinkAsync = async function (linkUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
     let client = await elasticsearchService.getClient(true, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
-    index: indexAlias,
-    filter_path: "took,hits.hits._source",
-    body: {
-        "query": {
-        "term": { "uuid": linkUuid }
+        index: indexAlias,
+        filter_path: "took,hits.hits._source",
+        body: {
+            "query": {
+                "term": { "uuid": linkUuid }
+            }
         }
-    }
     });
     return { "link": res.body.hits.hits[0]._source, "took": res.body.took }
 }
@@ -363,7 +362,7 @@ exports.getLinkAsync = async function(linkUuid) {
  * @description This function returns the link list entries from the core-model-1-4:control-construct
  * @returns {Promise<Object>} { links, took }
  **/
-exports.getLinkListAsync = async function() {
+exports.getLinkListAsync = async function () {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
     let client = await elasticsearchService.getClient(true, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
@@ -379,7 +378,7 @@ exports.getLinkListAsync = async function() {
         }
     });
     let linkList = createResultArray(res);
-    return { "links" : linkList, "took" : res.body.took };
+    return { "links": linkList, "took": res.body.took };
 }
 
 /**
@@ -413,10 +412,96 @@ exports.createPreApprovedLinks = async function (preApprovedLinks) {
                     createOrUpdateResponse = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
                     link = createOrUpdateResponse.link;
                 }
-            }            
-            console.log("link : " +count++);
+            }
+            console.log("link : " + count++);
             console.log(link);
         }
+    }
+}
+
+/**
+ * @description Returns Local ID of consuming operation client UUID.
+ * @param {String} link
+ * @param {String} clientOperationUuid
+ * @returns localId
+ **/
+function getLocalIdOfTheConsumingOperation(link, clientOperationUuid) {
+    let linkPortList = link[onfAttributes.LINK.LINK_PORT];
+    for (let linkPort of linkPortList) {
+        let linkPortLogicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
+        let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
+        if (portDirection === LinkPort.portDirectionEnum.INPUT && linkPortLogicalTerminationPoint === clientOperationUuid) {
+            return linkPort[onfAttributes.LOCAL_CLASS.LOCAL_ID];
+        }
+    }
+}
+
+/**
+ * @description Adds a link-port instance to the link.
+ * @param {String} linkUuid
+ * @param {String} linkPort : new link-port to be added
+ * @returns {Promise<Object>} { took }
+ **/
+async function addLinkPortAsync(linkUuid, linkPort) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(true, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let response = await client.updateByQuery({
+        index: indexAlias,
+        refresh: true,
+        body: {
+            script: {
+                source: "ctx._source['link-port'].add(params['link-port'])",
+                params: {
+                    "link-port": linkPort
+                }
+            },
+            query: {
+                match: {
+                    "uuid": linkUuid
+                }
+            }
+        },
+    });
+    if (response && response.body.updated !== 0) {
+        return { "took": response.body.took };
+    } else {
+        throw new Error('link-port was not updated');
+    }
+}
+
+/**
+ * @description This function deletes the linkPort instance that matches the localId argument from its corresponding
+ * link
+ * @param {String} linkUuid : uuid of the link
+ * @param {String} linkPortLocalId : local-id of an existing link-port
+ * @returns {Promise<Object>} { took }
+ **/
+async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let response = await client.updateByQuery({
+        index: indexAlias,
+        refresh: true,
+        body: {
+            script: {
+                source: "ctx._source['link-port'].removeIf(port -> port['local-id'] == params['local-id'])",
+                params: {
+                    "local-id": linkPortLocalId
+                }
+            },
+            query: {
+                match: {
+                    "uuid": linkUuid
+                }
+            }
+        },
+    });
+    if (response && response.body.updated !== 0) {
+        return { "took": response.body.took };
+    } else {
+        throw new Error('link-port was not updated');
     }
 }
 
