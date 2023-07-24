@@ -135,7 +135,7 @@ exports.notifyLinkUpdates = function (logicalTerminationPointconfigurationStatus
     });
 }
 
-exports.addOperationClientToLink = function (linkUuid) {
+exports.createLinkChangeNotificationForwardings = function (linkUuid) {
     return new Promise(async function (resolve, reject) {
         let forwardingConstructAutomationList = [];
         try {

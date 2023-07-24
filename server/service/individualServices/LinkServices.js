@@ -46,17 +46,13 @@ exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
         link = linkResponse.link;
         took += linkResponse.took;
         let createOrUpdateResponse;
-        if (link) {
-           if(consumingOperationUuid){
+        if (link && consumingOperationUuid) {
             createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
-            }
         } else {
             createOrUpdateResponse = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
             link = createOrUpdateResponse.link;
         }
-        if(createOrUpdateResponse){
-            took += createOrUpdateResponse.took;
-        }        
+        took += createOrUpdateResponse.took;
     }
     return { "linkUuid": link[onfAttributes.GLOBAL_CLASS.UUID], "took": took };
 }
@@ -141,7 +137,7 @@ async function getConsumingOperationUuidAsync(EndPoints) {
  * @param {Enumerator} portDirection
  * @returns {Promise<Object>} { link, took }
  */
-async function getLinkOfTheOperationAsync(operationUuid, portDirection) {
+exports.getLinkOfTheOperationAsync = async function (operationUuid, portDirection) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
@@ -219,12 +215,12 @@ async function createLinkAsync(consumingOperationUuid, servingOperationUuid) {
     let link = {
         [onfAttributes.GLOBAL_CLASS.UUID]: linkUuid,
         [onfAttributes.LINK.LINK_PORT]: []
-    };    
+    };
     let servingOperationLocalId = LinkPort.generateNextLocalId(link);
     let servingOperationLinkPort = {
-        [onfAttributes.LOCAL_CLASS.LOCAL_ID] : servingOperationLocalId,
-        [onfAttributes.LINK.PORT_DIRECTION] : LinkPort.portDirectionEnum.OUTPUT,
-        [onfAttributes.LINK.LOGICAL_TERMINATION_POINT] : servingOperationUuid
+        [onfAttributes.LOCAL_CLASS.LOCAL_ID]: servingOperationLocalId,
+        [onfAttributes.LINK.PORT_DIRECTION]: LinkPort.portDirectionEnum.OUTPUT,
+        [onfAttributes.LINK.LOGICAL_TERMINATION_POINT]: servingOperationUuid
     };
     link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
     if (consumingOperationUuid !== undefined) {
@@ -236,6 +232,33 @@ async function createLinkAsync(consumingOperationUuid, servingOperationUuid) {
         };
         link[onfAttributes.LINK.LINK_PORT].push(consumingOperationLinkPort);
     }
+    return await addLinkAsync(link);
+}
+
+exports.createCompleteLinkAsync = async function (consumingOperationUuids, servingOperationUuid) {
+    let linkUuid = await uuidv4();
+    let link = {
+        [onfAttributes.GLOBAL_CLASS.UUID]: linkUuid,
+        [onfAttributes.LINK.LINK_PORT]: []
+    };
+    let servingOperationLocalId = LinkPort.generateNextLocalId(link);
+    let servingOperationLinkPort = {
+        [onfAttributes.LOCAL_CLASS.LOCAL_ID]: servingOperationLocalId,
+        [onfAttributes.LINK.PORT_DIRECTION]: LinkPort.portDirectionEnum.OUTPUT,
+        [onfAttributes.LINK.LOGICAL_TERMINATION_POINT]: servingOperationUuid
+    };
+    if (consumingOperationUuids.length !== 0) {
+        for (let consumingOperationUuid of consumingOperationUuids) {
+            let consumingOperationLocalId = LinkPort.generateNextLocalId(link);
+            let consumingOperationLinkPort = {
+                [onfAttributes.LOCAL_CLASS.LOCAL_ID]: consumingOperationLocalId,
+                [onfAttributes.LINK.PORT_DIRECTION]: LinkPort.portDirectionEnum.INPUT,
+                [onfAttributes.LINK.LOGICAL_TERMINATION_POINT]: consumingOperationUuid
+            };
+            link[onfAttributes.LINK.LINK_PORT].push(consumingOperationLinkPort);
+        }
+    }
+    link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
     return await addLinkAsync(link);
 }
 
@@ -358,6 +381,9 @@ exports.getLinkAsync = async function (linkUuid) {
             }
         }
     });
+    if (res.body.hits === undefined) {
+        return { "took": res.body.took };
+    }
     return { "link": res.body.hits.hits[0]._source, "took": res.body.took }
 }
 
@@ -382,44 +408,6 @@ exports.getLinkListAsync = async function () {
     });
     let linkList = createResultArray(res);
     return { "links": linkList, "took": res.body.took };
-}
-
-/**
- * @description This function finds or creates a link.
- * @param {Object} preApprovedLinks details of the link
- **/
-exports.createPreApprovedLinks = async function (preApprovedLinks) {
-    let link = {};
-    let preApprovedLinkList = preApprovedLinks.links;
-    let count = 1;
-    for (let index = 0; index < preApprovedLinkList.length; index++) {
-        let preApprovedlink = preApprovedLinkList[index];
-        let servingOperationUuid = preApprovedlink.output;
-        let consumingOperationUuidList = [];
-
-        if (Array.isArray(preApprovedlink.input)) {
-            consumingOperationUuidList = preApprovedlink.input;
-        } else {
-            consumingOperationUuidList.push(preApprovedlink.input);
-        }
-
-        for (let uuidIndex = 0; uuidIndex < consumingOperationUuidList.length; uuidIndex++) {
-            let consumingOperationUuid = consumingOperationUuidList[uuidIndex];
-            if (servingOperationUuid) {
-                let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
-                link = linkResponse.link;
-                let createOrUpdateResponse;
-                if (link) {
-                    createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
-                } else {
-                    createOrUpdateResponse = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
-                    link = createOrUpdateResponse.link;
-                }
-            }
-            console.log("link : " + count++);
-            console.log(link);
-        }
-    }
 }
 
 /**
