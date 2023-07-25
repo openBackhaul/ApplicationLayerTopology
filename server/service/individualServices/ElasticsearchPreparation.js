@@ -36,8 +36,8 @@ async function prepareElasticsearch() {
     for (let uuid of uuids) {
         let ping = await elasticsearchService.getElasticsearchClientOperationalStateAsync(uuid);
         if (ping === operationalStateEnum.UNAVAILABLE) {
-            console.error(`Elasticsearch unavailable. Skipping Elasticsearch configuration.`);
-            return;
+           let err = new Error(`Elasticsearch unavailable. Skipping Elasticsearch configuration.`);
+           throw err;
         }
         if (uuid === await getCorrectEsUuid(false)) {
             await configureControlConstructIndexTemplate(uuid);
