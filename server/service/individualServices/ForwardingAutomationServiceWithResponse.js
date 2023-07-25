@@ -11,6 +11,7 @@ const RequestHeader = require('onf-core-model-ap/applicationPattern/rest/client/
 const RestRequestBuilder = require('onf-core-model-ap/applicationPattern/rest/client/RequestBuilder');
 const ExecutionAndTraceService = require('onf-core-model-ap/applicationPattern/services/ExecutionAndTraceService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
+const createHttpError = require('http-errors');
 
 var traceIndicatorIncrementer = 1;
 
@@ -97,7 +98,7 @@ async function dispatchEvent(operationClientUuid, httpRequestBody, user, xCorrel
         httpRequestBody
         );
     let responseCode = response.status;
-    if (responseCode.toString().startsWith("5") || responseCode == 404) {
+    if (responseCode == 408) {
         ExecutionAndTraceService.recordServiceRequestFromClient(serverApplicationName, serverApplicationReleaseNumber, xCorrelator, traceIndicator, user, originator, operationName, responseCode, httpRequestBody, response.data)
             .catch((error) => console.log(`record service request ${JSON.stringify({
                 xCorrelator,
