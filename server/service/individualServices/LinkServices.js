@@ -42,7 +42,7 @@ exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
     let consumingOperationUuid = consumingEndpointResponse.consumingOperationUuid;
 
     if (servingOperationUuid) {
-        let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+        let linkResponse =  await exports.getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
         link = linkResponse.link;
         took += linkResponse.took;
         let createOrUpdateResponse;
@@ -75,7 +75,7 @@ exports.deleteOperationClientFromTheEndPointsAsync = async function (EndPoints) 
     let consumingOperationUuid = consumingEndpointResponse.consumingOperationUuid;
 
     if (servingOperationUuid && consumingOperationUuid) {
-        let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+        let linkResponse = await exports.getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
         let link = linkResponse.link;
         took += linkResponse.took;
         linkUuid = link[onfAttributes.GLOBAL_CLASS.UUID];
