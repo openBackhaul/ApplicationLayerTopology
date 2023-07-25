@@ -192,9 +192,9 @@ exports.deleteLtpAndDependents = async function (body) {
   if (!controlConstruct) {
     return {
       "took": took
-    };;
+    }
   }
-
+  let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
   let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
   let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid);
   if (!ltpToBeRemoved) {
@@ -209,45 +209,44 @@ exports.deleteLtpAndDependents = async function (body) {
   let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
   switch (layerProtocolName) {
     case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT:
-      let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstruct, ltpToBeRemovedUuid);
+      let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, ltpToBeRemovedUuid);
       took += delFcResponse.took;
       let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(ltpToBeRemovedUuid);
       took += delLPResponse.took;
       break;
     case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT:
-      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async (clientUUID) => {
-        let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstruct, clientUUID);
+      for (let clientUUID of ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]) {
+        let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, clientUUID);
         took += delFcResponse.took;
         let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
         took += delLPResponse.took;
-        ControlConstructService.deleteLtpFromCCObject(controlConstruct, clientUUID);
-      });
-      ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].forEach(async (serverUUID) => {
-        ControlConstructService.deleteLtpFromCCObject(controlConstruct, serverUUID);
-      });
+        ControlConstructService.deleteLtpFromCCObject(ltps, clientUUID);
+      }
+      for (let serverUUID of ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP]) {
+        ControlConstructService.deleteLtpFromCCObject(ltps, serverUUID);
+      }
       break;
     case LayerProtocol.layerProtocolNameEnum.TCP_CLIENT:
       let httpClientUuid = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP][0];
       let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
       if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
-        httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP].forEach(async (clientUUID) => {
-          let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstruct, clientUUID);
+        for (let clientUUID of httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]) {
+          let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, clientUUID);
           took += delFcResponse.took;
           let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
           took += delLPResponse.took;
-          ControlConstructService.deleteLtpFromCCObject(controlConstruct, clientUUID);
-        });
-        ControlConstructService.deleteLtpFromCCObject(controlConstruct, httpClientUuid);
+          ControlConstructService.deleteLtpFromCCObject(ltps, clientUUID);
+        }
+        ControlConstructService.deleteLtpFromCCObject(ltps, httpClientUuid);
       }
       break;
     default:
       // don't do anything if LTP is of type http-s, tcp-s or op-s
       return;
   }
-  ControlConstructService.deleteLtpFromCCObject(controlConstruct, ltpToBeRemovedUuid);
   // update control-construct with removed LTP/FC
-  controlConstruct = ControlConstructService.deleteLtpFromCCObject(controlConstruct, ltpToBeRemovedUuid);
-  let res = await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
+  ltps = ControlConstructService.deleteLtpFromCCObject(ltps, ltpToBeRemovedUuid);
+  let res = await ControlConstructService.updateLtpsAsync(controlConstructUuid, ltps);
   took += res.took;
   return {
     "took": took
@@ -978,12 +977,11 @@ exports.updateLtp = async function (body) {
       throw new createHttpError.BadRequest(`LTP with UUID ${logicalTerminationPointUuid} could not be found.`);
     }
     if (isEqual(existingLtp, body)) {
-      console.log('LTP is already in database.');
+      console.log(`LTP with UUID ${logicalTerminationPointUuid} is already in database.`);
       return {
         "took": took
       };
     }
-    existingLtps.splice(existingIndex, 1, body);
     // deal with forwardings
     let forwardingAutomationInputListResponse = await prepareForwardingAutomation.updateLtp(existingLtp, body);
     forwardingAutomationInputList = forwardingAutomationInputListResponse.forwardingAutomationInputList;
@@ -997,14 +995,12 @@ exports.updateLtp = async function (body) {
     if (!controlConstruct) {
       throw new createHttpError.BadRequest(`CC with UUID ${controlConstructUuid} could not be found.`)
     }
-    existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    existingLtps.push(body);
   }
-
-  // update control construct
-  controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT] = existingLtps;
-  took += controlConstructResponse.took;
-  let controlConstructUpdateResponse = await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
+  // update LTP in control construct
+  let controlConstructUpdateResponse = await ControlConstructService.updateControlConstructLtp(
+    controlConstruct[onfAttributes.GLOBAL_CLASS.UUID],
+    body
+  );
   took += controlConstructUpdateResponse.took;
 
   // forwardings

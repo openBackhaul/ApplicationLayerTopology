@@ -21,6 +21,54 @@ const lock = new AsyncLock();
 
 class ControlConstructService {
 
+  /**
+   * @description Replaces one LTP in control-construct.
+   * @param {String} controlConstructUuid
+   * @param {Object} ltpToBeAdded
+   * @returns {Promise<Object>} { took }
+   */
+  static async updateControlConstructLtp(controlConstructUuid, ltpToBeAdded) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let response = await lock.acquire(controlConstructUuid, async () => {
+      let r = await client.updateByQuery({
+        index: indexAlias,
+        refresh: true,
+        body: {
+          script: {
+            source: `ctx._source['logical-termination-point'].removeIf(ltp -> ltp['uuid'] == params['ltpUuid']);
+                  ctx._source['logical-termination-point'].add(params['ltpToBeAdded'])`,
+            params: {
+              "ltpToBeAdded": ltpToBeAdded,
+              "ltpUuid": ltpToBeAdded["uuid"]
+            }
+          },
+          query: {
+            term: {
+              "uuid": controlConstructUuid
+            }
+          }
+        }
+      });
+      return r;
+    })
+    if (response.body.updated === 1) {
+      return { "took": response.body.took };
+    } else {
+      if (response.body.total === 0) {
+        throw new createHttpError.BadRequest(`CC with uuid ${controlConstructUuid} does not exist.`)
+      }
+      throw new Error("LTP was not updated")
+    }
+  }
+
+  /**
+   * @description Replaces forwarding-construct in control-construct
+   * @param {String} controlConstructUuid
+   * @param {Object} newForwardingConstruct
+   * @returns {Promise<Object>} { took }
+   */
   static async updateForwardingConstruct(controlConstructUuid, newForwardingConstruct) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
@@ -57,6 +105,13 @@ class ControlConstructService {
     }
   }
 
+  /**
+   * @description Replaces forwarding-construct-port in control-construct.
+   * @param {String} controlConstructUuid
+   * @param {String} fcUuid
+   * @param {Object} newFCPort
+   * @returns {Promise<Object>} { took }
+   */
   static async updateFCPort(controlConstructUuid, fcUuid, newFCPort) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
@@ -115,13 +170,12 @@ class ControlConstructService {
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let response = await lock.acquire(controlConstructUuid, async () => {
-      let r = await client.updateByQuery(
-        {
-          index: indexAlias,
-          refresh: true,
-          body: {
-            "script": {
-              "source": `def fwDomain = ctx._source['forwarding-domain'];
+      let r = await client.updateByQuery({
+        index: indexAlias,
+        refresh: true,
+        body: {
+          "script": {
+            "source": `def fwDomain = ctx._source['forwarding-domain'];
                 for (domain in fwDomain) {
                     def fcs = domain['forwarding-construct'];
                     for (fc in fcs) {
@@ -132,18 +186,18 @@ class ControlConstructService {
                     }
                 }
                 `,
-              "params": {
-                "local-id": fcPortLocalId,
-                "fc-uuid": forwardingConstructUuid
-              }
-            },
-            "query": {
-              "term": {
-                "uuid": controlConstructUuid
-              }
+            "params": {
+              "local-id": fcPortLocalId,
+              "fc-uuid": forwardingConstructUuid
+            }
+          },
+          "query": {
+            "term": {
+              "uuid": controlConstructUuid
             }
           }
         }
+      }
       )
       return r;
     });
@@ -152,33 +206,43 @@ class ControlConstructService {
 
   /**
    * @description Finds and deletes fc-ports where INPUT ports match given ltpUUID.
-   * @param {Object} controlConstruct
+   * @param {Object} controlConstructUuid
    * @param {String} ltpUuid
    * @returns {Promise<Object>} { took }
    */
-  static async deleteDependentFcPorts(controlConstruct, ltpUuid) {
-    let forwardingDomainList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN];
-    let took = 0;
-    for (let forwardingDomain of forwardingDomainList) {
-      let fcList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
-      for (let fc of fcList) {
-        let fcUuid = fc[onfAttributes.GLOBAL_CLASS.UUID];
-        let fcPortList = fc[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
-        for (let fcPort of fcPortList) {
-          let fcPortLocalId = fcPort[onfAttributes.LOCAL_CLASS.LOCAL_ID];
-          let fcPortlogicalTerminationPoint = fcPort[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-          if (fcPortlogicalTerminationPoint === ltpUuid) {
-            let deleteResponse = this.deleteFcPort(
-              fcPortLocalId,
-              fcUuid,
-              controlConstruct[onfAttributes.GLOBAL_CLASS.UUID]
-            );
-            took += deleteResponse.took;
+  static async deleteDependentFcPorts(controlConstructUuid, ltpUuid) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let response = await lock.acquire(controlConstructUuid, async () => {
+      let r = await client.updateByQuery({
+        index: indexAlias,
+        refresh: true,
+        body: {
+          "script": {
+            "source": `def fwDomain = ctx._source['forwarding-domain'];
+                    for (domain in fwDomain) {
+                        def fcs = domain['forwarding-construct'];
+                        for (fc in fcs) {
+                            def ports = fc['fc-port'];
+                            ports.removeIf(port -> port['logical-termination-point'] == params['ltpUuid'])
+                        }
+                    }
+                    `,
+            "params": {
+              "ltpUuid": ltpUuid
+            }
+          },
+          "query": {
+            "term": {
+              "uuid": controlConstructUuid
+            }
           }
         }
-      }
-    }
-    return { "took": took };
+      });
+      return r;
+    })
+    return { "took": response.body.took };
   }
 
   /**
@@ -304,6 +368,40 @@ class ControlConstructService {
   }
 
   /**
+   * @description Replaces logical-termination-point list in control construct
+   * specified by controlConstructUuid.
+   * @param {String} controlConstructUuid UUID of control construct that will be updated
+   * @param {Array<Object>} ltps logical-termination-point list
+   * @returns {Promise<Object>} { took }
+   */
+  static async updateLtpsAsync(controlConstructUuid, ltps) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let response = await lock.acquire(controlConstructUuid, async () => {
+      let r = await client.updateByQuery({
+        index: indexAlias,
+        refresh: true,
+        body: {
+          "script": {
+            "source": `ctx._source['logical-termination-point'] = params['ltps'];`,
+            "params": {
+              "ltps": ltps
+            }
+          },
+          "query": {
+            "term": {
+              "uuid": controlConstructUuid
+            }
+          }
+        }
+      });
+      return r;
+    })
+    return { "took": response.body.took };
+  }
+
+  /**
    * @description Creates or updates full control-construct in ES.
    * @param {Object} controlConstruct full control-construct
    * @returns {Promise<Object>} { took }
@@ -340,8 +438,13 @@ class ControlConstructService {
     }
   }
 
-  static deleteLtpFromCCObject(controlConstruct, ltpToBeRemovedUuid) {
-    let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+  /**
+   * @description Removes LTP and it's client/server references from list of LTPs.
+   * @param {Array<Object>} ltps
+   * @param {String} ltpToBeRemovedUuid
+   * @returns {Array<Object>} modified LTPs
+   */
+  static deleteLtpFromCCObject(ltps, ltpToBeRemovedUuid) {
     let ltpToBeRemovedIndex = ltps.findIndex(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid);
     ltps.splice(ltpToBeRemovedIndex, 1);
     ltps.forEach(ltp => {
@@ -362,7 +465,7 @@ class ControlConstructService {
         }
       }
     })
-    return controlConstruct;
+    return ltps;
   }
 
   /**
