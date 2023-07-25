@@ -136,31 +136,17 @@ exports.notifyLinkUpdates = function (logicalTerminationPointconfigurationStatus
 }
 
 exports.createLinkChangeNotificationForwardings = function (linkUuid) {
-    return new Promise(async function (resolve, reject) {
-        let forwardingConstructAutomationList = [];
-        try {
-            let forwardingAutomation;
+    let linkChangeNotificationForwardingName = "LinkChangeNotification";
+    let linkChangeNotificationContext;
+    let linkChangeNotificationRequestBody = {};
+    linkChangeNotificationRequestBody.linkUuid = linkUuid;
 
-            /***********************************************************************************
-             * LinkChangeNotification /v1/regard-updated-link
-             ************************************************************************************/
-            let linkChangeNotificationForwardingName = "LinkChangeNotification";
-            let linkChangeNotificationContext;
-            let linkChangeNotificationRequestBody = {};
-            linkChangeNotificationRequestBody.linkUuid = linkUuid;
-
-            linkChangeNotificationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(linkChangeNotificationRequestBody);
-            forwardingAutomation = new forwardingConstructAutomationInput(
-                linkChangeNotificationForwardingName,
-                linkChangeNotificationRequestBody,
-                linkChangeNotificationContext
-            );
-            forwardingConstructAutomationList.push(forwardingAutomation);
-            resolve(forwardingConstructAutomationList);
-        } catch (error) {
-            reject(error);
-        }
-    });
+    linkChangeNotificationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(linkChangeNotificationRequestBody);
+    return new forwardingConstructAutomationInput(
+        linkChangeNotificationForwardingName,
+        linkChangeNotificationRequestBody,
+        linkChangeNotificationContext
+    );
 }
 
 exports.removeOperationClientFromLink = function (linkUuid) {

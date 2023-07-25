@@ -44,12 +44,12 @@ const NEW_RELEASE_FORWARDING_NAME = 'PromptForBequeathingDataCausesTransferOfLis
 exports.addOperationClientToLink = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
   let response = await LinkServices.findOrCreateLinkForTheEndPointsAsync(body);
   let linkUuid = response.linkUuid;
-  let forwardingAutomationInputList = await prepareForwardingAutomation.createLinkChangeNotificationForwardings(
+  let forwardingAutomationInput = prepareForwardingAutomation.createLinkChangeNotificationForwardings(
     linkUuid
   );
   ForwardingAutomationService.automateForwardingConstructAsync(
     operationServerName,
-    forwardingAutomationInputList,
+    [forwardingAutomationInput],
     user,
     xCorrelator,
     traceIndicator,
@@ -776,8 +776,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     customerJourney
   }
 
-  automateForwarding(forwardingAutomationInputList[0], headers, applicationName, releaseNumber)
-
+  automateForwarding(forwardingAutomationInputList[0], headers, applicationName, releaseNumber);
 
   /***********************************************************************************
    * forwardings for application layer topology
@@ -795,7 +794,6 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     traceIndicator,
     customerJourney
   );
-
 }
 
 async function automateForwarding(forwardingAutomationInput, headers, applicationName, releaseNumber) {
@@ -803,29 +801,36 @@ async function automateForwarding(forwardingAutomationInput, headers, applicatio
     forwardingAutomationInput,
     headers
   );
-  let took = 0;
   if (response === undefined || response.data === undefined || Object.keys(response).length === 0) {
-    return {
-      "took": took
-    };
+    return;
   }
-
   // response is full control construct of regarded application
   let cc = response["data"]["core-model-1-4:control-construct"];
-  let res = await ControlConstructService.createOrUpdateControlConstructAsync(cc);
-  took += res.took;
-
+  await ControlConstructService.createOrUpdateControlConstructAsync(cc);
   let logicalTerminationPoints = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
   let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
+  let forwardings = [];
   for (let operationServerName of operationServerNames) {
     let endPointDetails = {
       'serving-application-name': applicationName,
       'serving-application-release-number': releaseNumber,
       'operation-name': operationServerName
     }
-    let linkResponse = await LinkServices.findOrCreateLinkForTheEndPointsAsync(endPointDetails);
-    took += linkResponse.took;
+    let servingOperationResponse = await LinkServices.getServingOperationUuidAsync(endPointDetails);
+    let servingOperationUuid = servingOperationResponse.servingOperationUuid;
+    let forwarding = await LinkServices.prepareLinkChangeNotificationForwardingsAsync(servingOperationUuid, []);
+    if (forwarding) {
+      forwardings.push(forwarding);
+    }
   }
+  ForwardingAutomationService.automateForwardingConstructAsync(
+    "/v1/add-operation-client-to-link",
+    forwardings,
+    headers.user,
+    headers.xCorrelator,
+    headers.traceIndicator,
+    headers.customerJourney
+  );
 }
 
 /**
