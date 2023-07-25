@@ -47,7 +47,7 @@ const NEW_RELEASE_FORWARDING_NAME = 'PromptForBequeathingDataCausesTransferOfLis
 exports.addOperationClientToLink = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
   let response = await LinkServices.findOrCreateLinkForTheEndPointsAsync(body);
   let linkUuid = response.linkUuid;
-  let forwardingAutomationInputList = await prepareForwardingAutomation.addOperationClientToLink(
+  let forwardingAutomationInputList = await prepareForwardingAutomation.createLinkChangeNotificationForwardings(
     linkUuid
   );
   ForwardingAutomationService.automateForwardingConstructAsync(
@@ -380,6 +380,12 @@ exports.listEndPointsOfLink = async function (body) {
   let linkResult = await LinkServices.getLinkAsync(linkUuid);
   let link = linkResult.link;
   took += linkResult.took;
+  if (!link) {
+    console.log(`Link with UUID ${linkUuid} could not be found.`);
+    return {
+      "took": took
+    }
+  }
   for (let linkPort of link[onfAttributes.LINK.LINK_PORT]) {
     let linkEndPoint = {};
     let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
