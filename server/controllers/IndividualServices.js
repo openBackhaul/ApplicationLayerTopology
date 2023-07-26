@@ -390,7 +390,7 @@ module.exports.updateLtp = async function updateLtp (req, res, next, body, user,
     let startTime = process.hrtime();
     let responseCode = responseCodeEnum.code.NO_CONTENT;
     let responseBodyToDocument = undefined;
-    await IndividualServices.updateLtp(body)
+    await IndividualServices.updateLtp(body, user, xCorrelator, traceIndicator,customerJourney,req.url)
       .then(async function (responseBody) {
         let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
         restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
