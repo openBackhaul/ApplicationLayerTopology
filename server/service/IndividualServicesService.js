@@ -968,7 +968,7 @@ exports.updateFcPort = async function (body) {
  * body V1_updateltp_body 
  * no response value expected for this operation
  **/
-exports.updateLtp = async function (body) {
+exports.updateLtp = async function (body, user, xCorrelator, traceIndicator,customerJourney, operationServerName) {
   let logicalTerminationPointUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
   let existingLtps = [];
   let forwardingAutomationInputList = [];
