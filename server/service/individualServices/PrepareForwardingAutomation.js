@@ -289,7 +289,7 @@ async function updateOperationClientLtp(existingLtp, newLtp, consumingHttpServer
     }
     let servingHttpServerCapabilityResponse = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(operationServerUuid);
     returnObject.took += servingHttpServerCapabilityResponse.took;
-    let servingHttpServerCapability = servingHttpServerCapabilityResponse.servingHttpServerCapability;
+    let servingHttpServerCapability = servingHttpServerCapabilityResponse.httpServerCapability;
     /**************************************************************************************************************
      * LtpUpdateMightCauseOperationClientBeingRemovedFromLink /v1/update-ltp -> /v1/remove-operation-client-to-link
      *************************************************************************************************************/
