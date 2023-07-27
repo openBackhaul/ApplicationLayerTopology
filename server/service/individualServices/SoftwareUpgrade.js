@@ -3,22 +3,19 @@
  * @module SoftwareUpgrade
  **/
 
-const operationClientInterface = require('../../applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
-const logicalTerminationPoint = require('../../applicationPattern/onfModel/models/LogicalTerminationPoint');
-const httpServerInterface = require('../../applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
-const httpClientInterface = require('../../applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
-const tcpClientInterface = require('../../applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
-const ForwardingDomain = require('../../applicationPattern/onfModel/models/ForwardingDomain');
-const onfAttributes = require('../../applicationPattern/onfModel/constants/OnfAttributes');
-const FcPort = require('../../applicationPattern/onfModel/models/FcPort');
-const onfAttributeFormatter = require('../../applicationPattern/onfModel/utility/OnfAttributeFormatter');
-
-const eventDispatcher = require('../../applicationPattern/rest/client/eventDispatcher');
-const LayerProtocol = require('../../applicationPattern/onfModel/models/LayerProtocol');
-const OperationServerInterface = require('../../applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
-const NetworkControlDomain = require('../../applicationPattern/onfModel/models/NetworkControlDomain');
-const ControlConstruct = require('../../applicationPattern/onfModel/models/ControlConstruct');
-const LinkPort = require('../../applicationPattern/onfModel/models/LinkPort');
+const LogicalTerminationPointService = require('onf-core-model-ap-bs/basicServices/utility/LogicalTerminationPoint');
+const operationClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
+const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
+const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
+const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
+const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
+const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
+const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
+const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
+const FcPort = require('onf-core-model-ap/applicationPattern/onfModel/models/FcPort');
+const eventDispatcher = require('onf-core-model-ap/applicationPattern/rest/client/eventDispatcher');
+const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
+var traceIncrementer = 1;
 
 /**
  * This method performs the set of procedure to transfer the data from this version to next version 
@@ -30,43 +27,13 @@ const LinkPort = require('../../applicationPattern/onfModel/models/LinkPort');
  * @param {String} customerJourney Holds information supporting customer’s journey to which the execution applies
  * @returns {Promise} Promise is resolved if the operation succeeded else the Promise is rejected
  * **/
-exports.upgradeSoftwareVersion = async function (isdataTransferRequired, user, xCorrelator, traceIndicator, customerJourney) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            if (isdataTransferRequired) {
-                await transferDataToTheNewRelease(user, xCorrelator, traceIndicator, customerJourney);
-            }
-            await redirectNotificationNewRelease(user, xCorrelator, traceIndicator, customerJourney);
-            await replaceOldReleaseWithNewRelease(user, xCorrelator, traceIndicator, customerJourney);
-            resolve();
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-/**
- * This method performs the data transfer from the current instance to the new instance
- * @param {String} user User identifier from the system starting the service call
- * @param {String} xCorrelator UUID for the service execution flow that allows to correlate requests and responses
- * @param {String} traceIndicator Sequence of request numbers along the flow
- * @param {String} customerJourney Holds information supporting customer’s journey to which the execution applies
- * The following are the list of forwarding-construct that will be automated to transfer the data from this current release to next release
- * 1. PromptForBequeathingDataCausesTransferOfListOfApplications
- * 2. PromptForBequeathingDataCausesTransferOfLtpsAndFcs
- * 3. PromptForBequeathingDataCausesTransferOfLinkInformation
- */
-async function transferDataToTheNewRelease(user, xCorrelator, traceIndicator, customerJourney) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            await PromptForBequeathingDataCausesTransferOfListOfApplications(user, xCorrelator, traceIndicator, customerJourney);
-            await PromptForBequeathingDataCausesTransferOfLtpsAndFcs(user, xCorrelator, traceIndicator, customerJourney);
-            await PromptForBequeathingDataCausesTransferOfLinkInformation(user, xCorrelator, traceIndicator, customerJourney);
-            resolve();
-        } catch (error) {
-            reject(error);
-        }
-    });
+exports.upgradeSoftwareVersion = async function (user, xCorrelator, traceIndicator, customerJourney, _traceIncrementer) {
+    if (_traceIncrementer !== 0) {
+        traceIncrementer = _traceIncrementer;
+    }
+    await PromptForBequeathingDataCausesTransferOfListOfApplications(user, xCorrelator, traceIndicator, customerJourney);
+    await redirectNotificationNewRelease(user, xCorrelator, traceIndicator, customerJourney);
+    await replaceOldReleaseWithNewRelease(user, xCorrelator, traceIndicator, customerJourney);
 }
 
 /**
@@ -82,16 +49,9 @@ async function transferDataToTheNewRelease(user, xCorrelator, traceIndicator, cu
  * 3. PromptForBequeathingDataCausesRObeingRequestedToStopNotificationsToOldRelease
  */
 async function redirectNotificationNewRelease(user, xCorrelator, traceIndicator, customerJourney) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            await PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOfNewApplicationsToNewRelease(user, xCorrelator, traceIndicator, customerJourney);
-            await PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnApprovalsToNewRelease(user, xCorrelator, traceIndicator, customerJourney);
-            await PromptForBequeathingDataCausesRObeingRequestedToStopNotificationsToOldRelease(user, xCorrelator, traceIndicator, customerJourney);
-            resolve();
-        } catch (error) {
-            reject(error);
-        }
-    });
+    await PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOfNewApplicationsToNewRelease(user, xCorrelator, traceIndicator, customerJourney);
+    await PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnApprovalsToNewRelease(user, xCorrelator, traceIndicator, customerJourney);
+    await PromptForBequeathingDataCausesRObeingRequestedToStopNotificationsToOldRelease(user, xCorrelator, traceIndicator, customerJourney);
 }
 
 /**
@@ -105,15 +65,8 @@ async function redirectNotificationNewRelease(user, xCorrelator, traceIndicator,
  * 2. PromptForBequeathingDataCausesRequestForDeregisteringOfOldRelease
  */
 async function replaceOldReleaseWithNewRelease(user, xCorrelator, traceIndicator, customerJourney) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            await promptForBequeathingDataCausesRequestForBroadcastingInfoAboutServerReplacement(user, xCorrelator, traceIndicator, customerJourney);
-            await promptForBequeathingDataCausesRequestForDeregisteringOfOldRelease(user, xCorrelator, traceIndicator, customerJourney);
-            resolve();
-        } catch (error) {
-            reject(error);
-        }
-    });
+    await promptForBequeathingDataCausesRequestForBroadcastingInfoAboutServerReplacement(user, xCorrelator, traceIndicator, customerJourney);
+    await promptForBequeathingDataCausesRequestForDeregisteringOfOldRelease(user, xCorrelator, traceIndicator, customerJourney);
 }
 
 /**
@@ -134,7 +87,8 @@ async function PromptForBequeathingDataCausesTransferOfListOfApplications(user, 
              * Preparing requestBody and transfering the data one by one
              ************************************************************************************/
 
-            let inquiryForApplicationTypeApprovalFCName = "NewApplicationCausesRequestForLatestTopologyInformation";
+            let inquiryForApplicationTypeApprovalFCName = "NewApplicationCausesRequestForTopologyChangeInformation";
+
             let forwardingConstructInstance = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(inquiryForApplicationTypeApprovalFCName);
             let operationClientUuidList = getFcPortOutputLogicalTerminationPointList(forwardingConstructInstance);
 
@@ -148,27 +102,28 @@ async function PromptForBequeathingDataCausesTransferOfListOfApplications(user, 
                     let releaseNumber = await httpClientInterface.getReleaseNumberAsync(httpClientUuid);
                     let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(tcpClientUuid);
                     let applicationPort = await tcpClientInterface.getRemotePortAsync(tcpClientUuid);
-
+                    let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(tcpClientUuid);
                     /***********************************************************************************
                      * PromptForBequeathingDataCausesTransferOfListOfApplications
                      *   /v1/regard-application
                      ************************************************************************************/
                     let requestBody = {};
                     requestBody.applicationName = applicationName;
-                    requestBody.applicationReleaseNumber = releaseNumber;
-                    requestBody.applicationAddress = applicationAddress;
-                    requestBody.applicationPort = applicationPort;
+                    requestBody.releaseNumber = releaseNumber;
+                    requestBody.address = applicationAddress;
+                    requestBody.port = applicationPort;
+                    requestBody.protocol = applicationProtocol
                     requestBody = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(requestBody);
                     result = await forwardRequest(
                         forwardingKindNameOfTheBequeathOperation,
                         requestBody,
                         user,
                         xCorrelator,
-                        traceIndicator,
+                        traceIndicator + "." + traceIncrementer++,
                         customerJourney
                     );
                     if (!result) {
-                        throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + requestBody;
+                        throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + JSON.stringify(requestBody);
                     }
 
                 } catch (error) {
@@ -183,142 +138,6 @@ async function PromptForBequeathingDataCausesTransferOfListOfApplications(user, 
     });
 }
 
-/**
- * Prepare attributes and automate PromptForBequeathingDataCausesNewApplicationBeingRequestedToDocumentSubscriptionsForDeregistrationNotifications<br>
- * @param {String} user User identifier from the system starting the service call
- * @param {String} xCorrelator UUID for the service execution flow that allows to correlate requests and responses
- * @param {String} traceIndicator Sequence of request numbers along the flow
- * @param {String} customerJourney Holds information supporting customer’s journey to which the execution applies
- * @returns {boolean} return true if the operation is success or else return false
- */
-async function PromptForBequeathingDataCausesTransferOfLtpsAndFcs(user, xCorrelator, traceIndicator, customerJourney) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            let result = true;
-            let forwardingKindNameOfTheBequeathOperation = "PromptForBequeathingDataCausesTransferOfLtpsAndFcs";
-
-            /***********************************************************************************
-             * Preparing requestBody and transfering the data one by one
-             ************************************************************************************/
-
-            let controlConstructList = await NetworkControlDomain.getControlConstructListAsync();
-            let currentControlConstructUuid = await ControlConstruct.getUuidAsync();
-
-            for (let i = 0; i < controlConstructList.length; i++) {
-                try {
-                    let controlConstruct = controlConstructList[i];
-                    let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-                    if (currentControlConstructUuid != controlConstructUuid) {
-                        /***********************************************************************************
-                         * PromptForBequeathingDataCausesTransferOfLtpsAndFcs
-                         *   /v1/update-all-ltps-and-fcs
-                         ************************************************************************************/
-                        let requestBody = {};
-                        requestBody["core-model-1-4:control-construct"] = controlConstruct;
-                        result = await forwardRequest(
-                            forwardingKindNameOfTheBequeathOperation,
-                            requestBody,
-                            user,
-                            xCorrelator,
-                            traceIndicator,
-                            customerJourney
-                        );
-                        if (!result) {
-                            throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + controlConstruct;
-                        }
-                    }
-                } catch (error) {
-                    console.log(error);
-                    throw "operation is not success";
-                }
-            }
-            resolve(result);
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-
-/**
- * Prepare attributes and automate PromptForBequeathingDataCausesNewApplicationBeingRequestedToDocumentSubscriptionsForApprovalNotifications<br>
- * @param {String} user User identifier from the system starting the service call
- * @param {String} xCorrelator UUID for the service execution flow that allows to correlate requests and responses
- * @param {String} traceIndicator Sequence of request numbers along the flow
- * @param {String} customerJourney Holds information supporting customer’s journey to which the execution applies
- * @returns {boolean} return true if the operation is success or else return false
- */
-async function PromptForBequeathingDataCausesTransferOfLinkInformation(user, xCorrelator, traceIndicator, customerJourney) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            let result = true;
-            let forwardingKindNameOfTheBequeathOperation = "PromptForBequeathingDataCausesTransferOfLinkInformation";
-
-            /***********************************************************************************
-             * Preparing requestBody and transfering the data one by one
-             ************************************************************************************/
-            let linkList = await NetworkControlDomain.getLinkListAsync();
-
-            for (let i = 0; i < linkList.length; i++) {
-                try {
-                    let link = linkList[i];
-                    let outputLinkPort = getOutputLinkPort(link);
-                    let servingApplicationOperationServerUuid = outputLinkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-                    let servingApplicationControlConstructUuid = figureOutControlConstructUuid(
-                        servingApplicationOperationServerUuid);
-                    let servingApplicationControlConstruct = await NetworkControlDomain.getControlConstructAsync(
-                        servingApplicationControlConstructUuid);
-                    let servingApplicationName = getApplicationName(servingApplicationControlConstruct);
-                    let servingApplicationReleaseNumber = getReleaseNumber(servingApplicationControlConstruct);
-                    let operationName = getOperationServerName(servingApplicationControlConstruct, servingApplicationOperationServerUuid);
-                    let consumingApplicationName;
-                    let consumingApplicationReleaseNumber;
-
-                    let inputLinkPortList = getInputLinkPortList(link);
-                    for (let j = 0; j < inputLinkPortList.length; j++) {
-                        let inputLinkPort = inputLinkPortList[j];
-                        let servingApplicationOperationClientUuid = inputLinkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-                        let consumingApplicationControlConstructUuid = figureOutControlConstructUuid(
-                            servingApplicationOperationClientUuid);
-                        let cosumingApplicationControlConstruct = await NetworkControlDomain.getControlConstructAsync(
-                            consumingApplicationControlConstructUuid);
-                        consumingApplicationName = getApplicationName(cosumingApplicationControlConstruct);
-                        consumingApplicationReleaseNumber = getReleaseNumber(cosumingApplicationControlConstruct);
-
-                        /***********************************************************************************
-                         * PromptForBequeathingDataCausesTransferOfLinkInformation
-                         *   /v1/add-operation-client-to-link
-                         ************************************************************************************/
-                        let requestBody = {};
-                        requestBody.servingApplicationName = servingApplicationName;
-                        requestBody.servingApplicationReleaseNumber = servingApplicationReleaseNumber;
-                        requestBody.operationName = operationName;
-                        requestBody.consumingApplicationName = consumingApplicationName;
-                        requestBody.consumingApplicationReleaseNumber = consumingApplicationReleaseNumber;
-                        requestBody = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(requestBody);
-                        result = await forwardRequest(
-                            forwardingKindNameOfTheBequeathOperation,
-                            requestBody,
-                            user,
-                            xCorrelator,
-                            traceIndicator,
-                            customerJourney
-                        );
-                        if (!result) {
-                            throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + requestBody;
-                        }
-                    }
-                } catch (error) {
-                    console.log(error);
-                    throw "operation is not success";
-                }
-            }
-            resolve(result);
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
 
 /**
  * Prepare attributes and automate PromptForBequeathingDataCausesTARbeingRequestedToRedirectInfoAboutApprovalsToNewApplication<br>
@@ -339,15 +158,16 @@ async function PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOf
              ************************************************************************************/
             try {
 
-                let newReleaseHttpClientUuid = await httpClientInterface.getHttpClientUuidAsync("NewRelease");
+                let newHttpClientUuid = await LogicalTerminationPointService.resolveHttpTcpAndOperationClientUuidOfNewRelease()
+                let newReleaseHttpClientUuid = newHttpClientUuid.httpClientUuid           
                 let newReleaseTcpClientUuid = (await logicalTerminationPoint.getServerLtpListAsync(newReleaseHttpClientUuid))[0];
 
-                let applicationName = await httpServerInterface.getApplicationNameAsync();
+                let applicationName = await httpClientInterface.getApplicationNameAsync(newReleaseHttpClientUuid);
                 let releaseNumber = await httpClientInterface.getReleaseNumberAsync(newReleaseHttpClientUuid);
-                let regardApplicationOperation = await OperationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3001");
+                let regardApplicationOperation = "/v1/regard-application";
                 let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(newReleaseTcpClientUuid);
                 let applicationPort = await tcpClientInterface.getRemotePortAsync(newReleaseTcpClientUuid);
-
+                let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(newReleaseTcpClientUuid); 
                 /***********************************************************************************
                  * PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOfNewApplicationsToNewRelease
                  *   /v1/notify-approvals
@@ -358,17 +178,18 @@ async function PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOf
                 requestBody.subscriberOperation = regardApplicationOperation;
                 requestBody.subscriberAddress = applicationAddress;
                 requestBody.subscriberPort = applicationPort;
+                requestBody.subscriberProtocol = applicationProtocol;
                 requestBody = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(requestBody);
                 result = await forwardRequest(
                     forwardingKindNameOfTheBequeathOperation,
                     requestBody,
                     user,
                     xCorrelator,
-                    traceIndicator,
+                    traceIndicator + "." + traceIncrementer++,
                     customerJourney
                 );
                 if (!result) {
-                    throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + requestBody;
+                    throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + JSON.stringify(requestBody);
                 }
 
             } catch (error) {
@@ -402,15 +223,16 @@ async function PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnAp
              ************************************************************************************/
             try {
 
-                let newReleaseHttpClientUuid = await httpClientInterface.getHttpClientUuidAsync("NewRelease");
+                let newHttpClientUuid = await LogicalTerminationPointService.resolveHttpTcpAndOperationClientUuidOfNewRelease()
+                let newReleaseHttpClientUuid = newHttpClientUuid.httpClientUuid
                 let newReleaseTcpClientUuid = (await logicalTerminationPoint.getServerLtpListAsync(newReleaseHttpClientUuid))[0];
 
-                let applicationName = await httpServerInterface.getApplicationNameAsync();
+                let applicationName = await httpClientInterface.getApplicationNameAsync(newReleaseHttpClientUuid);
                 let releaseNumber = await httpClientInterface.getReleaseNumberAsync(newReleaseHttpClientUuid);
-                let disregardApplicationOperation = await OperationServerInterface.getOperationNameAsync("alt-0-0-1-op-s-3002");
+                let disregardApplicationOperation = "/v1/disregard-application";
                 let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(newReleaseTcpClientUuid);
                 let applicationPort = await tcpClientInterface.getRemotePortAsync(newReleaseTcpClientUuid);
-
+                let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(newReleaseTcpClientUuid); 
                 /***********************************************************************************
                  * PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnApprovalsToNewRelease
                  *   /v1/notify-withdrawn-approvals
@@ -421,17 +243,18 @@ async function PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnAp
                 requestBody.subscriberOperation = disregardApplicationOperation;
                 requestBody.subscriberAddress = applicationAddress;
                 requestBody.subscriberPort = applicationPort;
+                requestBody.subscriberProtocol = applicationProtocol;
                 requestBody = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(requestBody);
                 result = await forwardRequest(
                     forwardingKindNameOfTheBequeathOperation,
                     requestBody,
                     user,
                     xCorrelator,
-                    traceIndicator,
+                    traceIndicator + "." + traceIncrementer++,
                     customerJourney
                 );
                 if (!result) {
-                    throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + requestBody;
+                    throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + JSON.stringify(requestBody);
                 }
 
             } catch (error) {
@@ -459,29 +282,27 @@ async function PromptForBequeathingDataCausesRObeingRequestedToStopNotifications
         try {
             let result = true;
             let forwardingKindNameOfTheBequeathOperation = "PromptForBequeathingDataCausesRObeingRequestedToStopNotificationsToOldRelease";
+            let forwardingKindNameOfTheNotifyApprovals = "PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOfNewApplicationsToNewRelease";
+            let forwardingKindNameOfTheNotifyWithdrawnApprovals = "PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnApprovalsToNewRelease";
 
             let listOfOperationToBeUnsubscribed = [];
-            let approvalOperationName = await operationClientInterface.getOperationNameAsync("alt-0-0-1-op-c-3020");
-            let withdrawApprovalOperationName = await operationClientInterface.getOperationNameAsync("alt-0-0-1-op-c-3021");
-            listOfOperationToBeUnsubscribed.push(approvalOperationName);
-            listOfOperationToBeUnsubscribed.push(withdrawApprovalOperationName);
-            /***********************************************************************************
+            listOfOperationToBeUnsubscribed.push((await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyApprovals))[0]);
+            listOfOperationToBeUnsubscribed.push((await getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheNotifyWithdrawnApprovals))[0]);
+           /***********************************************************************************
              * Preparing requestBody 
              ************************************************************************************/
+           
+              
             try {
-                for (let i = 0; i < listOfOperationToBeUnsubscribed.length; i++) {
-
-                    let applicationName = await httpServerInterface.getApplicationNameAsync();
-                    let releaseNumber = await httpServerInterface.getReleaseNumberAsync();
-                    let subscriptionName = listOfOperationToBeUnsubscribed[i];
+                for (let subscriptionName of listOfOperationToBeUnsubscribed) {
+                    let requestBody = {};
 
                     /***********************************************************************************
                      * PromptForBequeathingDataCausesRObeingRequestedToStopNotificationsToOldRelease
                      *   /v1/end-subscription
                      ************************************************************************************/
-                    let requestBody = {};
-                    requestBody.subscriberApplication = applicationName;
-                    requestBody.subscriberReleaseNumber = releaseNumber;
+                    requestBody.subscriberApplication = await httpServerInterface.getApplicationNameAsync();
+                    requestBody.subscriberReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
                     requestBody.subscription = subscriptionName;
                     requestBody = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(requestBody);
                     result = await forwardRequest(
@@ -489,11 +310,11 @@ async function PromptForBequeathingDataCausesRObeingRequestedToStopNotifications
                         requestBody,
                         user,
                         xCorrelator,
-                        traceIndicator,
+                        traceIndicator + "." + traceIncrementer++,
                         customerJourney
                     );
                     if (!result) {
-                        throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + requestBody;
+                        throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + JSON.stringify(requestBody);
                     }
                 }
 
@@ -527,37 +348,41 @@ async function promptForBequeathingDataCausesRequestForBroadcastingInfoAboutServ
              * Preparing requestBody 
              ************************************************************************************/
             try {
-
-                let newReleaseHttpClientUuid = await httpClientInterface.getHttpClientUuidAsync("NewRelease");
+                let newHttpClientUuid = await LogicalTerminationPointService.resolveHttpTcpAndOperationClientUuidOfNewRelease();
+                let newReleaseHttpClientUuid = newHttpClientUuid.httpClientUuid;
                 let newReleaseTcpClientUuid = (await logicalTerminationPoint.getServerLtpListAsync(newReleaseHttpClientUuid))[0];
 
                 let applicationName = await httpServerInterface.getApplicationNameAsync();
                 let oldReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
+                let newApplicationName = await httpClientInterface.getApplicationNameAsync(newReleaseHttpClientUuid)
                 let newReleaseNumber = await httpClientInterface.getReleaseNumberAsync(newReleaseHttpClientUuid);
                 let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(newReleaseTcpClientUuid);
                 let applicationPort = await tcpClientInterface.getRemotePortAsync(newReleaseTcpClientUuid);
+                let applicationProtocol = await tcpClientInterface.getRemoteProtocolAsync(newReleaseTcpClientUuid);   
 
                 /***********************************************************************************
                  * PromptForBequeathingDataCausesRequestForBroadcastingInfoAboutServerReplacement
                  *   /v1/relay-server-replacement
                  ************************************************************************************/
                 let requestBody = {};
-                requestBody.applicationName = applicationName;
-                requestBody.oldApplicationReleaseNumber = oldReleaseNumber;
-                requestBody.newApplicationReleaseNumber = newReleaseNumber;
-                requestBody.newApplicationAddress = applicationAddress;
-                requestBody.newApplicationPort = applicationPort;
+                requestBody.currentApplicationName = applicationName;
+                requestBody.currentReleaseNumber = oldReleaseNumber; 
+                requestBody.futureReleaseNumber = newReleaseNumber; 
+                requestBody.futureApplicationName = newApplicationName;
+                requestBody.futureAddress = applicationAddress;
+                requestBody.futurePort= applicationPort;
+                requestBody.futureProtocol= applicationProtocol;
                 requestBody = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(requestBody);
                 result = await forwardRequest(
                     forwardingKindNameOfTheBequeathOperation,
                     requestBody,
                     user,
                     xCorrelator,
-                    traceIndicator,
+                    traceIndicator + "." + traceIncrementer++,
                     customerJourney
                 );
                 if (!result) {
-                    throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + requestBody;
+                    throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + JSON.stringify(requestBody);
                 }
 
             } catch (error) {
@@ -590,7 +415,8 @@ async function promptForBequeathingDataCausesRequestForDeregisteringOfOldRelease
              * Preparing requestBody 
              ************************************************************************************/
             try {
-                let newReleaseHttpClientUuid = await httpClientInterface.getHttpClientUuidAsync("NewRelease");
+                let newHttpClientUuid = await LogicalTerminationPointService.resolveHttpTcpAndOperationClientUuidOfNewRelease()
+                let newReleaseHttpClientUuid = newHttpClientUuid.httpClientUuid
                 let oldApplicationName = await httpServerInterface.getApplicationNameAsync();
                 let oldReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
                 let newReleaseNumber = await httpClientInterface.getReleaseNumberAsync(newReleaseHttpClientUuid);
@@ -601,18 +427,18 @@ async function promptForBequeathingDataCausesRequestForDeregisteringOfOldRelease
                      ************************************************************************************/
                     let requestBody = {};
                     requestBody.applicationName = oldApplicationName;
-                    requestBody.applicationReleaseNumber = oldReleaseNumber;
+                    requestBody.releaseNumber = oldReleaseNumber;
                     requestBody = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(requestBody);
                     result = await forwardRequest(
                         forwardingKindNameOfTheBequeathOperation,
                         requestBody,
                         user,
                         xCorrelator,
-                        traceIndicator,
+                        traceIndicator + "." + traceIncrementer++,
                         customerJourney
                     );
                     if (!result) {
-                        throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + requestBody;
+                        throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + JSON.stringify(requestBody);
                     }
                 }
             } catch (error) {
@@ -684,152 +510,21 @@ function forwardRequest(forwardingKindName, attributeList, user, xCorrelator, tr
  * Generic functions used across 
  **********************************************************************************************************/
 
-/**
- * This function provides the uuid of the control-construct based on the logical-termination-point (or) 
- * forwarding-domain (or) forwarding-construct uuid
- * @param {*} uuid 
- * @returns controlConstructUuid
- */
-function figureOutControlConstructUuid(uuid) {
-    let controlConstructUuid = uuid.split('-').slice(0, 4).join("-");
-    return controlConstructUuid;
-}
-
-/***************************************************************************************************************
- * End point details
- **************************************************************************************************************/
-
-/**
- * This function returns the list of clients information reacting on the operation server 
- * @param {*} controlConstruct 
- * @param {*} operationClientsUuidsReactingOnOperationServerList 
- * @returns object in the form of {addressedApplicationName:"name",
- * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
- */
-function getApplicationName(controlConstruct) {
-    let applicationName;
-    try {
-        let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
-                let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
-                let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
-                applicationName = httpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
-            }
-        }
-        return applicationName;
-    } catch (error) {
-        console.log(error)
+async function getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheBequeathOperation) {
+    let operationNamesList = [];
+    let forwardingConstruct = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(forwardingKindNameOfTheBequeathOperation);
+    let filteredFcPorts = await ForwardingConstruct.getOutputFcPortsAsync(forwardingConstruct.uuid);
+    for (let fcOutputPort of filteredFcPorts) {
+        let operationName = await operationClientInterface.getOperationNameAsync(fcOutputPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT]);
+        operationNamesList.push(operationName);
     }
-}
-
-/**
- * This function returns the list of clients information reacting on the operation server 
- * @param {*} controlConstruct 
- * @param {*} operationClientsUuidsReactingOnOperationServerList 
- * @returns object in the form of {addressedApplicationName:"name",
- * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
- */
-function getReleaseNumber(controlConstruct) {
-    let releaseNumber;
-    try {
-        let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
-                let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
-                let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
-                releaseNumber = httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
-            }
-        }
-        return releaseNumber;
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-/**
- * Provides operationServerUuid for the operationServerName
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationServerName operation name of the operation Server
- * @returns operationServeruuid
- */
-function getOperationServerName(controlConstruct, operationServerUuid) {
-    let operationServerName;
-    try {
-        let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let uuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-            if (uuid == operationServerUuid) {
-                let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-                let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-                if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
-                    let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-                    let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-                    operationServerName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-                }
-            }
-        }
-        return operationServerName;
-    } catch (error) {
-        console.log(error)
-    }
+    return operationNamesList;
 }
 
 
-/***************************************************************************************************************
- * End point details
- **************************************************************************************************************/
 
 
-/**
- * Provides output link port
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationServerName operation name of the operation Server
- * @returns operationServeruuid
- */
-function getOutputLinkPort(link) {
-    let outputLinkPort;
-    try {
-        let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-        for (let i = 0; i < linkPortList.length; i++) {
-            let linkPort = linkPortList[i];
-            let linkPortDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-            if (linkPortDirection == LinkPort.portDirectionEnum.OUTPUT) {
-                outputLinkPort = linkPort
-            }
-        }
-        return outputLinkPort;
-    } catch (error) {
-        console.log(error)
-    }
-}
 
-/**
- * Provides input link port
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationServerName operation name of the operation Server
- * @returns operationServeruuid
- */
-function getInputLinkPortList(link) {
-    let inputLinkPortList = [];
-    try {
-        let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-        for (let i = 0; i < linkPortList.length; i++) {
-            let linkPort = linkPortList[i];
-            let linkPortDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-            if (linkPortDirection == LinkPort.portDirectionEnum.INPUT) {
-                inputLinkPortList.push(linkPort);
-            }
-        }
-        return inputLinkPortList;
-    } catch (error) {
-        console.log(error)
-    }
-}
+
+
+

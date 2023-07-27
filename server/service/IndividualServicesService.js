@@ -1,92 +1,66 @@
 'use strict';
 
-const LogicalTerminatinPointConfigurationInput = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInput');
-const LogicalTerminationPointService = require('../applicationPattern/onfModel/services/LogicalTerminationPointServices');
-const LogicalTerminationPointConfigurationStatus = require('../applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
-const layerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
+const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
+const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
+const prepareALTForwardingAutomation = require('onf-core-model-ap-bs/basicServices/services/PrepareALTForwardingAutomation');
 
-const LinkServices = require('../applicationPattern/onfModel/services/LinkServices');
+const LinkServices = require('./individualServices/LinkServices');
+const LogicalTerminationPointServiceOfUtility = require('onf-core-model-ap-bs/basicServices/utility/LogicalTerminationPoint');
+const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
+const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
+const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
+const ForwardingAutomationServiceWithResponse = require('./individualServices/ForwardingAutomationServiceWithResponse');
+const FcPort = require('onf-core-model-ap/applicationPattern/onfModel/models/FcPort');
 
-const ForwardingConfigurationService = require('../applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
-const ForwardingAutomationService = require('../applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
 const prepareForwardingConfiguration = require('./individualServices/PrepareForwardingConfiguration');
 const prepareForwardingAutomation = require('./individualServices/PrepareForwardingAutomation');
 const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
-const ConfigurationStatus = require('../applicationPattern/onfModel/services/models/ConfigurationStatus');
+const ConfigurationStatus = require('onf-core-model-ap/applicationPattern/onfModel/services/models/ConfigurationStatus');
+const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
+const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
+const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 
-const logicalTerminationPoint = require('../applicationPattern/onfModel/models/LogicalTerminationPoint');
-const httpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
-const tcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
-const operationServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
-const operationClientInterface = require('../applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
-const httpClientInterface = require('../applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
+const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
+const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
+const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
+const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
+const LogicalTerminationPointConfigurationStatus = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
+const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
+const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
+const LinkPort = require('./models/LinkPort');
+const ControlConstructService = require('./individualServices/ControlConstructService');
+const isEqual = require('lodash.isequal');
+const createHttpError = require('http-errors');
 
-const onfAttributeFormatter = require('../applicationPattern/onfModel/utility/OnfAttributeFormatter');
-const consequentAction = require('../applicationPattern/rest/server/responseBody/ConsequentAction');
-const responseValue = require('../applicationPattern/rest/server/responseBody/ResponseValue');
-
-const onfPaths = require('../applicationPattern/onfModel/constants/OnfPaths');
-const onfAttributes = require('../applicationPattern/onfModel/constants/OnfAttributes');
-
-
-const fileOperation = require('../applicationPattern/databaseDriver/JSONDriver');
-const NetworkControlDomain = require('../applicationPattern/onfModel/models/NetworkControlDomain');
-const FcPort = require('../applicationPattern/onfModel/models/FcPort');
-const ForwardingConstruct = require('../applicationPattern/onfModel/models/ForwardingConstruct');
-const LayerProtocol = require('../applicationPattern/onfModel/models/LayerProtocol');
-const LinkPort = require('../applicationPattern/onfModel/models/LinkPort');
-const Link = require('../applicationPattern/onfModel/models/Link');
-const TcpServerInterface = require('../applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
+const NEW_RELEASE_FORWARDING_NAME = 'PromptForBequeathingDataCausesTransferOfListOfApplications';
 
 /**
  * Connects an OperationClient to an OperationServer
  *
  * body V1_addoperationclienttolink_body 
  * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
  * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
  * traceIndicator String Sequence of request numbers along the flow
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-
-exports.addOperationClientToLink = function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
-  return new Promise(async function (resolve, reject) {
-    try {
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let EndPointDetails = body;
-
-      /****************************************************************************************
-       * Prepare logicalTerminatinPointConfigurationInput object to 
-       * configure logical-termination-point
-       ****************************************************************************************/
-      let linkUuid = await LinkServices.findOrCreateLinkForTheEndPointsAsync(EndPointDetails);
-
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-      let forwardingAutomationInputList = await prepareForwardingAutomation.addOperationClientToLink(
-        linkUuid
-      );
-      ForwardingAutomationService.automateForwardingConstructAsync(
-        operationServerName,
-        forwardingAutomationInputList,
-        user,
-        xCorrelator,
-        traceIndicator,
-        customerJourney
-      );
-
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+exports.addOperationClientToLink = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  let response = await LinkServices.findOrCreateLinkForTheEndPointsAsync(body);
+  let linkUuid = response.linkUuid;
+  let forwardingAutomationInputList = await prepareForwardingAutomation.createLinkChangeNotificationForwardings(
+    linkUuid
+  );
+  ForwardingAutomationService.automateForwardingConstructAsync(
+    operationServerName,
+    forwardingAutomationInputList,
+    user,
+    xCorrelator,
+    traceIndicator,
+    customerJourney
+  );
+  return {
+    "took": response.took
+  };
 }
 
 /**
@@ -109,43 +83,67 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
        ****************************************************************************************/
       let applicationName = body["new-application-name"];
       let releaseNumber = body["new-application-release"];
-      let applicationAddress = body["new-application-address"];
-      let applicationPort = body["new-application-port"];
+      let protocol = body["new-application-protocol"];
+      let address = body["new-application-address"];
+      let port = body["new-application-port"];
 
       /****************************************************************************************
        * Prepare logicalTerminatinPointConfigurationInput object to 
        * configure logical-termination-point
        ****************************************************************************************/
-      let isdataTransferRequired = true;
-      let newReleaseUuid = await httpClientInterface.getHttpClientUuidAsync("NewRelease");
-      let currentApplicationName = await httpServerInterface.getApplicationNameAsync();
-      if (currentApplicationName == applicationName) {
-        let isUpdated = await httpClientInterface.setReleaseNumberAsync(newReleaseUuid, releaseNumber);
-        let currentApplicationRemoteAddress = await TcpServerInterface.getLocalAddress();
-        let currentApplicationRemotePort = await TcpServerInterface.getLocalPort();
-        if ((applicationAddress == currentApplicationRemoteAddress) &&
-          (applicationPort == currentApplicationRemotePort)) {
-          isdataTransferRequired = false;
+      let httpClientUuidList = await LogicalTerminationPointServiceOfUtility.resolveHttpTcpAndOperationClientUuidOfNewRelease()
+      let newReleaseHttpClientLtpUuid = httpClientUuidList.httpClientUuid
+      let tcpclientUuid = httpClientUuidList.tcpClientUuid
+
+      let currentNewReleaseApplicationName = await httpClientInterface.getApplicationNameAsync(newReleaseHttpClientLtpUuid);
+      let currentNewReleaseNumber = await httpClientInterface.getReleaseNumberAsync(newReleaseHttpClientLtpUuid);
+      let currentNewReleaseRemoteAddress = await tcpClientInterface.getRemoteAddressAsync(tcpclientUuid);
+      let currentNewReleaseRemoteProtocol = await tcpClientInterface.getRemoteProtocolAsync(tcpclientUuid);
+      let currentNewReleaseRemotePort = await tcpClientInterface.getRemotePortAsync(tcpclientUuid);
+      let update = {};
+      let logicalTerminationPointConfigurationStatus = {};
+      if (newReleaseHttpClientLtpUuid != undefined) {
+        if (releaseNumber != currentNewReleaseNumber) {
+          update.isReleaseUpdated = await httpClientInterface.setReleaseNumberAsync(newReleaseHttpClientLtpUuid, releaseNumber);
         }
-        if (isUpdated) {
-          applicationName = await httpClientInterface.getApplicationNameAsync(newReleaseUuid);
-          let operationList = [];
-          let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
-            applicationName,
-            releaseNumber,
-            applicationAddress,
-            applicationPort,
-            operationList
-          );
-          let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationInformationAsync(
-            logicalTerminatinPointConfigurationInput
-          );
+        if (applicationName != currentNewReleaseApplicationName) {
+          update.isApplicationNameUpdated = await httpClientInterface.setApplicationNameAsync(newReleaseHttpClientLtpUuid, applicationName);
+        }
+
+        if (protocol != currentNewReleaseRemoteProtocol) {
+          update.isProtocolUpdated = await tcpClientInterface.setRemoteProtocolAsync(tcpclientUuid, protocol);
+        }
+        if (JSON.stringify(address) != JSON.stringify(currentNewReleaseRemoteAddress)) {
+          update.isAddressUpdated = await tcpClientInterface.setRemoteAddressAsync(tcpclientUuid, address);
+        }
+        if (port != currentNewReleaseRemotePort) {
+          update.isPortUpdated = await tcpClientInterface.setRemotePortAsync(tcpclientUuid, port);
+        }
+
+        let tcpClientConfigurationStatus = new ConfigurationStatus(
+          newReleaseHttpClientLtpUuid,
+          '',
+          (update.isProtocolUpdated || update.isAddressUpdated || update.isPortUpdated)
+        );
+        let httpClientConfigurationStatus = new ConfigurationStatus(
+          newReleaseHttpClientLtpUuid,
+          '',
+          (update.isReleaseUpdated || update.isApplicationNameUpdated)
+        );
+        logicalTerminationPointConfigurationStatus = new LogicalTerminationPointConfigurationStatus(
+          false,
+          httpClientConfigurationStatus,
+          [tcpClientConfigurationStatus]
+        );
+
+        let forwardingAutomationInputList = [];
+        if (logicalTerminationPointConfigurationStatus != undefined) {
 
           /****************************************************************************************
            * Prepare attributes to automate forwarding-construct
            ****************************************************************************************/
-          let forwardingAutomationInputList = await prepareForwardingAutomation.bequeathYourDataAndDie(
-            logicalTerminationPointconfigurationStatus
+          forwardingAutomationInputList = await prepareForwardingAutomation.bequeathYourDataAndDie(
+            logicalTerminationPointConfigurationStatus
           );
           ForwardingAutomationService.automateForwardingConstructAsync(
             operationServerName,
@@ -156,9 +154,9 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
             customerJourney
           );
         }
+        softwareUpgrade.upgradeSoftwareVersion(user, xCorrelator, traceIndicator, customerJourney, forwardingAutomationInputList.length)
+          .catch(err => console.log(`upgradeSoftwareVersion failed with error: ${err}`));
       }
-      softwareUpgrade.upgradeSoftwareVersion(isdataTransferRequired, user, xCorrelator, traceIndicator, customerJourney)
-        .catch(err => console.log(`upgradeSoftwareVersion failed with error: ${err}`));
       resolve();
     } catch (error) {
       reject(error);
@@ -171,107 +169,89 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
  * FcPort identified by FcUuid and FcPortLid will be deleted
  *
  * body V1_deletefcport_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.deleteFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      await checkApplicationExists(originator);
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let forwardingConstructUuid = body["fc-uuid"];
-      let fcPortLocalId = body["fc-port-local-id"];
-      let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-      let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
-      if (forwardingDomainUuid != undefined) {
-        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-        let forwardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT + "=" + forwardingConstructUuid;
-        let fcPortPath = forwardingConstructPath + "/" + onfAttributes.FORWARDING_CONSTRUCT.FC_PORT + "=" + fcPortLocalId;
-        let isFcPortExists = await fileOperation.readFromDatabaseAsync(fcPortPath)
-        if (isFcPortExists) {
-          await fileOperation.deletefromDatabaseAsync(fcPortPath,
-            fcPortPath,
-            true);
-        }
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+exports.deleteFcPort = async function (body) {
+  let forwardingConstructUuid = body["fc-uuid"];
+  let fcPortLocalId = body["fc-port-local-id"];
+  let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+  return await ControlConstructService.deleteFcPort(fcPortLocalId, forwardingConstructUuid, controlConstructUuid);
 }
-
 
 /**
- * An OperationClient identified by LtpUuid and all its entries in FCs and Links gets deleted
+ * Removes LTP and all it's data from corresponding control-construct and links.
  *
  * body V1_deleteltpanddependents_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.deleteLtpAndDependents = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      await checkApplicationExists(originator);
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let logicalTerminationPointUuid = body["uuid"];
-      let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT +
-        "=" +
-        controlConstructUuid;
-      let logicalTerminationPointPath = controlConstructPath +
-        "/logical-termination-point"
-      let logicalTerminationPointPathForTheUuid = logicalTerminationPointPath +
-        "=" +
-        logicalTerminationPointUuid;
-
-      let existingLogicalTerminationPoint = await fileOperation.readFromDatabaseAsync(logicalTerminationPointPathForTheUuid);
-
-      if (existingLogicalTerminationPoint) {
-        let layerProtocol = existingLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
-        let layerProtocolName = layerProtocol[0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-        let isdeleted = await fileOperation.deletefromDatabaseAsync(logicalTerminationPointPathForTheUuid,
-          existingLogicalTerminationPoint,
-          true);
-        if (isdeleted && (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT ||
-          layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER)) {
-          await deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid);
-          await deleteDependentLinkPorts(logicalTerminationPointUuid);
-        }
-      }
-
-      resolve();
-    } catch (error) {
-      reject(error);
+exports.deleteLtpAndDependents = async function (body) {
+  let ltpToBeRemovedUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
+  let controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(ltpToBeRemovedUuid);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  let took = controlConstructResponse.took;
+  if (!controlConstruct) {
+    return {
+      "took": took
     }
-  });
-}
+  }
+  let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
+  let ltps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+  let ltpToBeRemoved = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === ltpToBeRemovedUuid);
+  if (!ltpToBeRemoved) {
+    console.log(`LTP with UUID ${ltpToBeRemovedUuid} could not be found.`);
+    return {
+      "took": took
+    };
+  }
 
+  // do removal based on layerProtocol
+  let layerProtocol = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+  let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+  switch (layerProtocolName) {
+    case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT:
+      let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, ltpToBeRemovedUuid);
+      took += delFcResponse.took;
+      let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(ltpToBeRemovedUuid);
+      took += delLPResponse.took;
+      break;
+    case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT:
+      for (let clientUUID of ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]) {
+        let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, clientUUID);
+        took += delFcResponse.took;
+        let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
+        took += delLPResponse.took;
+        ControlConstructService.deleteLtpFromCCObject(ltps, clientUUID);
+      }
+      for (let serverUUID of ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP]) {
+        ControlConstructService.deleteLtpFromCCObject(ltps, serverUUID);
+      }
+      break;
+    case LayerProtocol.layerProtocolNameEnum.TCP_CLIENT:
+      let httpClientUuid = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP][0];
+      let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
+      if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
+        for (let clientUUID of httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]) {
+          let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, clientUUID);
+          took += delFcResponse.took;
+          let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
+          took += delLPResponse.took;
+          ControlConstructService.deleteLtpFromCCObject(ltps, clientUUID);
+        }
+        ControlConstructService.deleteLtpFromCCObject(ltps, httpClientUuid);
+      }
+      break;
+    default:
+      // don't do anything if LTP is of type http-s, tcp-s or op-s
+      return;
+  }
+  // update control-construct with removed LTP/FC
+  ltps = ControlConstructService.deleteLtpFromCCObject(ltps, ltpToBeRemovedUuid);
+  let res = await ControlConstructService.updateLtpsAsync(controlConstructUuid, ltps);
+  took += res.took;
+  return {
+    "took": took
+  };
+}
 
 /**
  * Removes application from application layer topology representation
@@ -292,7 +272,7 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
        * Setting up required local variables from the request body
        ****************************************************************************************/
       let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+      let applicationReleaseNumber = body["release-number"];
 
       /****************************************************************************************
        * Prepare logicalTerminatinPointConfigurationInput object to 
@@ -304,7 +284,8 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
 
         let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.deleteApplicationInformationAsync(
           applicationName,
-          applicationReleaseNumber
+          applicationReleaseNumber,
+          NEW_RELEASE_FORWARDING_NAME
         );
 
         /****************************************************************************************
@@ -320,23 +301,10 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
             operationClientConfigurationStatusList
           );
           forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-            unConfigureForwardingConstructAsync(
-              operationServerName,
-              forwardingConfigurationInputList
-            );
-        }
-
-
-        /****************************************************************************************
-         * Prepare attributes to configure control-construct
-         ****************************************************************************************/
-        // remove the entry from control-construct
-        let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
-          applicationName,
-          applicationReleaseNumber);
-        if (controlConstruct) {
-          let controlConstructUuid = controlConstruct["uuid"];
-          await NetworkControlDomain.deleteControlConstructAsync(controlConstructUuid);
+          unConfigureForwardingConstructAsync(
+            operationServerName,
+            forwardingConfigurationInputList
+          );
         }
 
         /****************************************************************************************
@@ -376,12 +344,13 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
 exports.listApplications = function (user, originator, xCorrelator, traceIndicator, customerJourney) {
   return new Promise(async function (resolve, reject) {
     let response = {};
+    const forwardingName = 'NewApplicationCausesRequestForTopologyChangeInformation';
     try {
       /****************************************************************************************
        * Preparing response body
        ****************************************************************************************/
-      let applicationList = await getAllClientApplicationList();
 
+      let applicationList = await LogicalTerminationPointServiceOfUtility.getAllApplicationList(forwardingName);
       /****************************************************************************************
        * Setting 'application/json' response body
        ****************************************************************************************/
@@ -402,183 +371,119 @@ exports.listApplications = function (user, originator, xCorrelator, traceIndicat
 /**
  * Provides list of operation UUIDs belonging to link identified by UUID
  *
- * body V1_listendpointsoflink_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_6
  **/
-exports.listEndPointsOfLink = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    try {
-      /****************************************************************************************
-       * Preparing input from request body
-       ****************************************************************************************/
-      let linkUuid = body["link-uuid"];
-
-      /****************************************************************************************
-       * Preparing response body
-       ****************************************************************************************/
-
-      let linkEndPointList = [];
-      let link = await NetworkControlDomain.getLinkAsync(linkUuid);
-      let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-      for (let i = 0; i < linkPortList.length; i++) {
-        let linkEndPoint = {};
-        let linkPort = linkPortList[i];
-        let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-        let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPoint);
-        let controlConstruct = await NetworkControlDomain.getControlConstructAsync(controlConstructUuid);
-        linkEndPoint.operationUuid = logicalTerminationPoint;
-        if (controlConstruct) {
-          linkEndPoint.ltpDirection = getLtpDirection(controlConstruct, logicalTerminationPoint);
-          linkEndPoint.applicationName = getApplicationName(controlConstruct);
-          linkEndPoint.applicationReleaseNumber = getReleaseNumber(controlConstruct);
-        }
-        linkEndPointList.push(linkEndPoint);
-      }
-      linkEndPointList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(linkEndPointList);
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = {
-        "link-end-point-list": linkEndPointList
-      };
-    } catch (error) {
-      console.log(error);
+exports.listEndPointsOfLink = async function (body) {
+  let linkUuid = body["link-uuid"];
+  let linkEndPointList = [];
+  let took = 0;
+  let linkResult = await LinkServices.getLinkAsync(linkUuid);
+  let link = linkResult.link;
+  took += linkResult.took;
+  if (!link) {
+    console.log(`Link with UUID ${linkUuid} could not be found.`);
+    return {
+      "took": took
     }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
+  }
+  for (let linkPort of link[onfAttributes.LINK.LINK_PORT]) {
+    let linkEndPoint = {};
+    let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
+    let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPoint);
+    let controlConstructResponse = await ControlConstructService.getControlConstructAsync(controlConstructUuid);
+    took += controlConstructResponse.took;
+    let controlConstruct = controlConstructResponse.controlConstruct;
+    linkEndPoint.operationUuid = logicalTerminationPoint;
+    if (controlConstruct) {
+      let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+      let found = logicalTerminationPointList.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === logicalTerminationPoint);
+      linkEndPoint.ltpDirection = found[onfAttributes.LOGICAL_TERMINATION_POINT.LTP_DIRECTION];
+      linkEndPoint.applicationName = ControlConstructService.getApplicationName(controlConstruct);
+      linkEndPoint.releaseNumber = ControlConstructService.getReleaseNumber(controlConstruct);
     }
-  });
-
+    linkEndPointList.push(linkEndPoint);
+  }
+  linkEndPointList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(linkEndPointList);
+  return {
+    "body": {
+      "link-end-point-list": linkEndPointList
+    },
+    "took": took
+  };
 }
 
 /**
  * Provides list of UUIDs of Links
  *
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_5
  **/
-exports.listLinkUuids = function (user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    try {
-      let linkUuidList = [];
-      /****************************************************************************************
-       * Preparing response body
-       ****************************************************************************************/
-      let linkList = await NetworkControlDomain.getLinkListAsync();
-      for (let i = 0; i < linkList.length; i++) {
-        let link = linkList[i];
-        let linkUuid = link[onfAttributes.GLOBAL_CLASS.UUID];
-        linkUuidList.push(linkUuid);
-      }
-
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = {
-        "link-uuid-list": linkUuidList
-      };
-    } catch (error) {
-      console.log(error);
-    }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
-    }
-  });
-
+exports.listLinkUuids = async function () {
+  let linksResponse = await LinkServices.getLinkListAsync();
+  let linkList = linksResponse.links;
+  const linkUuidList = linkList.flatMap(link => link[onfAttributes.GLOBAL_CLASS.UUID]);
+  return {
+    "body": {
+      "link-uuid-list": linkUuidList
+    },
+    "took": linksResponse.took
+  };
 }
-
 
 /**
  * Provides list of applications and names of operations that are connected by links to an application
  * 'Browses list of links for UUIDs of OperationClients at (application-name,application-release-number) as INPUT and  returns (serving-application-name,serving-application-release-number,operation-name) for OperationServers of UUIDs that are stated as OUTPUT.' 
  *
  * body V1_listlinkstooperationclientsofapplication_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_7
  **/
-exports.listLinksToOperationClientsOfApplication = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    let operationServerList = [];
-    try {
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+exports.listLinksToOperationClientsOfApplication = async function (body) {
+  let operationServerList = [];
+  let took = 0;
+  let applicationName = body["application-name"];
+  let applicationReleaseNumber = body["release-number"];
 
-      /****************************************************************************************
-       * Preparing response body
-       ****************************************************************************************/
-      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
-        applicationName,
-        applicationReleaseNumber);
+  let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+    applicationName,
+    applicationReleaseNumber);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  if (controlConstruct) {
+    took += controlConstructResponse.took;
 
-      if (controlConstruct) {
-        let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-        let opertionClientUuidListWithLink = [];
-        let linkList = await NetworkControlDomain.getLinkListAsync();
-        for (let i = 0; i < linkList.length; i++) {
-          let link = linkList[i];
-          let linkPortList = link[onfAttributes.LINK.LINK_PORT];
-          for (let j = 0; j < linkPortList.length; j++) {
-            let linkPort = linkPortList[j];
-            let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
-            if (portDirection == LinkPort.portDirectionEnum.INPUT) {
-              let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
-              let controlConstructUuidOfTheLTP = figureOutControlConstructUuid(logicalTerminationPoint);
-              if (controlConstructUuidOfTheLTP == controlConstructUuid) {
-                opertionClientUuidListWithLink.push(logicalTerminationPoint);
-              }
-            }
+    let controlConstructUuid = controlConstruct[onfAttributes.GLOBAL_CLASS.UUID];
+    let opertionClientUuidListWithLink = [];
+    let linkListResponse = await LinkServices.getLinkListAsync();
+    let linkList = linkListResponse.links;
+    took += linkListResponse.took;
+    for (let link of linkList) {
+      let linkPortList = link[onfAttributes.LINK.LINK_PORT];
+      for (let linkPort of linkPortList) {
+        let portDirection = linkPort[onfAttributes.LINK.PORT_DIRECTION];
+        if (portDirection === LinkPort.portDirectionEnum.INPUT) {
+          let logicalTerminationPoint = linkPort[onfAttributes.LINK.LOGICAL_TERMINATION_POINT];
+          let controlConstructUuidOfTheLTP = figureOutControlConstructUuid(logicalTerminationPoint);
+          if (controlConstructUuidOfTheLTP === controlConstructUuid) {
+            opertionClientUuidListWithLink.push(logicalTerminationPoint);
           }
         }
-
-        let operationClientInformationList = getClientsReactingOnOperationServerList(controlConstruct, opertionClientUuidListWithLink);
-        for (let i = 0; i < operationClientInformationList.length; i++) {
-          let servingApplication = {};
-          let operationClientInformation = operationClientInformationList[i];
-          servingApplication.servingApplicationName = operationClientInformation.addressedApplicationName;
-          servingApplication.servingApplicationReleaseNumber = operationClientInformation.addressedApplicationReleaseNumber;
-          servingApplication.operationName = operationClientInformation.addressedOperationName;
-          servingApplication = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(servingApplication);
-          operationServerList.push(servingApplication);
-        }
       }
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = {
-        "operation-server-list": operationServerList
-      };
-    } catch (error) {
-      console.log(error);
     }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
+
+    let operationClientInformationList = getClientsReactingOnOperationServerList(controlConstruct, opertionClientUuidListWithLink);
+    for (let operationClientInformation of operationClientInformationList) {
+      let servingApplication = {};
+      servingApplication.servingApplicationName = operationClientInformation.addressedApplicationName;
+      servingApplication.servingApplicationReleaseNumber = operationClientInformation.addressedApplicationReleaseNumber;
+      servingApplication.operationName = operationClientInformation.addressedOperationName;
+      servingApplication = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(servingApplication);
+      operationServerList.push(servingApplication);
     }
-  });
+  }
+  return {
+    "body": {
+      "operation-server-list": operationServerList
+    },
+    "took": took
+  };
 }
 
 
@@ -587,96 +492,71 @@ exports.listLinksToOperationClientsOfApplication = function (body, user, origina
  * Returns information about targets of OperationClients.
  *
  * body V1_listoperationclientsatapplication_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_3
  **/
-exports.listOperationClientsAtApplication = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    let operationClientList = [];
-    try {
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+exports.listOperationClientsAtApplication = async function (body) {
+  let operationClientList = [];
+  let took = 0;
+  let applicationName = body["application-name"];
+  let applicationReleaseNumber = body["release-number"];
 
-      /****************************************************************************************
-       * Preparing response body
-       ****************************************************************************************/
-      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
-        applicationName,
-        applicationReleaseNumber);
+  let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+    applicationName,
+    applicationReleaseNumber);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  if (controlConstruct) {
+    took += controlConstructResponse.took;
 
-      if (controlConstruct) {
-        let logicalTerminationPointList = controlConstruct["logical-termination-point"];
+    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
 
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-          let logicalTerminationPoint = logicalTerminationPointList[i];
-          let layerProtocol = logicalTerminationPoint["layer-protocol"][0];
-          let layerProtocolName = layerProtocol["layer-protocol-name"];
-          if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
-            let clientUuidList = logicalTerminationPoint["client-ltp"];
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+        let clientUuidList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
 
-            let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-            let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
-            let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-            let clientApplicationName = httpClientCapability[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
-            let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+        let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+        let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+        let clientApplicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+        let clientReleaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
 
-            if (clientUuidList) {
+        if (clientUuidList) {
 
-              for (let j = 0; j < clientUuidList.length; j++) {
-                let clientUuid = clientUuidList[j];
+          for (let clientUuid of clientUuidList) {
 
-                for (let k = 0; k < logicalTerminationPointList.length; k++) {
-                  let clientLogicalTerminationPoint = logicalTerminationPointList[k];
-                  let clientlogicalTerminationPointUuid = clientLogicalTerminationPoint["uuid"];
+            for (let clientLogicalTerminationPoint of logicalTerminationPointList) {
+              let clientlogicalTerminationPointUuid = clientLogicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
 
-                  if (clientlogicalTerminationPointUuid == clientUuid) {
-                    let clientLayerProtocol = clientLogicalTerminationPoint["layer-protocol"][0];
-                    let clientLayerProtocolName = clientLayerProtocol["layer-protocol-name"];
+              if (clientlogicalTerminationPointUuid === clientUuid) {
+                let clientLayerProtocol = clientLogicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+                let clientLayerProtocolName = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
 
-                    if (clientLayerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
-                      let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-                      let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-                      let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
+                if (clientLayerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
+                  let operationClientInterfacePac = clientLayerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+                  let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+                  let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
 
-                      let operationClient = {};
-                      operationClient.servingApplicationName = clientApplicationName;
-                      operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
-                      operationClient.operationName = operationName;
-                      operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
+                  let operationClient = {};
+                  operationClient.servingApplicationName = clientApplicationName;
+                  operationClient.servingApplicationReleaseNumber = clientReleaseNumber;
+                  operationClient.operationName = operationName;
+                  operationClient = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(operationClient);
 
-                      operationClientList.push(operationClient);
-                    }
-                  }
+                  operationClientList.push(operationClient);
                 }
               }
             }
           }
         }
       }
-
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = {
-        "operation-client-list": operationClientList
-      };
-    } catch (error) {
-      console.log(error);
     }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
-    }
-  });
+  }
+  return {
+    "body": {
+      "operation-client-list": operationClientList
+    },
+    "took": took
+  };
 }
 
 
@@ -685,127 +565,82 @@ exports.listOperationClientsAtApplication = function (body, user, originator, xC
  * Informs about the internal forwarding (FCs).
  *
  * body V1_listoperationclientsreactingonoperationserver_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_4
  **/
-exports.listOperationClientsReactingOnOperationServer = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    let operationClientList = [];
-    try {
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let applicationName = body["receiving-application-name"];
-      let applicationReleaseNumber = body["receiving-application-release-number"];
-      let operationServerName = body["receiving-operation"];
+exports.listOperationClientsReactingOnOperationServer = async function (body) {
+  let operationClientList = [];
+  let took = 0;
+  let applicationName = body["receiving-application-name"];
+  let applicationReleaseNumber = body["receiving-application-release-number"];
+  let operationServerName = body["receiving-operation"];
 
-      /****************************************************************************************
-       * Preparing response body
-       ****************************************************************************************/
-      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
-        applicationName,
-        applicationReleaseNumber);
-      if (controlConstruct) {
-        let operationServerUuid = getOperationServerUuid(controlConstruct, operationServerName);
-        if (operationServerUuid) {
-          let operationClientsUuidsReactingOnOperationServerList = getOperationClientsUuidsReactingOnOperationServerList(
-            controlConstruct,
-            operationServerUuid
-          );
-          if (operationClientsUuidsReactingOnOperationServerList) {
-            let clientsReactingOnOperationServerList = getClientsReactingOnOperationServerList(
-              controlConstruct,
-              operationClientsUuidsReactingOnOperationServerList
-            );
-            if (clientsReactingOnOperationServerList) {
-              operationClientList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(clientsReactingOnOperationServerList);
-            }
-          }
-        }
-      }
+  let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+    applicationName,
+    applicationReleaseNumber);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  if (controlConstruct) {
+    took += controlConstructResponse.took;
 
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = {
-        "operation-client-list": operationClientList
-      };
-    } catch (error) {
-      console.log(error);
+    let operationServerUuid = ControlConstructService.getOperationServerUuid(controlConstruct, operationServerName);
+    if (operationServerUuid) {
+      let operationClientsUuidsReactingOnOperationServerList = getOperationClientsUuidsReactingOnOperationServerList(
+        controlConstruct,
+        operationServerUuid
+      );
+      let clientsReactingOnOperationServerList = getClientsReactingOnOperationServerList(
+        controlConstruct,
+        operationClientsUuidsReactingOnOperationServerList
+      );
+      operationClientList = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(clientsReactingOnOperationServerList);
     }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
-    }
-  });
+  }
+  return {
+    "body": {
+      "operation-client-list": operationClientList
+    },
+    "took": took
+  };
 }
 
 /**
  * Provides list of names of operations that are supported by an application
  *
  * body V1_listoperationserversatapplication_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns inline_response_200_2
  **/
-exports.listOperationServersAtApplication = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    let operationServerNameList = [];
-    try {
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
+exports.listOperationServersAtApplication = async function (body) {
+  let operationServerNameList = [];
+  let took = 0;
+  let applicationName = body["application-name"];
+  let applicationReleaseNumber = body["release-number"];
 
-      /****************************************************************************************
-       * Preparing response body
-       ****************************************************************************************/
-      let controlConstruct = await NetworkControlDomain.getControlConstructOfTheApplication(
-        applicationName,
-        applicationReleaseNumber);
-      if (controlConstruct) {
-        let logicalTerminationPointList = controlConstruct["logical-termination-point"];
-        for (let i = 0; i < logicalTerminationPointList.length; i++) {
-          let logicalTerminationPoint = logicalTerminationPointList[i];
-          let layerProtocol = logicalTerminationPoint["layer-protocol"][0];
-          let layerProtocolName = layerProtocol["layer-protocol-name"];
-          if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
-            let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-            let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-            let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-            operationServerNameList.push(operationName);
-          }
-        }
-      }
+  let controlConstructResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+    applicationName,
+    applicationReleaseNumber);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  if (controlConstruct) {
+    took += controlConstructResponse.took;
 
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = {
-        "operation-server-name-list": operationServerNameList
-      };
-    } catch (error) {
-      console.log(error);
+    let logicalTerminationPointFullList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    let logicalTerminationPointList = logicalTerminationPointFullList.filter(ltp => {
+      let name = ltp[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0][onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+      return name === LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER;
+    });
+    for (let logicalTerminationPoint of logicalTerminationPointList) {
+      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+      let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+      let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+      let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
+      operationServerNameList.push(operationName);
     }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
-    }
-  });
+  }
+  return {
+    "body": {
+      "operation-server-name-list": operationServerNameList
+    },
+    "took": took
+  };
 }
-
 
 /**
  * Offers subscribing for notifications about updates of Links
@@ -827,24 +662,31 @@ exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, trace
        ****************************************************************************************/
       let applicationName = body["subscriber-application"];
       let releaseNumber = body["subscriber-release-number"];
-      let applicationAddress = body["subscriber-address"];
-      let applicationPort = body["subscriber-port"];
       let subscriberOperation = body["subscriber-operation"];
 
+      let tcpServerList = [{
+        protocol: body["subscriber-protocol"],
+        address: body["subscriber-address"],
+        port: body["subscriber-port"]
+      }];
+
+
+      let operationNamesByAttributes = new Map();
+      operationNamesByAttributes.set("regard-updated-link", subscriberOperation);
       /****************************************************************************************
        * Prepare logicalTerminatinPointConfigurationInput object to 
        * configure logical-termination-point
        ****************************************************************************************/
 
-      let operationList = [
-        subscriberOperation
-      ];
+
+
       let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
         applicationName,
         releaseNumber,
-        applicationAddress,
-        applicationPort,
-        operationList
+        tcpServerList,
+        operationServerName,
+        operationNamesByAttributes,
+        individualServicesOperationsMapping.individualServicesOperationsMapping
       );
       let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationInformationAsync(
         logicalTerminatinPointConfigurationInput
@@ -865,10 +707,10 @@ exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, trace
           subscriberOperation
         );
         forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-          configureForwardingConstructAsync(
-            operationServerName,
-            forwardingConfigurationInputList
-          );
+        configureForwardingConstructAsync(
+          operationServerName,
+          forwardingConfigurationInputList
+        );
       }
 
       /****************************************************************************************
@@ -926,732 +768,295 @@ exports.provideCurrentOperationKey = function (body, user, originator, xCorrelat
  *
  * body V1_regardapplication_body 
  * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
  * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
  * traceIndicator String Sequence of request numbers along the flow
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.regardApplication = function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
-  return new Promise(async function (resolve, reject) {
-    try {
+exports.regardApplication = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  let took = 0;
+  let applicationName = body["application-name"];
+  let releaseNumber = body["release-number"];
+  let tcpServerList = [{
+    protocol: body["protocol"],
+    address: body["address"],
+    port: body["port"]
+  }];
 
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["application-release-number"];
-      let applicationAddress = body["application-address"];
-      let applicationPort = body["application-port"];
-      let listLTPsFCsOperation = "/v1/list-ltps-and-fcs";
-      let redirectTopologyInformationOperation = "/v1/redirect-topology-change-information";
+  let redirectTopologyInformationOperation = "/v1/redirect-topology-change-information";
 
-      /****************************************************************************************
-       * Prepare logicalTerminatinPointConfigurationInput object to 
-       * configure logical-termination-point
-       ****************************************************************************************/
+  let operationNamesByAttributes = new Map();
+  operationNamesByAttributes.set("redirect-topology-change-information", redirectTopologyInformationOperation);
 
-      let operationList = [
-        listLTPsFCsOperation,
-        redirectTopologyInformationOperation
-      ];
-      let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
-        applicationName,
-        applicationReleaseNumber,
-        applicationAddress,
-        applicationPort,
-        operationList
-      );
-      let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationInformationAsync(
-        logicalTerminatinPointConfigurationInput
-      );
+  let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
+    applicationName,
+    releaseNumber,
+    tcpServerList,
+    operationServerName,
+    operationNamesByAttributes,
+    individualServicesOperationsMapping.individualServicesOperationsMapping
+  );
+  let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.findOrCreateApplicationInformationAsync(
+    logicalTerminatinPointConfigurationInput,
+    NEW_RELEASE_FORWARDING_NAME
+  );
+
+  let forwardingConfigurationInputList = [];
+  let forwardingConstructConfigurationStatus;
+  let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
+
+  if (operationClientConfigurationStatusList) {
+    forwardingConfigurationInputList = await prepareForwardingConfiguration.regardApplication(
+      operationClientConfigurationStatusList,
+      redirectTopologyInformationOperation
+    );
+    forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
+    configureForwardingConstructAsync(
+      operationServerName,
+      forwardingConfigurationInputList
+    );
+  }
+
+  let forwardingAutomationInputList = await prepareForwardingAutomation.regardApplication(
+    logicalTerminationPointconfigurationStatus,
+    forwardingConstructConfigurationStatus,
+    applicationName,
+    releaseNumber
+  );
+
+  let headers = {
+    user,
+    xCorrelator,
+    traceIndicator,
+    customerJourney
+  }
+
+  automateForwarding(forwardingAutomationInputList[0], headers, applicationName, releaseNumber)
 
 
-      /****************************************************************************************
-       * Prepare attributes to configure forwarding-construct
-       ****************************************************************************************/
-      let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
-      let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-      if (!(applicationName == ownApplicationName && applicationReleaseNumber == ownApplicationReleaseNumber)) {
-        let forwardingConfigurationInputList = [];
-        let forwardingConstructConfigurationStatus;
-        let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
+  /***********************************************************************************
+   * forwardings for application layer topology
+   ************************************************************************************/
+  let applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputAsync(
+    logicalTerminationPointconfigurationStatus,
+    forwardingConstructConfigurationStatus
+  );
 
-        if (operationClientConfigurationStatusList) {
-          forwardingConfigurationInputList = await prepareForwardingConfiguration.regardApplication(
-            operationClientConfigurationStatusList,
-            listLTPsFCsOperation,
-            redirectTopologyInformationOperation
-          );
-          forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-            configureForwardingConstructAsync(
-              operationServerName,
-              forwardingConfigurationInputList
-            );
-        }
+  ForwardingAutomationService.automateForwardingConstructAsync(
+    operationServerName,
+    applicationLayerTopologyForwardingInputList,
+    user,
+    xCorrelator,
+    traceIndicator,
+    customerJourney
+  );
 
-        /****************************************************************************************
-         * Prepare attributes to automate forwarding-construct
-         ****************************************************************************************/
-        let forwardingAutomationInputList = await prepareForwardingAutomation.regardApplication(
-          logicalTerminationPointconfigurationStatus,
-          forwardingConstructConfigurationStatus,
-          applicationName,
-          applicationReleaseNumber
-        );
-        ForwardingAutomationService.automateForwardingConstructAsync(
-          operationServerName,
-          forwardingAutomationInputList,
-          user,
-          xCorrelator,
-          traceIndicator,
-          customerJourney
-        );
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
 }
 
+async function automateForwarding(forwardingAutomationInput, headers, applicationName, releaseNumber) {
+  let response = await ForwardingAutomationServiceWithResponse.automateForwardingConstructAsync(
+    forwardingAutomationInput,
+    headers
+  );
+  let took = 0;
+  if (response === undefined || response.data === undefined || Object.keys(response).length === 0) {
+    return {
+      "took": took
+    };
+  }
+
+  // response is full control construct of regarded application
+  let cc = response["data"]["core-model-1-4:control-construct"];
+  let res = await ControlConstructService.createOrUpdateControlConstructAsync(cc);
+  took += res.took;
+
+  let logicalTerminationPoints = cc[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+  let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
+  for (let operationServerName of operationServerNames) {
+    let endPointDetails = {
+      'serving-application-name': applicationName,
+      'serving-application-release-number': releaseNumber,
+      'operation-name': operationServerName
+    }
+    let linkResponse = await LinkServices.findOrCreateLinkForTheEndPointsAsync(endPointDetails);
+    took += linkResponse.took;
+  }
+}
 
 /**
  * Disconnects an OperationClient
  *
  * body V1_removeoperationclientfromlink_body 
  * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
  * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
  * traceIndicator String Sequence of request numbers along the flow
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.removeOperationClientFromLink = function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
-  return new Promise(async function (resolve, reject) {
-    try {
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let EndPointDetails = body;
-
-      /****************************************************************************************
-       * Prepare logicalTerminatinPointConfigurationInput object to 
-       * configure logical-termination-point
-       ****************************************************************************************/
-      let linkUuid = await LinkServices.deleteOperationClientFromTheEndPointsAsync(EndPointDetails);
-
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-      let forwardingAutomationInputList = await prepareForwardingAutomation.removeOperationClientFromLink(
-        linkUuid
-      );
-      ForwardingAutomationService.automateForwardingConstructAsync(
-        operationServerName,
-        forwardingAutomationInputList,
-        user,
-        xCorrelator,
-        traceIndicator,
-        customerJourney
-      );
-
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
-/**
- * Starts application in generic representation
- *
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
- * returns inline_response_200
- **/
-exports.startApplicationInGenericRepresentation = function (user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    try {
-      /****************************************************************************************
-       * Preparing consequent-action-list for response body
-       ****************************************************************************************/
-      let consequentActionList = [];
-      let protocol = "http";
-
-      let localAddress = await tcpServerInterface.getLocalAddress();
-      let localPort = await tcpServerInterface.getLocalPort();
-      let baseUrl = protocol + "://" + localAddress + ":" + localPort
-
-      let informAboutApplicationOperationServerUuid = "alt-0-0-1-op-s-2002";
-      let informAboutApplicationOperationName = await operationServerInterface.getOperationNameAsync(
-        informAboutApplicationOperationServerUuid);
-
-      let LabelForInformAboutApplication = "Inform about Application";
-      let requestForInformAboutApplication = baseUrl + informAboutApplicationOperationName;
-      let consequentActionForInformAboutApplication = new consequentAction(
-        LabelForInformAboutApplication,
-        requestForInformAboutApplication,
-        false
-      );
-      consequentActionList.push(consequentActionForInformAboutApplication);
-      /****************************************************************************************
-       * Preparing response-value-list for response body
-       ****************************************************************************************/
-      let responseValueList = [];
-      let applicationName = await httpServerInterface.getApplicationNameAsync();
-      let reponseValue = new responseValue(
-        "applicationName",
-        applicationName,
-        typeof applicationName
-      );
-
-      responseValueList.push(reponseValue);
-
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase({
-        consequentActionList,
-        responseValueList
-      });
-    } catch (error) {
-      console.log(error);
-    }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
-    }
-  });
-
+exports.removeOperationClientFromLink = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  let response = await LinkServices.deleteOperationClientFromTheEndPointsAsync(body);
+  let linkUuid = response.linkUuid;
+  if (linkUuid) {
+    let forwardingAutomationInputList = await prepareForwardingAutomation.removeOperationClientFromLink(
+      linkUuid
+    );
+    ForwardingAutomationService.automateForwardingConstructAsync(
+      operationServerName,
+      forwardingAutomationInputList,
+      user,
+      xCorrelator,
+      traceIndicator,
+      customerJourney
+    );
+  }
+  return {
+    "took": response.took
+  };
 }
 
 
 /**
  * Existing documentation of all interfaces and internal connections will be replaced for the same CcUuid
  *
- * body V1_updateallltpsandfcs_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
+ * body V1_updateallltpsandfcs_body
  * no response value expected for this operation
  **/
-exports.updateAllLtpsAndFcs = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      await checkApplicationExists(originator);
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let controlConstruct = body["core-model-1-4:control-construct"];
-      let controlConstructUuid = controlConstruct["uuid"];
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-
-      let existingControlConstruct = await NetworkControlDomain.getControlConstructAsync(controlConstructUuid);
-      if (existingControlConstruct) {
-        let existingControlConstructAsAString = JSON.stringify(existingControlConstruct);
-        let newControlConstructAsAString = JSON.stringify(controlConstruct);
-        if (existingControlConstructAsAString != newControlConstructAsAString) {
-          await NetworkControlDomain.deleteControlConstructAsync(controlConstructUuid);
-          await NetworkControlDomain.addControlConstructAsync(controlConstruct);
-        }
-      } else {
-        await NetworkControlDomain.addControlConstructAsync(controlConstruct);
-      }
-
-      /****************************************************************************************
-       * Prepare attributes to configure forwarding-construct
-       ****************************************************************************************/
-
-
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+exports.updateAllLtpsAndFcs = async function (body) {
+  let controlConstruct = body["core-model-1-4:control-construct"];
+  await checkIfApplicationExists(controlConstruct);
+  return await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct);
 }
-
 
 /**
  * Existing documentation of an FC identified by FcUuid will be replaced
  *
  * body V1_updatefc_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.updateFc = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      await checkApplicationExists(originator);
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let forwardingConstruct = body;
-      let forwardingConstructUuid = forwardingConstruct["uuid"];
-      let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-      let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
-      if (forwardingDomainUuid != undefined) {
-        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-        let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
-        let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
-
-        let existingForwardingConstruct = await fileOperation.readFromDatabaseAsync(forwardingConstructPathForTheUuid);
-
-        if (existingForwardingConstruct) {
-          let existingForwardingConstructAsAString = JSON.stringify(existingForwardingConstruct);
-          let newForwardingConstructAsAString = JSON.stringify(forwardingConstruct);
-          if (existingForwardingConstructAsAString != newForwardingConstructAsAString) {
-            await fileOperation.deletefromDatabaseAsync(forwardingConstructPathForTheUuid,
-              existingForwardingConstruct,
-              true);
-            await fileOperation.writeToDatabaseAsync(forardingConstructPath,
-              forwardingConstruct,
-              true);
-          }
-        } else {
-          await fileOperation.writeToDatabaseAsync(forardingConstructPath,
-            forwardingConstruct,
-            true);
-        }
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+exports.updateFc = async function (body) {
+  let forwardingConstructUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
+  let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+  let response = await ControlConstructService.updateForwardingConstruct(controlConstructUuid, body)
+  if (response) {
+    return response;
+  } else {
+    throw new Error('fc is not updated')
+  }
 }
-
 
 /**
  * Existing documentation of an FcPort identified by FcUuid and FcPortLid will be replaced
  *
  * body V1_updatefcport_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.updateFcPort = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      await checkApplicationExists(originator);
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let forwardingConstructUuid = body["fc-uuid"];
-      let fcPort = body["fc-port"];
-      let fcPortLocalId = fcPort["local-id"];
-      let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-      let forwardingDomainUuid = await getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid);
-      if (forwardingDomainUuid != undefined) {
-        let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-        let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-        let forardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT;
-        let forwardingConstructPathForTheUuid = forardingConstructPath + "=" + forwardingConstructUuid;
-        let fcPortPath = forwardingConstructPathForTheUuid + "/fc-port";
-        let fcPortPathForTheUuid = fcPortPath + "=" + fcPortLocalId
-
-        let existingFcPort = await fileOperation.readFromDatabaseAsync(fcPortPathForTheUuid);
-
-        if (existingFcPort) {
-          let existingFcPortAsAString = JSON.stringify(existingFcPort);
-          let newFcPortAsAString = JSON.stringify(fcPort);
-          if (existingFcPortAsAString != newFcPortAsAString) {
-            await fileOperation.deletefromDatabaseAsync(fcPortPathForTheUuid,
-              existingFcPort,
-              true);
-            await fileOperation.writeToDatabaseAsync(fcPortPath,
-              fcPort,
-              true);
-          }
-        } else {
-          await fileOperation.writeToDatabaseAsync(fcPortPath,
-            fcPort,
-            true);
-        }
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+exports.updateFcPort = async function (body) {
+  let forwardingConstructUuid = body["fc-uuid"];
+  let fcPort = body["fc-port"];
+  let controlConstructUuid = figureOutControlConstructUuid(forwardingConstructUuid);
+  let response = await ControlConstructService.updateFCPort(controlConstructUuid, forwardingConstructUuid, fcPort);
+  if (response) {
+    return response;
+  } else {
+    throw new Error('fc-port is not updated')
+  }
 }
-
 
 /**
  * Existing documentation of the interface identified by LtpUuid will be replaced
  *
  * body V1_updateltp_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.updateLtp = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      await checkApplicationExists(originator);
-
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let logicalTerminationPoint = body;
-      let logicalTerminationPointUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-      let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
-
-      /****************************************************************************************
-       * Prepare input object to 
-       * configure control-construct list
-       ****************************************************************************************/
-      let logicalTerminationPointPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT +
-        "=" +
-        controlConstructUuid +
-        "/" + onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT;
-
-      let logicalTerminationPointPathForTheUuid = logicalTerminationPointPath +
-        "=" +
-        logicalTerminationPointUuid;
-
-      let existingLogicalTerminationPoint = await fileOperation.readFromDatabaseAsync(logicalTerminationPointPathForTheUuid);
-
-      if (existingLogicalTerminationPoint) {
-        let existingLogicalTerminationPointAsAString = JSON.stringify(existingLogicalTerminationPoint);
-        let newLogicalTerminationPointAsAString = JSON.stringify(logicalTerminationPoint);
-        if (existingLogicalTerminationPointAsAString != newLogicalTerminationPointAsAString) {
-          await fileOperation.deletefromDatabaseAsync(logicalTerminationPointPathForTheUuid,
-            existingLogicalTerminationPoint,
-            true);
-          await fileOperation.writeToDatabaseAsync(logicalTerminationPointPath,
-            logicalTerminationPoint,
-            true);
-        }
-      } else {
-        await fileOperation.writeToDatabaseAsync(logicalTerminationPointPath,
-          logicalTerminationPoint,
-          true);
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
+exports.updateLtp = async function (body, user, xCorrelator, traceIndicator,customerJourney, operationServerName) {
+  let logicalTerminationPointUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
+  let existingLtps = [];
+  let forwardingAutomationInputList = [];
+  let controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
+  let controlConstruct = controlConstructResponse.controlConstruct;
+  let took = controlConstructResponse.took;
+  if (controlConstruct) {
+    existingLtps = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+    let existingIndex = existingLtps.findIndex(item => item[onfAttributes.GLOBAL_CLASS.UUID] === logicalTerminationPointUuid);
+    let existingLtp = existingLtps[existingIndex];
+    if (!existingLtp) {
+      throw new createHttpError.BadRequest(`LTP with UUID ${logicalTerminationPointUuid} could not be found.`);
     }
-  });
+    if (isEqual(existingLtp, body)) {
+      console.log(`LTP with UUID ${logicalTerminationPointUuid} is already in database.`);
+      return {
+        "took": took
+      };
+    }
+    // deal with forwardings
+    let forwardingAutomationInputListResponse = await prepareForwardingAutomation.updateLtp(existingLtp, body);
+    forwardingAutomationInputList = forwardingAutomationInputListResponse.forwardingAutomationInputList;
+    took += forwardingAutomationInputListResponse.took;
+  } else {
+    // we did not find existing LTP with this name, figure out CC by UUID
+    let controlConstructUuid = figureOutControlConstructUuid(logicalTerminationPointUuid);
+    controlConstructResponse = await ControlConstructService.getControlConstructAsync(controlConstructUuid);
+    controlConstruct = controlConstructResponse.controlConstruct;
+    took += controlConstructResponse.took;
+    if (!controlConstruct) {
+      throw new createHttpError.BadRequest(`CC with UUID ${controlConstructUuid} could not be found.`)
+    }
+  }
+  // update LTP in control construct
+  let controlConstructUpdateResponse = await ControlConstructService.updateControlConstructLtp(
+    controlConstruct[onfAttributes.GLOBAL_CLASS.UUID],
+    body
+  );
+  took += controlConstructUpdateResponse.took;
+
+  // forwardings
+  if (forwardingAutomationInputList.length !== 0) {
+    ForwardingAutomationService.automateForwardingConstructAsync(
+      operationServerName,
+      forwardingAutomationInputList,
+      user,
+      xCorrelator,
+      traceIndicator,
+      customerJourney
+    );
+  }
+  return {
+    "took": took
+  };
 }
 
 /****************************************************************************************
  * Functions utilized by individual services
  ****************************************************************************************/
 
-/**
- * @description This function returns list of registered application information application-name , release-number.
- * @return {Promise} return the list of application information
- **/
-function getAllClientApplicationList() {
-  return new Promise(async function (resolve, reject) {
-    let clientApplicationList = [];
-    try {
-
-      /** 
-       * This class instantiate objects that holds the application name , release number 
-       * of the client applications
-       */
-      let clientApplicationInformation = class ClientApplicationInformation {
-        applicationName;
-        applicationReleaseNumber;
-
-        /**
-         * @constructor 
-         * @param {String} applicationName name of the client application.
-         * @param {String} applicationReleaseNumber release number of the application.
-         **/
-        constructor(applicationName, applicationReleaseNumber) {
-          this.applicationName = applicationName;
-          this.applicationReleaseNumber = applicationReleaseNumber;
-        }
-      };
-      let controlConstructList = await NetworkControlDomain.getControlConstructListAsync();
-      for (let i = 0; i < controlConstructList.length; i++) {
-        let controlConstruct = controlConstructList[i];
-        try {
-          let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-          for (let i = 0; i < logicalTerminationPointList.length; i++) {
-            let logicalTerminationPoint = logicalTerminationPointList[i];
-            let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-            let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-            if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
-              let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
-              let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
-              let applicationName = httpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
-              let applicationReleaseNumber = httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
-              let clientApplication = new clientApplicationInformation(applicationName, applicationReleaseNumber);
-              clientApplicationList.push(clientApplication);
-            }
-          }
-        } catch (error) {
-          console.log(error)
-        }
-      }
-      resolve(clientApplicationList);
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
-async function getForwardingDomainUuid(controlConstructUuid, forwardingConstructUuid) {
-  return new Promise(async function (resolve, reject) {
-    let forwardingDomainUuid;
-    try {
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-      let forwardingConstructPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN;
-
-      let forwardingDomainList = await fileOperation.readFromDatabaseAsync(
-        forwardingConstructPath);
-      /*************************************************************************************
-       ****************delete dependents , if a fc-port exist for them***********************
-       *************************************************************************************/
-      if (forwardingDomainList != undefined) {
-        for (let i = 0; i < forwardingDomainList.length; i++) {
-          let forwardingDomain = forwardingDomainList[i];
-          let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
-
-          for (let j = 0; j < forwardingConstructList.length; j++) {
-            let forwardingConstruct = forwardingConstructList[j];
-            let _forwardingConstructUuid = forwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-            if (_forwardingConstructUuid == forwardingConstructUuid) {
-              forwardingDomainUuid = forwardingDomain[onfAttributes.GLOBAL_CLASS.UUID];
-            }
-          }
-        }
-      }
-      resolve(forwardingDomainUuid);
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
-async function deleteDependentFcPorts(controlConstructUuid, logicalTerminationPointUuid) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-      let forwardingConstructPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN;
-
-      let forwardingDomainList = await fileOperation.readFromDatabaseAsync(
-        forwardingConstructPath);
-      /*************************************************************************************
-       ****************delete dependents , if a fc-port exist for them***********************
-       *************************************************************************************/
-      for (let i = 0; i < forwardingDomainList.length; i++) {
-        let forwardingDomain = forwardingDomainList[i];
-        let forwardingDomainUuid = forwardingDomain[onfAttributes.GLOBAL_CLASS.UUID];
-        let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
-
-        for (let j = 0; j < forwardingConstructList.length; j++) {
-          let forwardingConstruct = forwardingConstructList[j];
-          let forwardingConstructUuid = forwardingConstruct[onfAttributes.GLOBAL_CLASS.UUID];
-          let nameList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.NAME];
-          let forwardingKind = getValueFromKey(nameList, "ForwardingKind");
-          let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
-
-          for (let k = 0; k < fcPortList.length; k++) {
-            let fcPort = fcPortList[k];
-            let fcPortLocalId = fcPort[onfAttributes.LOCAL_CLASS.LOCAL_ID];
-            let FcPortlogicalTerminationPoint = fcPort[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-
-            if (FcPortlogicalTerminationPoint == logicalTerminationPointUuid) {
-              await deleteFcPorts(
-                forwardingKind,
-                controlConstructUuid,
-                forwardingDomainUuid,
-                forwardingConstructUuid,
-                fcPortLocalId
-              );
-            }
-
-          }
-        }
-      }
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
-
-async function deleteFcPorts(forwardingName, controlConstructUuid, forwardingDomainUuid, forwardingConstructUuid, fcPortLocalId) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let controlConstructPath = onfPaths.NETWORK_DOMAIN_CONTROL_CONSTRUCT + "=" + controlConstructUuid;
-      let forwardingDomainPath = controlConstructPath + "/" + onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN + "=" + forwardingDomainUuid;
-      let forwardingConstructPath = forwardingDomainPath + "/" + onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT + "=" + forwardingConstructUuid;
-      let fcPortPath = forwardingConstructPath + "/" + onfAttributes.FORWARDING_CONSTRUCT.FC_PORT + "=" + fcPortLocalId;
-
-      if (forwardingName != ForwardingConstruct.name.forwardingConstructKindEnum.INVARIANT_PROCESS_SNIPPET) {
-        await fileOperation.deletefromDatabaseAsync(fcPortPath,
-          fcPortPath,
-          true);
-      } else {
-        fcPortPath = fcPortPath +
-          "/" + onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT;
-        await fileOperation.writeToDatabaseAsync(fcPortPath,
-          "-1",
-          false);
-      }
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
-async function deleteDependentLinkPorts(logicalTerminationPointUuid) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let linkList = await NetworkControlDomain.getLinkListAsync();
-      if (linkList) {
-        for (let i = 0; i < linkList.length; i++) {
-          let link = linkList[i];
-          let linkUuid = link["uuid"];
-          let linkPortList = link["link-port"];
-          if (linkPortList) {
-            for (let j = 0; j < linkPortList.length; j++) {
-              let linkPort = linkPortList[j];
-              let linkPortLogicalTerminationPoint = linkPort["logical-termination-point"];
-              if (linkPortLogicalTerminationPoint == logicalTerminationPointUuid) {
-                await NetworkControlDomain.deleteLinkAsync(linkUuid);
-              }
-            }
-          }
-        }
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
 
 /***************************************************************************************************************
  ****************** Funtions that are specific to the addOperationClientToLink ************
  ***************************************************************************************************************/
 
 /**
- * Provides operationClientUuid for the operationClientName
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationClientName operation name of the operation client
- * @returns operationClientUuid
+ * Extracts operation server names from given list of LTPs.
+ * @param {Array} logicalTerminationPoints LTPs from which the operation server names should be extracted
+ * @returns {Array} of operation server names
  */
-function getOperationClientUuid(controlConstruct, operationClientName, consumingApplicationName, consumingApplicationReleaseNumber) {
-  let operationClientUuid;
-  try {
-    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    for (let i = 0; i < logicalTerminationPointList.length; i++) {
-      let logicalTerminationPoint = logicalTerminationPointList[i];
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT) {
-        let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-        let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-        let operationName = operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
-        if (operationName == operationClientName) {
-          let _operationClientUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-          let applicationName = getApplicationName(logicalTerminationPointList,
-            _operationClientUuid);
-          let releaseNumber = getReleaseNumber(logicalTerminationPointList,
-            _operationClientUuid);
-          if (applicationName == consumingApplicationName && releaseNumber == consumingApplicationReleaseNumber) {
-            operationClientUuid = _operationClientUuid;
-          }
-        }
-      }
+function getAllOperationServerNameAsync(logicalTerminationPoints) {
+  let operationServerNames = [];
+  for (let logicalTerminationPoint of logicalTerminationPoints) {
+    let protocols = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
+    let protocol = protocols[0];
+    let protocolName = protocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+    if (LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER === protocolName) {
+      let operationServerPac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
+      let operationServerCapability = operationServerPac[onfAttributes.OPERATION_SERVER.CAPABILITY];
+      operationServerNames.push(operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME]);
     }
-    return operationClientUuid;
-  } catch (error) {
-    console.log(error)
   }
+  return operationServerNames;
 }
-
-
-
 
 /***************************************************************************************************************
  ****************** Funtions that are specific to the listOperationClientsReactingOnOperationServer ************
  ***************************************************************************************************************/
-
-/**
- * Provides operationServerUuid for the operationServerName
- * @param {*} controlConstruct complete control-construct instance
- * @param {*} operationServerName operation name of the operation Server
- * @returns operationServeruuid
- */
-function getOperationServerUuid(controlConstruct, operationServerName) {
-  let operationServerUuid;
-  try {
-    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    for (let i = 0; i < logicalTerminationPointList.length; i++) {
-      let logicalTerminationPoint = logicalTerminationPointList[i];
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER) {
-        let operationServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
-        let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
-        let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-        if (operationName == operationServerName) {
-          operationServerUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-        }
-      }
-    }
-    return operationServerUuid;
-  } catch (error) {
-    console.log(error)
-  }
-}
-
 
 /**
  * This function gets the operation client uuids reacting on the operation server list
@@ -1660,233 +1065,119 @@ function getOperationServerUuid(controlConstruct, operationServerName) {
  * @returns array
  */
 function getOperationClientsUuidsReactingOnOperationServerList(controlConstruct, operationServerUuid) {
-  let operationClientsUuidsReactingOnOperationServerList = [];
-  try {
-    let forwardingDomainList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN];
-    for (let i = 0; i < forwardingDomainList.length; i++) {
-      let forwardingDomain = forwardingDomainList[i];
-      let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
-      for (let j = 0; j < forwardingConstructList.length; j++) {
-        let forwardingConstruct = forwardingConstructList[j];
-        let fcOutputUuidList = getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid);
-        for (let k = 0; k < fcOutputUuidList.length; k++) {
-          let fcOutputUuid = fcOutputUuidList[k];
-          operationClientsUuidsReactingOnOperationServerList.push(fcOutputUuid);
-        }
+  let operationClientsUuids = [];
+  let forwardingDomainList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.FORWARDING_DOMAIN];
+  for (let forwardingDomain of forwardingDomainList) {
+    let forwardingConstructList = forwardingDomain[onfAttributes.FORWARDING_DOMAIN.FORWARDING_CONSTRUCT];
+    for (let forwardingConstruct of forwardingConstructList) {
+      let fcOutputUuidList = getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid)
+      for (let fcOutputUuid of fcOutputUuidList) {
+        operationClientsUuids.push(fcOutputUuid);
       }
     }
-    return operationClientsUuidsReactingOnOperationServerList;
-  } catch (error) {
-    console.log(error)
   }
+  return operationClientsUuids;
 }
 
 /**
  * This function returns the list of output fc-port uuids for the operationServerUuid in the given forwardingConstruct
- * @param {*} forwardingConstruct 
- * @param {*} operationServerUuid 
- * @returns array
+ * @param {Object} forwardingConstruct
+ * @param {String} operationServerUuid
+ * @returns {Array}
  */
 function getFcOutputUuidListforTheInput(forwardingConstruct, operationServerUuid) {
   let fcOutputUuidList = [];
-  try {
-    if (isOperationServerIsInInput(forwardingConstruct, operationServerUuid)) {
-      let fcPortList = forwardingConstruct["fc-port"];
-      for (let i = 0; i < fcPortList.length; i++) {
-        let fcPort = fcPortList[i];
-        let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
-        if (fcPortDirection == FcPort.portDirectionEnum.OUTPUT) {
-          let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
-          fcOutputUuidList.push(logicalTerminationPoint);
-        }
+  if (isOperationServerIsInInput(forwardingConstruct, operationServerUuid)) {
+    let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
+    for (let fcPort of fcPortList) {
+      let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
+      if (fcPortDirection === FcPort.portDirectionEnum.OUTPUT) {
+        let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
+        fcOutputUuidList.push(logicalTerminationPoint);
       }
     }
-    return fcOutputUuidList;
-  } catch (error) {
-    console.log(error)
   }
+  return fcOutputUuidList;
 }
 
 
 /**
  * This function returns true if the operation server is listed as a input port in given forwarding construct
- * @param {*} forwardingConstruct 
- * @param {*} operationServerUuid 
- * @returns boolean
+ * @param {Object} forwardingConstruct
+ * @param {String} operationServerUuid
+ * @returns {boolean}
  */
 function isOperationServerIsInInput(forwardingConstruct, operationServerUuid) {
-  let isOperationServerUuidIsAInput = false;
-  try {
-    let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
-    for (let i = 0; i < fcPortList.length; i++) {
-      let fcPort = fcPortList[i];
-      let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
-      if (fcPortDirection == FcPort.portDirectionEnum.INPUT) {
-        let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
-        if (logicalTerminationPoint == operationServerUuid) {
-          isOperationServerUuidIsAInput = true;
-        }
+  let fcPortList = forwardingConstruct[onfAttributes.FORWARDING_CONSTRUCT.FC_PORT];
+  for (let fcPort of fcPortList) {
+    let fcPortDirection = fcPort[onfAttributes.FC_PORT.PORT_DIRECTION];
+    if (fcPortDirection === FcPort.portDirectionEnum.INPUT) {
+      let logicalTerminationPoint = fcPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT];
+      if (logicalTerminationPoint === operationServerUuid) {
+        return true;
       }
     }
-    return isOperationServerUuidIsAInput;
-  } catch (error) {
-    console.log(error)
   }
+  return false;
 }
 
 /**
  * This function returns the list of clients information reacting on the operation server 
- * @param {*} controlConstruct 
- * @param {*} operationClientsUuidsReactingOnOperationServerList 
- * @returns object in the form of {addressedApplicationName:"name",
- * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
+ * @param {Object} controlConstruct
+ * @param {Array} operationClientsUuids
+ * @returns {Object} { addressedApplicationName,
+ * addressedApplicationReleaseNumber, addressedOperationName }
  */
-function getClientsReactingOnOperationServerList(controlConstruct,
-  operationClientsUuidsReactingOnOperationServerList) {
+function getClientsReactingOnOperationServerList(controlConstruct, operationClientsUuids) {
   let clientsReactingOnOperationServerList = [];
-  try {
-    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    for (let i = 0; i < logicalTerminationPointList.length; i++) {
-      let logicalTerminationPoint = logicalTerminationPointList[i];
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
-        let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
-        for (let j = 0; j < clientLtpList.length; j++) {
-          let clientLtp = clientLtpList[j];
-          if (operationClientsUuidsReactingOnOperationServerList.includes(clientLtp)) {
-            let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
-            let httpClientCapability = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CAPABILITY];
-            let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
-            let operationName = getOperationNameOfTheOperationClient(logicalTerminationPointList,
-              clientLtp);
-            let applicationName = httpClientCapability[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
-            let releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
-            let clientDetails = {};
-            clientDetails.addressedApplicationName = applicationName;
-            clientDetails.addressedApplicationReleaseNumber = releaseNumber;
-            clientDetails.addressedOperationName = operationName;
-            clientsReactingOnOperationServerList.push(clientDetails);
-          }
+  let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
+  for (let logicalTerminationPoint of logicalTerminationPointList) {
+    let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+    let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+    if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT) {
+      let clientLtpList = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP];
+      for (let clientLtp of clientLtpList) {
+        if (operationClientsUuids.includes(clientLtp)) {
+          let httpClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+          let httpClientConfiguration = httpClientInterfacePac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+          let operationName = getOperationName(logicalTerminationPointList, clientLtp);
+          let applicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+          let releaseNumber = httpClientConfiguration[onfAttributes.HTTP_CLIENT.RELEASE_NUMBER];
+          let clientDetails = {};
+          clientDetails.addressedApplicationName = applicationName;
+          clientDetails.addressedApplicationReleaseNumber = releaseNumber;
+          clientDetails.addressedOperationName = operationName;
+          clientsReactingOnOperationServerList.push(clientDetails);
         }
       }
     }
-    return clientsReactingOnOperationServerList;
-  } catch (error) {
-    console.log(error)
   }
+  return clientsReactingOnOperationServerList;
 }
 
 
 /**
  * This function returns the operation name of the operation client uuid
- * @param {*} uuid 
- * @returns operationName
+ * @param {Array} logicalTerminationPointList
+ * @param {String} operationClientUuid
+ * @returns {String|undefined} operationName
  */
-function getOperationNameOfTheOperationClient(logicalTerminationPointList,
-  operationClientsUuid) {
-  let operationName;
-  try {
-    for (let i = 0; i < logicalTerminationPointList.length; i++) {
-      let logicalTerminationPoint = logicalTerminationPointList[i];
-      let logicalTerminationPointUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT &&
-        logicalTerminationPointUuid == operationClientsUuid) {
-        let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
-        let operaitonClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
-        operationName = operaitonClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
-      }
+function getOperationName(logicalTerminationPointList,
+  operationClientUuid) {
+  for (let logicalTerminationPoint of logicalTerminationPointList) {
+    let logicalTerminationPointUuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
+    let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+    let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
+    if (layerProtocolName === LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT &&
+      logicalTerminationPointUuid === operationClientUuid) {
+      let operationClientInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.OPERATION_CLIENT_INTERFACE_PAC];
+      let operationClientConfiguration = operationClientInterfacePac[onfAttributes.OPERATION_CLIENT.CONFIGURATION];
+      return operationClientConfiguration[onfAttributes.OPERATION_CLIENT.OPERATION_NAME];
     }
-    return operationName;
-  } catch (error) {
-    console.log(error)
   }
+  return undefined;
 }
 
-/***************************************************************************************************************
- * End point details
- **************************************************************************************************************/
-
-/**
- * This function returns the list of clients information reacting on the operation server 
- * @param {*} controlConstruct 
- * @param {*} operationClientsUuidsReactingOnOperationServerList 
- * @returns object in the form of {addressedApplicationName:"name",
- * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
- */
-function getApplicationName(controlConstruct) {
-  let applicationName;
-  try {
-    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    for (let i = 0; i < logicalTerminationPointList.length; i++) {
-      let logicalTerminationPoint = logicalTerminationPointList[i];
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
-        let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
-        let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
-        applicationName = httpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
-      }
-    }
-    return applicationName;
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-/**
- * This function returns the list of clients information reacting on the operation server 
- * @param {*} controlConstruct 
- * @param {*} operationClientsUuidsReactingOnOperationServerList 
- * @returns object in the form of {addressedApplicationName:"name",
- * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
- */
-function getReleaseNumber(controlConstruct) {
-  let releaseNumber;
-  try {
-    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    for (let i = 0; i < logicalTerminationPointList.length; i++) {
-      let logicalTerminationPoint = logicalTerminationPointList[i];
-      let layerProtocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
-      let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
-      if (layerProtocolName == LayerProtocol.layerProtocolNameEnum.HTTP_SERVER) {
-        let httpServerInterfacePac = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC];
-        let httpServerCapability = httpServerInterfacePac[onfAttributes.HTTP_SERVER.CAPABILITY];
-        releaseNumber = httpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
-      }
-    }
-    return releaseNumber;
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-/**
- * This function returns the list of clients information reacting on the operation server 
- * @param {*} controlConstruct 
- * @param {*} operationClientsUuidsReactingOnOperationServerList 
- * @returns object in the form of {addressedApplicationName:"name",
- * addressedApplicationReleaseNumber:"0.0.1" ,addressedOperationName:"/v1/service1"}
- */
-function getLtpDirection(controlConstruct,
-  operationServerUuid) {
-  let ltpDirection;
-  try {
-    let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
-    for (let i = 0; i < logicalTerminationPointList.length; i++) {
-      let logicalTerminationPoint = logicalTerminationPointList[i];
-      let logicalTerminationPointuuid = logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
-      if (logicalTerminationPointuuid == operationServerUuid) {
-        ltpDirection = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LTP_DIRECTION];
-      }
-    }
-    return ltpDirection;
-  } catch (error) {
-    console.log(error)
-  }
-}
 /**********************************************************************************************************
  * Generic functions used across 
  **********************************************************************************************************/
@@ -1903,29 +1194,15 @@ function figureOutControlConstructUuid(uuid) {
 }
 
 /**
- * This function provides the values of the key from the provided nameList
- * @param {*} nameList 
- * @param {*} key 
- * @returns keyValue
- */
-function getValueFromKey(nameList, key) {
-  for (let i = 0; i < nameList.length; i++) {
-    let valueName = nameList[i]["value-name"];
-    if (valueName == key) {
-      return nameList[i]["value"];
-    }
-  }
-  return undefined;
-}
-
-/**
- * Checks if http-client LTP with the given application name exists. Throws Error if not. 
- * @param {string} applicationName
+ * Checks if http-c ltp exists by fetching applicationName and releaseNumber from given controlConstruc. Throws Error if not. 
+ * @param {Object} controlConstruct
  * @throws {Error} Will throw an error if the application does not exist.
  */
-async function checkApplicationExists(applicationName) {
-  const applicationExists = await httpClientInterface.isApplicationExists(applicationName);
-  if (!applicationExists) {
+async function checkIfApplicationExists(controlConstruct) {
+  let applicationName = ControlConstructService.getApplicationName(controlConstruct);
+  let releaseNumber = ControlConstructService.getReleaseNumber(controlConstruct);
+  let httpClientUuid = await httpClientInterface.getHttpClientUuidAsync(applicationName, releaseNumber);
+  if (httpClientUuid === undefined) {
     throw new Error(`Application ${applicationName} is not in the list of known applications.`);
   }
 }

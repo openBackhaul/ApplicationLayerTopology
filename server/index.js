@@ -3,9 +3,12 @@
 
 var path = require('path');
 var http = require('http');
-var oas3Tools = require('oas3-tools');
-var appCommons = require('./applicationPattern/commons/AppCommons');
+var oas3Tools = require('openbackhaul-oas3-tools');
+var appCommons = require('onf-core-model-ap/applicationPattern/commons/AppCommons');
+var PrepareApprovedLinks = require('./service/individualServices/PrepareApprovedLinks');
 var serverPort = 3005;
+
+const ElasticsearchPreparation = require('./service/individualServices/ElasticsearchPreparation');
 
 // uncomment if you do not want to validate security e.g. operation-key, basic auth, etc
 // appCommons.openApiValidatorOptions.validateSecurity = false;
@@ -30,3 +33,14 @@ http.createServer(app).listen(serverPort, function () {
 
 //setting the path to the database 
 global.databasePath = './database/load.json'
+
+ElasticsearchPreparation.prepareElasticsearch().then(
+    () => {
+        const preApprovedLinks = require('./utils/preApprovedLinks.json');
+        PrepareApprovedLinks.createPreApprovedLinks(preApprovedLinks);
+    }
+).catch(err => {
+    console.error(`Error preparing Elasticsearch : ${err}`);
+});
+
+appCommons.performApplicationRegistration();

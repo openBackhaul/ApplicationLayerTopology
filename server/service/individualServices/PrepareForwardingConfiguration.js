@@ -1,14 +1,14 @@
-const forwardingConstructConfigurationInput = require('../../applicationPattern/onfModel/services/models/forwardingConstruct/ConfigurationInput');
-const operationClientInterface = require('../../applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
-const httpClientInterface = require('../../applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
-const operationServerInterface = require('../../applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
-const forwardingDomain = require('../../applicationPattern/onfModel/models/ForwardingDomain');
-const FcPort = require('../../applicationPattern/onfModel/models/FcPort');
-const logicalTerminationPoint = require('../../applicationPattern/onfModel/models/LogicalTerminationPoint');
+const forwardingConstructConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/forwardingConstruct/ConfigurationInput');
+const operationClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
+const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
+const operationServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
+const forwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
+const FcPort = require('onf-core-model-ap/applicationPattern/onfModel/models/FcPort');
+const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
 
 
 
-exports.regardApplication = function (operationClientConfigurationStatusList, listLTPsFCsOperation,
+exports.regardApplication = function (operationClientConfigurationStatusList,
     redirectTopologyInformationOperation) {
     return new Promise(async function (resolve, reject) {
         let forwardingConfigurationInputList = [];
@@ -27,14 +27,7 @@ exports.regardApplication = function (operationClientConfigurationStatusList, li
                         forwardingName,
                         operationClientUuid
                     );
-                } else if (operationClientName == listLTPsFCsOperation) {
-                    forwardingName =
-                        "NewApplicationCausesRequestForLatestTopologyInformation";
-                    forwardingConfigurationInput = new forwardingConstructConfigurationInput(
-                        forwardingName,
-                        operationClientUuid
-                    );
-                } 
+                }
                 forwardingConfigurationInputList.push(
                     forwardingConfigurationInput
                 );
