@@ -26,23 +26,26 @@ var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/open
 var app = expressAppConfig.getApp();
 appCommons.setupExpressApp(app);
 
-ElasticsearchPreparation.prepareElasticsearch().then().catch(err => {
-    console.error(`Error preparing Elasticsearch : ${err}`);
-});
-
-// Initialize the Swagger middleware
-http.createServer(app).listen(serverPort, function () {
-    console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
-    console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);
-});
 
 //setting the path to the database 
 global.databasePath = './database/load.json'
 
-PrepareApprovedLinks.createPreApprovedLinks(preApprovedLinks).then().catch(
-    err => {
-        console.error(`Error entering preapproved links : ${err}`);
+ElasticsearchPreparation.prepareElasticsearch().catch(err => {
+    console.error(`Error preparing Elasticsearch : ${err}`);
+}).finally(
+    () => {
+        // Initialize the Swagger middleware
+        http.createServer(app).listen(serverPort, function () {
+        console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
+        console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);
+        });
+        PrepareApprovedLinks.createPreApprovedLinks(preApprovedLinks).catch(
+            err => {
+                console.error(`Error entering preapproved links : ${err}`);
+            }
+        );
+        appCommons.performApplicationRegistration();
     }
 );
 
-appCommons.performApplicationRegistration();
+
