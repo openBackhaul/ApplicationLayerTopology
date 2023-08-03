@@ -251,6 +251,7 @@ exports.createCompleteLinkAsync = async function (consumingOperationUuids, servi
         [onfAttributes.LINK.PORT_DIRECTION]: LinkPort.portDirectionEnum.OUTPUT,
         [onfAttributes.LINK.LOGICAL_TERMINATION_POINT]: servingOperationUuid
     };
+    link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
     if (consumingOperationUuids.length !== 0) {
         for (let consumingOperationUuid of consumingOperationUuids) {
             let consumingOperationLocalId = LinkPort.generateNextLocalId(link);
@@ -262,7 +263,6 @@ exports.createCompleteLinkAsync = async function (consumingOperationUuids, servi
             link[onfAttributes.LINK.LINK_PORT].push(consumingOperationLinkPort);
         }
     }
-    link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
     return await addLinkAsync(link);
 }
 
