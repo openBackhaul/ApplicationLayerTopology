@@ -46,13 +46,17 @@ exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
         link = linkResponse.link;
         took += linkResponse.took;
         let createOrUpdateResponse;
-        if (link && consumingOperationUuid) {
-            createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
+        if (link) {
+             if(consumingOperationUuid) {
+              createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
+             } 
         } else {
             createOrUpdateResponse = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
             link = createOrUpdateResponse.link;
         }
-        took += createOrUpdateResponse.took;
+        if(createOrUpdateResponse) {
+            took += createOrUpdateResponse.took;
+        }
     }
     return { "linkUuid": link[onfAttributes.GLOBAL_CLASS.UUID], "took": took };
 }
@@ -501,4 +505,3 @@ async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
         throw new Error('link-port was not updated');
     }
 }
-
