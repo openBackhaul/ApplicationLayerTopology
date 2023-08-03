@@ -9,6 +9,7 @@ var PrepareApprovedLinks = require('./service/individualServices/PrepareApproved
 var serverPort = 3005;
 
 const ElasticsearchPreparation = require('./service/individualServices/ElasticsearchPreparation');
+const preApprovedLinks = require('./utils/preApprovedLinks.json');
 
 // uncomment if you do not want to validate security e.g. operation-key, basic auth, etc
 // appCommons.openApiValidatorOptions.validateSecurity = false;
@@ -25,6 +26,10 @@ var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/open
 var app = expressAppConfig.getApp();
 appCommons.setupExpressApp(app);
 
+ElasticsearchPreparation.prepareElasticsearch().then().catch(err => {
+    console.error(`Error preparing Elasticsearch : ${err}`);
+});
+
 // Initialize the Swagger middleware
 http.createServer(app).listen(serverPort, function () {
     console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
@@ -34,13 +39,10 @@ http.createServer(app).listen(serverPort, function () {
 //setting the path to the database 
 global.databasePath = './database/load.json'
 
-ElasticsearchPreparation.prepareElasticsearch().then(
-    () => {
-        const preApprovedLinks = require('./utils/preApprovedLinks.json');
-        PrepareApprovedLinks.createPreApprovedLinks(preApprovedLinks);
+PrepareApprovedLinks.createPreApprovedLinks(preApprovedLinks).then().catch(
+    err => {
+        console.error(`Error entering preapproved links : ${err}`);
     }
-).catch(err => {
-    console.error(`Error preparing Elasticsearch : ${err}`);
-});
+);
 
 appCommons.performApplicationRegistration();
