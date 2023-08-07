@@ -15,7 +15,7 @@ module.exports = {
 async function getCorrectEsUuid(links) {
     let uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
     return links ? uuids.find(uuid => uuid.endsWith('001')) : uuids.find(uuid => uuid.endsWith('000'));
-};
+}
 
 /**
  * @description Elasticsearch preparation. Checks if ES instance is configured properly.

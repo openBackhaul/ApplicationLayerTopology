@@ -11,7 +11,6 @@ const RequestHeader = require('onf-core-model-ap/applicationPattern/rest/client/
 const RestRequestBuilder = require('onf-core-model-ap/applicationPattern/rest/client/RequestBuilder');
 const ExecutionAndTraceService = require('onf-core-model-ap/applicationPattern/services/ExecutionAndTraceService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
-const createHttpError = require('http-errors');
 
 var traceIndicatorIncrementer = 1;
 
