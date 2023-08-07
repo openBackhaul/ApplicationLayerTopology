@@ -20,12 +20,9 @@ const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfMod
 const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
 const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 
-const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
 const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
-const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const LogicalTerminationPointConfigurationStatus = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationStatus');
-const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const LinkPort = require('./models/LinkPort');
 const ControlConstructService = require('./individualServices/ControlConstructService');
@@ -208,13 +205,14 @@ exports.deleteLtpAndDependents = async function (body) {
   let layerProtocol = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
   let layerProtocolName = layerProtocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
   switch (layerProtocolName) {
-    case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT:
+    case LayerProtocol.layerProtocolNameEnum.OPERATION_CLIENT: {
       let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, ltpToBeRemovedUuid);
       took += delFcResponse.took;
       let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(ltpToBeRemovedUuid);
       took += delLPResponse.took;
       break;
-    case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT:
+    } 
+    case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT: {
       for (let clientUUID of ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]) {
         let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, clientUUID);
         took += delFcResponse.took;
@@ -226,7 +224,8 @@ exports.deleteLtpAndDependents = async function (body) {
         ControlConstructService.deleteLtpFromCCObject(ltps, serverUUID);
       }
       break;
-    case LayerProtocol.layerProtocolNameEnum.TCP_CLIENT:
+    }
+    case LayerProtocol.layerProtocolNameEnum.TCP_CLIENT: {
       let httpClientUuid = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP][0];
       let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
       if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
@@ -240,6 +239,7 @@ exports.deleteLtpAndDependents = async function (body) {
         ControlConstructService.deleteLtpFromCCObject(ltps, httpClientUuid);
       }
       break;
+    }
     default:
       // don't do anything if LTP is of type http-s, tcp-s or op-s
       return;
@@ -330,43 +330,16 @@ exports.disregardApplication = function (body, user, originator, xCorrelator, tr
   });
 }
 
-
 /**
  * Provides list of applications that are part of the application layer topology representation
  *
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * returns List
  **/
-exports.listApplications = function (user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(async function (resolve, reject) {
-    let response = {};
-    const forwardingName = 'NewApplicationCausesRequestForTopologyChangeInformation';
-    try {
-      /****************************************************************************************
-       * Preparing response body
-       ****************************************************************************************/
-
-      let applicationList = await LogicalTerminationPointServiceOfUtility.getAllApplicationList(forwardingName);
-      /****************************************************************************************
-       * Setting 'application/json' response body
-       ****************************************************************************************/
-      response['application/json'] = onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(applicationList);
-    } catch (error) {
-      console.log(error);
-    }
-    if (Object.keys(response).length > 0) {
-      resolve(response[Object.keys(response)[0]]);
-    } else {
-      resolve();
-    }
-  });
-
+exports.listApplications = async function () {
+  const forwardingName = 'NewApplicationCausesRequestForTopologyChangeInformation';
+  let applicationList = await LogicalTerminationPointServiceOfUtility.getAllApplicationList(forwardingName);
+  return onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(applicationList);
 }
-
 
 /**
  * Provides list of operation UUIDs belonging to link identified by UUID
@@ -736,33 +709,6 @@ exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, trace
   });
 }
 
-
-/**
- * Provides operationKey of operation identified by UUID
- *
- * body V1_providecurrentoperationkey_body 
- * user String User identifier from the system starting the service call
- * originator String 'Identification for the system consuming the API, as defined in  [/core-model-1-4:network-control-domain/control-construct=alt-0-0-1/logical-termination-point={uuid}/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-capability/application-name]' 
- * xCorrelator String UUID for the service execution flow that allows to correlate requests and responses
- * traceIndicator String Sequence of request numbers along the flow
- * customerJourney String Holds information supporting customer’s journey to which the execution applies
- * returns inline_response_200_8
- **/
-exports.provideCurrentOperationKey = function (body, user, originator, xCorrelator, traceIndicator, customerJourney) {
-  return new Promise(function (resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-      "operation-key": "Operation key not yet provided."
-    };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
-}
-
-
 /**
  * Adds to the list of applications
  *
@@ -774,7 +720,6 @@ exports.provideCurrentOperationKey = function (body, user, originator, xCorrelat
  * no response value expected for this operation
  **/
 exports.regardApplication = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
-  let took = 0;
   let applicationName = body["application-name"];
   let releaseNumber = body["release-number"];
   let tcpServerList = [{

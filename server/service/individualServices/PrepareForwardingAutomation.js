@@ -354,7 +354,7 @@ async function findOperationServerNameAsync(operationServerUuid) {
                 let opServerInterfacePac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];
                 let opServerCap = opServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
                 return opServerCap[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
-            };
+            }
         }
     }
     return '';
@@ -628,17 +628,11 @@ exports.updateClient = function (logicalTerminationPointconfigurationStatus, for
 }
 
 function removeAttribute(jsonObject, attributeName) {
-
     for (var element in jsonObject) {
-
-        if (jsonObject.hasOwnProperty(element)) {
-
-            if (element == attributeName) {
-                delete jsonObject[element];
-
-            } else if (typeof jsonObject[element] == 'object') {
-                removeAttribute(jsonObject[element], attributeName);
-            }
+        if (element == attributeName) {
+            delete jsonObject[element];
+        } else if (typeof jsonObject[element] == 'object') {
+            removeAttribute(jsonObject[element], attributeName);
         }
     }
     return jsonObject;
@@ -671,29 +665,16 @@ exports.bequeathYourDataAndDie = function (logicalTerminationPointconfigurationS
     });
 }
 
-exports.OAMLayerRequest = function (uuid) {
-    return new Promise(async function (resolve, reject) {
-        let forwardingConstructAutomationList = [];
-        try {
-
-            /***********************************************************************************         
-                        forwardings for application layer topology            
-             *************************************************************************************/
-            let applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputForOamRequestAsync(
-                uuid
-            );
-
-
-            if (applicationLayerTopologyForwardingInputList) {
-                for (let i = 0; i < applicationLayerTopologyForwardingInputList.length; i++) {
-                    let applicationLayerTopologyForwardingInput = applicationLayerTopologyForwardingInputList[i];
-                    forwardingConstructAutomationList.push(applicationLayerTopologyForwardingInput);
-                }
-            }
-            resolve(forwardingConstructAutomationList);
+exports.OAMLayerRequest = async function (uuid) {
+    let forwardingConstructAutomationList = [];
+    let applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputForOamRequestAsync(
+        uuid
+    );
+    if (applicationLayerTopologyForwardingInputList) {
+        for (let i = 0; i < applicationLayerTopologyForwardingInputList.length; i++) {
+            let applicationLayerTopologyForwardingInput = applicationLayerTopologyForwardingInputList[i];
+            forwardingConstructAutomationList.push(applicationLayerTopologyForwardingInput);
         }
-        catch (error) {
-            reject(error);
-        }
-    });
+    }
+    return forwardingConstructAutomationList;
 }

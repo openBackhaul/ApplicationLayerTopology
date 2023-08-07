@@ -16,6 +16,7 @@ const {
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 const AsyncLock = require('async-lock');
+const createHttpError = require('http-errors');
 
 const lock = new AsyncLock();
 
@@ -500,7 +501,7 @@ class ControlConstructService {
         let httpServerCapability = layerProtocol[onfAttributes.LAYER_PROTOCOL.HTTP_SERVER_INTERFACE_PAC][onfAttributes.HTTP_SERVER.CAPABILITY];
         return { "httpServerCapability": httpServerCapability, "took": res.body.took };
       }
-    };
+    }
     return { "took": res.body.took };
   }
 
