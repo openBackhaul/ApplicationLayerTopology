@@ -60,7 +60,7 @@ exports.putTcpClientRemoteAddress = async function (body, uuid) {
       ForwardingAutomationService.automateForwardingConstructWithoutInputAsync(
         forwardingAutomationInputList
       );
-      if (isTcpClientElasticsearch(uuid)) {
+      if (await isTcpClientElasticsearch(uuid)) {
         // recreate all the clients with new connection data
         const uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
         for (const uuid of uuids) {
@@ -91,7 +91,7 @@ exports.putTcpClientRemotePort = async function (body, uuid) {
       ForwardingAutomationService.automateForwardingConstructWithoutInputAsync(
         forwardingAutomationInputList
       );
-      if (isTcpClientElasticsearch(uuid)) {
+      if (await isTcpClientElasticsearch(uuid)) {
         // recreate all the clients with new connection data
         const uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
         for (const uuid of uuids) {
@@ -115,7 +115,7 @@ exports.putTcpClientRemoteProtocol = async function (body, uuid) {
       ForwardingAutomationService.automateForwardingConstructWithoutInputAsync(
         forwardingAutomationInputList
       );
-      if (isTcpClientElasticsearch(uuid)) {
+      if (await isTcpClientElasticsearch(uuid)) {
         // recreate all the clients with new connection data
         const uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
         for (const uuid of uuids) {
