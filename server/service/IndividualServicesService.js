@@ -1,7 +1,7 @@
 'use strict';
 
-const LogicalTerminatinPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInputWithMapping');
-const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointWithMappingServices');
+const LogicalTerminationPointConfigurationInput = require('onf-core-model-ap/applicationPattern/onfModel/services/models/logicalTerminationPoint/ConfigurationInput');
+const LogicalTerminationPointService = require('onf-core-model-ap/applicationPattern/onfModel/services/LogicalTerminationPointServices');
 const prepareALTForwardingAutomation = require('onf-core-model-ap-bs/basicServices/services/PrepareALTForwardingAutomation');
 
 const LinkServices = require('./individualServices/LinkServices');
@@ -28,6 +28,7 @@ const LinkPort = require('./models/LinkPort');
 const ControlConstructService = require('./individualServices/ControlConstructService');
 const isEqual = require('lodash.isequal');
 const createHttpError = require('http-errors');
+const TcpObject = require('onf-core-model-ap/applicationPattern/onfModel/services/models/TcpObject');
 
 const NEW_RELEASE_FORWARDING_NAME = 'PromptForBequeathingDataCausesTransferOfListOfApplications';
 
@@ -264,70 +265,59 @@ exports.deleteLtpAndDependents = async function (body) {
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.disregardApplication = function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
-  return new Promise(async function (resolve, reject) {
-    try {
+exports.disregardApplication = async function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  let applicationName = body["application-name"];
+  let applicationReleaseNumber = body["release-number"];
 
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let applicationName = body["application-name"];
-      let applicationReleaseNumber = body["release-number"];
+  /****************************************************************************************
+   * Prepare logicalTerminatinPointConfigurationInput object to 
+   * configure logical-termination-point
+   ****************************************************************************************/
+  let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
+  let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
+  if (!(applicationName == ownApplicationName && applicationReleaseNumber == ownApplicationReleaseNumber)) {
+    let httpClientUuid = await httpClientInterface.getHttpClientUuidExcludingOldReleaseAndNewRelease(
+      applicationName, applicationReleaseNumber, NEW_RELEASE_FORWARDING_NAME
+    )
+    let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.deleteApplicationLtpsAsync(
+      httpClientUuid
+    );
 
-      /****************************************************************************************
-       * Prepare logicalTerminatinPointConfigurationInput object to 
-       * configure logical-termination-point
-       ****************************************************************************************/
-      let ownApplicationName = await httpServerInterface.getApplicationNameAsync();
-      let ownApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-      if (!(applicationName == ownApplicationName && applicationReleaseNumber == ownApplicationReleaseNumber)) {
+    /****************************************************************************************
+     * Prepare attributes to configure forwarding-construct
+     ****************************************************************************************/
 
-        let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.deleteApplicationInformationAsync(
-          applicationName,
-          applicationReleaseNumber,
-          NEW_RELEASE_FORWARDING_NAME
-        );
+    let forwardingConfigurationInputList = [];
+    let forwardingConstructConfigurationStatus;
+    let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
 
-        /****************************************************************************************
-         * Prepare attributes to configure forwarding-construct
-         ****************************************************************************************/
-
-        let forwardingConfigurationInputList = [];
-        let forwardingConstructConfigurationStatus;
-        let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
-
-        if (operationClientConfigurationStatusList) {
-          forwardingConfigurationInputList = await prepareForwardingConfiguration.disregardApplication(
-            operationClientConfigurationStatusList
-          );
-          forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-          unConfigureForwardingConstructAsync(
-            operationServerName,
-            forwardingConfigurationInputList
-          );
-        }
-
-        /****************************************************************************************
-         * Prepare attributes to automate forwarding-construct
-         ****************************************************************************************/
-        let forwardingAutomationInputList = await prepareForwardingAutomation.disregardApplication(
-          logicalTerminationPointconfigurationStatus,
-          forwardingConstructConfigurationStatus
-        );
-        ForwardingAutomationService.automateForwardingConstructAsync(
-          operationServerName,
-          forwardingAutomationInputList,
-          user,
-          xCorrelator,
-          traceIndicator,
-          customerJourney
-        );
-      }
-      resolve();
-    } catch (error) {
-      reject(error);
+    if (operationClientConfigurationStatusList) {
+      forwardingConfigurationInputList = await prepareForwardingConfiguration.disregardApplication(
+        operationClientConfigurationStatusList
+      );
+      forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
+      unConfigureForwardingConstructAsync(
+        operationServerName,
+        forwardingConfigurationInputList
+      );
     }
-  });
+
+    /****************************************************************************************
+     * Prepare attributes to automate forwarding-construct
+     ****************************************************************************************/
+    let forwardingAutomationInputList = await prepareForwardingAutomation.disregardApplication(
+      logicalTerminationPointconfigurationStatus,
+      forwardingConstructConfigurationStatus
+    );
+    ForwardingAutomationService.automateForwardingConstructAsync(
+      operationServerName,
+      forwardingAutomationInputList,
+      user,
+      xCorrelator,
+      traceIndicator,
+      customerJourney
+    );
+  }
 }
 
 /**
@@ -626,87 +616,56 @@ exports.listOperationServersAtApplication = async function (body) {
  * customerJourney String Holds information supporting customer’s journey to which the execution applies
  * no response value expected for this operation
  **/
-exports.notifyLinkUpdates = function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
-  return new Promise(async function (resolve, reject) {
-    try {
+exports.notifyLinkUpdates = async function (body, user, originator, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+  let applicationName = body["subscriber-application"];
+  let releaseNumber = body["subscriber-release-number"];
+  let subscriberOperation = body["subscriber-operation"];
 
-      /****************************************************************************************
-       * Setting up required local variables from the request body
-       ****************************************************************************************/
-      let applicationName = body["subscriber-application"];
-      let releaseNumber = body["subscriber-release-number"];
-      let subscriberOperation = body["subscriber-operation"];
+  let tcpServerList = [new TcpObject(body["subscriber-protocol"], body["subscriber-address"], body["subscriber-port"])];
 
-      let tcpServerList = [{
-        protocol: body["subscriber-protocol"],
-        address: body["subscriber-address"],
-        port: body["subscriber-port"]
-      }];
+  let operationNamesByAttributes = new Map();
+  operationNamesByAttributes.set("regard-updated-link", subscriberOperation);
+  let httpClientUuid = await httpClientInterface.getHttpClientUuidAsync(applicationName);
+  let ltpConfigurationInput = new LogicalTerminationPointConfigurationInput(
+    httpClientUuid,
+    applicationName,
+    releaseNumber,
+    tcpServerList,
+    operationServerName,
+    operationNamesByAttributes,
+    individualServicesOperationsMapping.individualServicesOperationsMapping
+  );
+  let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationLtpsAsync(
+    ltpConfigurationInput
+  );
 
+  let forwardingConfigurationInputList = [];
+  let forwardingConstructConfigurationStatus;
+  let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
 
-      let operationNamesByAttributes = new Map();
-      operationNamesByAttributes.set("regard-updated-link", subscriberOperation);
-      /****************************************************************************************
-       * Prepare logicalTerminatinPointConfigurationInput object to 
-       * configure logical-termination-point
-       ****************************************************************************************/
-
-
-
-      let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
-        applicationName,
-        releaseNumber,
-        tcpServerList,
-        operationServerName,
-        operationNamesByAttributes,
-        individualServicesOperationsMapping.individualServicesOperationsMapping
-      );
-      let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationInformationAsync(
-        logicalTerminatinPointConfigurationInput
-      );
-
-
-      /****************************************************************************************
-       * Prepare attributes to configure forwarding-construct
-       ****************************************************************************************/
-
-      let forwardingConfigurationInputList = [];
-      let forwardingConstructConfigurationStatus;
-      let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
-
-      if (operationClientConfigurationStatusList) {
-        forwardingConfigurationInputList = await prepareForwardingConfiguration.notifyLinkUpdates(
-          operationClientConfigurationStatusList,
-          subscriberOperation
-        );
-        forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
-        configureForwardingConstructAsync(
-          operationServerName,
-          forwardingConfigurationInputList
-        );
-      }
-
-      /****************************************************************************************
-       * Prepare attributes to automate forwarding-construct
-       ****************************************************************************************/
-      let forwardingAutomationInputList = await prepareForwardingAutomation.notifyLinkUpdates(
-        logicalTerminationPointconfigurationStatus,
-        forwardingConstructConfigurationStatus
-      );
-      ForwardingAutomationService.automateForwardingConstructAsync(
-        operationServerName,
-        forwardingAutomationInputList,
-        user,
-        xCorrelator,
-        traceIndicator,
-        customerJourney
-      );
-
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+  if (operationClientConfigurationStatusList) {
+    forwardingConfigurationInputList = await prepareForwardingConfiguration.notifyLinkUpdates(
+      operationClientConfigurationStatusList,
+      subscriberOperation
+    );
+    forwardingConstructConfigurationStatus = await ForwardingConfigurationService.
+    configureForwardingConstructAsync(
+      operationServerName,
+      forwardingConfigurationInputList
+    );
+  }
+  let forwardingAutomationInputList = await prepareForwardingAutomation.notifyLinkUpdates(
+    logicalTerminationPointconfigurationStatus,
+    forwardingConstructConfigurationStatus
+  );
+  ForwardingAutomationService.automateForwardingConstructAsync(
+    operationServerName,
+    forwardingAutomationInputList,
+    user,
+    xCorrelator,
+    traceIndicator,
+    customerJourney
+  );
 }
 
 /**
@@ -733,7 +692,11 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
   let operationNamesByAttributes = new Map();
   operationNamesByAttributes.set("redirect-topology-change-information", redirectTopologyInformationOperation);
 
-  let logicalTerminatinPointConfigurationInput = new LogicalTerminatinPointConfigurationInput(
+  let httpClientUuid = await httpClientInterface.getHttpClientUuidExcludingOldReleaseAndNewRelease(
+    applicationName, releaseNumber, NEW_RELEASE_FORWARDING_NAME
+  )
+  let logicalTerminatinPointConfigurationInput = new LogicalTerminationPointConfigurationInput(
+    httpClientUuid,
     applicationName,
     releaseNumber,
     tcpServerList,
@@ -741,14 +704,13 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     operationNamesByAttributes,
     individualServicesOperationsMapping.individualServicesOperationsMapping
   );
-  let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.findOrCreateApplicationInformationAsync(
-    logicalTerminatinPointConfigurationInput,
-    NEW_RELEASE_FORWARDING_NAME
+  let ltpConfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationLtpsAsync(
+    logicalTerminatinPointConfigurationInput
   );
 
   let forwardingConfigurationInputList = [];
   let forwardingConstructConfigurationStatus;
-  let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
+  let operationClientConfigurationStatusList = ltpConfigurationStatus.operationClientConfigurationStatusList;
 
   if (operationClientConfigurationStatusList) {
     forwardingConfigurationInputList = await prepareForwardingConfiguration.regardApplication(
@@ -763,7 +725,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
   }
 
   let forwardingAutomationInputList = await prepareForwardingAutomation.regardApplication(
-    logicalTerminationPointconfigurationStatus,
+    ltpConfigurationStatus,
     forwardingConstructConfigurationStatus,
     applicationName,
     releaseNumber
@@ -782,7 +744,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
    * forwardings for application layer topology
    ************************************************************************************/
   let applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputAsync(
-    logicalTerminationPointconfigurationStatus,
+    ltpConfigurationStatus,
     forwardingConstructConfigurationStatus
   );
 
