@@ -305,8 +305,8 @@ function createForwarding(servingHttpServerCapability, operationName, forwarding
     forwardingRequestBody.servingApplicationName = servingHttpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
     forwardingRequestBody.servingApplicationReleaseNumber = servingHttpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
     forwardingRequestBody.operationName = operationName;
-    forwardingRequestBody.consumerApplicationName = consumingHttpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
-    forwardingRequestBody.consumerReleaseNumber = consumingHttpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
+    forwardingRequestBody.consumingApplicationName = consumingHttpServerCapability[onfAttributes.HTTP_SERVER.APPLICATION_NAME];
+    forwardingRequestBody.consumingApplicationReleaseNumber = consumingHttpServerCapability[onfAttributes.HTTP_SERVER.RELEASE_NUMBER];
 
     forwardingRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(forwardingRequestBody);
     let forwardingAutomation = new forwardingConstructAutomationInput(
