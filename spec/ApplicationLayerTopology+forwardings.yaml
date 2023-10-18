@@ -81,41 +81,41 @@ forwardings:
         uuid: alt-2-0-1-op-s-bs-003
       - server-name: /v1/inform-about-release-history-in-generic-representation
         uuid: alt-2-0-1-op-s-bs-004
-      - service-name: /v1/regard-application
+      - server-name: /v1/regard-application
         uuid: alt-2-0-1-op-s-is-001
-      - service-name: /v1/disregard-application
+      - server-name: /v1/disregard-application
         uuid: alt-2-0-1-op-s-is-002
-      - service-name: /v1/list-applications
+      - server-name: /v1/list-applications
         uuid: alt-2-0-1-op-s-is-003
-      - service-name: /v1/update-all-ltps-and-fcs
+      - server-name: /v1/update-all-ltps-and-fcs
         uuid: alt-2-0-1-op-s-is-004
-      - service-name: /v1/update-ltp
+      - server-name: /v1/update-ltp
         uuid: alt-2-0-1-op-s-is-005
-      - service-name: /v1/delete-ltp-and-dependents
+      - server-name: /v1/delete-ltp-and-dependents
         uuid: alt-2-0-1-op-s-is-006
-      - service-name: /v1/list-operation-servers-at-application
+      - server-name: /v1/list-operation-servers-at-application
         uuid: alt-2-0-1-op-s-is-009
-      - service-name: /v1/list-operation-clients-at-application
+      - server-name: /v1/list-operation-clients-at-application
         uuid: alt-2-0-1-op-s-is-010
-      - service-name: /v1/update-fc
+      - server-name: /v1/update-fc
         uuid: alt-2-0-1-op-s-is-013
-      - service-name: /v1/update-fc-port
+      - server-name: /v1/update-fc-port
         uuid: alt-2-0-1-op-s-is-014
-      - service-name: /v1/delete-fc-port
+      - server-name: /v1/delete-fc-port
         uuid: alt-2-0-1-op-s-is-015
-      - service-name: /v1/list-operation-clients-reacting-on-operation-server
+      - server-name: /v1/list-operation-clients-reacting-on-operation-server
         uuid: alt-2-0-1-op-s-is-016
-      - service-name: /v1/list-link-uuids
+      - server-name: /v1/list-link-uuids
         uuid: alt-2-0-1-op-s-is-017
-      - service-name: /v1/add-operation-client-to-link
+      - server-name: /v1/add-operation-client-to-link
         uuid: alt-2-0-1-op-s-is-018
-      - service-name: /v1/remove-operation-client-from-link
+      - server-name: /v1/remove-operation-client-from-link
         uuid: alt-2-0-1-op-s-is-019
-      - service-name: /v1/list-end-points-of-link
+      - server-name: /v1/list-end-points-of-link
         uuid: alt-2-0-1-op-s-is-020
-      - service-name: /v1/list-links-to-operation-clients-of-application
+      - server-name: /v1/list-links-to-operation-clients-of-application
         uuid: alt-2-0-1-op-s-is-021
-      - service-name: /v1/notify-link-updates
+      - server-name: /v1/notify-link-updates
         uuid: alt-2-0-1-op-s-is-022
     consequent-requests:
       - client-name: ExecutionAndTraceLog://v1/record-service-request
@@ -305,7 +305,7 @@ forwardings:
         uuid: alt-2-0-1-op-s-bm-011
       - server-name: /v1/bequeath-your-data-and-die
         uuid: alt-2-0-1-op-s-im-000
-      - service-name: /v1/regard-application
+      - server-name: /v1/regard-application
         uuid: alt-2-0-1-op-s-is-001
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-ltp
@@ -324,7 +324,7 @@ forwardings:
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
-      - service-name: /v1/disregard-application
+      - server-name: /v1/disregard-application
         uuid: alt-2-0-1-op-s-is-002
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/delete-ltp-and-dependents
@@ -343,7 +343,7 @@ forwardings:
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
-      - service-name: /v1/regard-application
+      - server-name: /v1/regard-application
         uuid: alt-2-0-1-op-s-is-001
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-fc
@@ -516,10 +516,10 @@ forwardings:
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
-      - service-name: /v1/update-ltp
+      - server-name: /v1/update-ltp
         uuid: alt-2-0-1-op-s-is-005
     consequent-requests:
-      - service-name: ApplicationLayerTopology://v1/add-operation-client-to-link
+      - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
         uuid: alt-2-0-1-op-c-is-alt-2-0-1-000
 
   - forwarding-name: LtpUpdateMightCauseOperationClientBeingRemovedFromLink
@@ -531,10 +531,10 @@ forwardings:
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
-      - service-name: /v1/update-ltp
+      - server-name: /v1/update-ltp
         uuid: alt-2-0-1-op-s-is-005
     consequent-requests:
-      - service-name: ApplicationLayerTopology://v1/remove-operation-client-from-link
+      - client-name: ApplicationLayerTopology://v1/remove-operation-client-from-link
         uuid: alt-2-0-1-op-c-is-alt-2-0-1-001
 
   - forwarding-name: LtpDeletionCausesOperationClientBeingRemovedFromLink
@@ -546,10 +546,10 @@ forwardings:
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
-      - service-name: /v1/delete-ltp-and-dependents
+      - server-name: /v1/delete-ltp-and-dependents
         uuid: alt-2-0-1-op-s-is-006
     consequent-requests:
-      - service-name: ApplicationLayerTopology://v1/remove-operation-client-from-link
+      - client-name: ApplicationLayerTopology://v1/remove-operation-client-from-link
         uuid: alt-2-0-1-op-c-is-alt-2-0-1-001
 
   - forwarding-name: LinkChangeNotification
