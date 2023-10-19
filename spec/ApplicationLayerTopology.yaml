@@ -2730,8 +2730,8 @@ paths:
                         from [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]'
                 example:
                   link-uuid-list:
-                    - 'cc-1-0-0-op-link-001'
-                    - 'cc-1-0-0-op-link-002'
+                    - '11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000'
+                    - '21bf5b37-e0b8-42e0-8dcf-dc8c4aefc002'
           headers:
             x-correlator:
               schema:
@@ -3013,12 +3013,11 @@ paths:
               properties:
                 link-uuid:
                   type: string
-                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-link-([0-9]{3})$'
                   description: >
                     'UUID of Link with searched end points
                     find [ElasticSearch://core-model-1-4:network-control-domain/link=*/uuid]'
               example:
-                link-uuid: 'alt-2-0-1-op-link-001'
+                link-uuid: '11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000'
       responses:
         '200':
           description: 'List of operation UUIDs belonging to given link provided'
@@ -3400,7 +3399,7 @@ paths:
                         link-uuid:
                           type: string
                       example:
-                        link-uuid: 'alt-2-0-1-op-link-001'
+                        link-uuid: '11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000'
               responses:
                 '204':
                   description: 'UUID of changed Link has been received'
