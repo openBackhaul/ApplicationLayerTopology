@@ -1,0 +1,30 @@
+@startuml 01x_Embedding
+skinparam responseMessageBelowArrow true
+
+title
+PromptForEmbeddingInitiatesEmbeddingProcess
+end title
+
+participant "RO" as RO
+participant "ALT://v1/embed-yourself" as ALT
+participant "OR://v1/bequeath-your-data-and-die" as OR
+participant "RO://redirect-topology-change-information" as CcOfRo
+participant "TAR://redirect-topology-change-information" as CcOfTar
+
+RO -> ALT
+activate ALT
+
+note over ALT
+<u> RequestForBequeathingData </u>
+end note
+ALT -> OR
+
+note over ALT
+<u> RetrieveControlConstructFromRoAndTar </u>
+end note
+ALT -> CcOfRo
+ALT -> CcOfTar
+
+deactivate ALT
+
+@enduml
