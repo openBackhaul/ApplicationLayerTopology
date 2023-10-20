@@ -3065,7 +3065,7 @@ paths:
                   link-end-point-list:
                     - application-name: 'RegistryOffice'
                       release-number: '2.0.1'
-                      operation-uuid: 'ro-2-0-1-op-c-2070'
+                      operation-uuid: 'ro-2-0-1-op-c-im-alt-1-0-0-000'
                       ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SINK'
                     - application-name: 'ApplicationLayerTopology'
                       release-number: '2.0.1'
