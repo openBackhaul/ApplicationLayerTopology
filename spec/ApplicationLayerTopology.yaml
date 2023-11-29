@@ -122,8 +122,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-im-000/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-im-000/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -972,8 +972,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1282,8 +1282,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1400,8 +1400,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-003/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-003/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1551,8 +1551,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1632,8 +1632,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -1907,8 +1907,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-006/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-006/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2106,8 +2106,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-009/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-009/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2229,8 +2229,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-010/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-010/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2361,8 +2361,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-013/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-013/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2469,8 +2469,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-014/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-014/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2552,8 +2552,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-015/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-015/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2682,8 +2682,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-016/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-016/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2760,8 +2760,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-017/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-017/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2838,8 +2838,43 @@ paths:
                 consuming-application-name: 'TypeApprovalRegister'
                 consuming-application-release-number: '1.0.0'
       responses:
-        '204':
+        '200':
           description: 'OperationClient connected with OperationServer'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - description: 'IF client-successfully-added == true'
+                    type: object
+                    required:
+                      - client-successfully-added
+                    additionalProperties: false
+                    properties:
+                      client-successfully-added:
+                        type: boolean
+                    example:
+                      client-successfully-added: true
+                  - description: 'IF client-successfully-added == false'
+                    type: object
+                    required:
+                      - client-successfully-added
+                      - reason-of-failure
+                    properties:
+                      client-successfully-added:
+                        type: boolean
+                      reason-of-failure:
+                        type: string
+                        enum:
+                          - 'ALT_SERVING_APPLICATION_NAME_UNKNOWN'
+                          - 'ALT_SERVING_APPLICATION_RELEASE_NUMBER_UNKNOWN'
+                          - 'ALT_OPERATION_NAME_UNKNOWN'
+                          - 'ALT_CONSUMING_APPLICATION_NAME_UNKNOWN'
+                          - 'ALT_CONSUMING_APPLICATION_RELEASE_NUMBER_UNKNOWN'
+                          - 'ALT_UNKNOWN'
+                        description: 'Reasons to be checked and indicated according to the sequence defined in the enumeration.'
+                    example:
+                      client-successfully-added: false
+                      reason-of-failure: 'ALT_SERVING_APPLICATION_NAME_UNKNOWN'
           headers:
             x-correlator:
               schema:
@@ -2868,8 +2903,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-018/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-018/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -2974,8 +3009,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-019/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-019/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -3099,8 +3134,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-020/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-020/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -3225,8 +3260,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-021/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-021/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -3363,8 +3398,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-022/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-022/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -3662,8 +3697,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-000/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-000/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -4017,8 +4052,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -4265,8 +4300,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -4516,8 +4551,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-003/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-003/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -4713,8 +4748,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -4850,8 +4885,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -5115,8 +5150,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-007/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-007/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -5255,8 +5290,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-008/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-008/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -5508,8 +5543,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-009/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-009/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -6395,8 +6430,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-010/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-010/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -6494,8 +6529,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-011/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bm-011/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '401':
@@ -6565,8 +6600,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-000/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-000/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '403':
@@ -6668,8 +6703,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-001/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '404':
@@ -6752,8 +6787,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-002/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '404':
@@ -6830,8 +6865,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-003/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-003/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '404':
@@ -6893,8 +6928,8 @@ paths:
                   - 'NOT_YET_DEFINED'
                 example: 'EXPERIMENTAL'
               description: >
-                  'Life cycle state of the consumed service
-                  find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
+                'Life cycle state of the consumed service
+                find in [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-bs-004/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-configuration/life-cycle-state]'
         '400':
           $ref: '#/components/responses/responseForErroredServiceRequests'
         '404':
