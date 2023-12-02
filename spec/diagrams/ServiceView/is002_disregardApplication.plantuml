@@ -1,0 +1,25 @@
+@startuml is002_disregardApplication
+skinparam responseMessageBelowArrow true
+
+title
+is002_disregardApplication
+end title
+
+participant "RO" as ro
+participant "ALT://v1/disregard-application" as alt
+
+ro -> alt : {newApplicationName, releaseNumber} (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+note over alt #LightCyan
+ServiceRequestCausesLtpDeletionRequest
+end note
+
+note over alt #LightCyan
+NewApplicationCausesRequestForTopologyChangeInformation
+end note
+
+@enduml

@@ -1,0 +1,17 @@
+@startuml is016_listOperationClientsReactingOnOperationServer
+skinparam responseMessageBelowArrow true
+
+title
+is016_listOperationClientsReactingOnOperationServer
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/list-operation-clients-reacting-on-operation-server" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+@enduml
