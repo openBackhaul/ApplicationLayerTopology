@@ -3459,131 +3459,6 @@
                 "name": [
                   {
                     "value-name": "ForwardingKind",
-                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
-                  },
-                  {
-                    "value-name": "ForwardingName",
-                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedLtpInformation"
-                  }
-                ],
-                "fc-port": [
-                  {
-                    "local-id": "100",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
-                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
-                  },
-                  {
-                    "local-id": "200",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
-                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
-                  }
-                ]
-              },
-              {
-                "uuid": "alt-2-0-1-op-fc-is-013",
-                "name": [
-                  {
-                    "value-name": "ForwardingKind",
-                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
-                  },
-                  {
-                    "value-name": "ForwardingName",
-                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedLtpInformation"
-                  }
-                ],
-                "fc-port": [
-                  {
-                    "local-id": "100",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
-                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
-                  },
-                  {
-                    "local-id": "200",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
-                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
-                  }
-                ]
-              },
-              {
-                "uuid": "alt-2-0-1-op-fc-is-014",
-                "name": [
-                  {
-                    "value-name": "ForwardingKind",
-                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
-                  },
-                  {
-                    "value-name": "ForwardingName",
-                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcInformation"
-                  }
-                ],
-                "fc-port": [
-                  {
-                    "local-id": "100",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
-                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
-                  },
-                  {
-                    "local-id": "200",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
-                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
-                  }
-                ]
-              },
-              {
-                "uuid": "alt-2-0-1-op-fc-is-015",
-                "name": [
-                  {
-                    "value-name": "ForwardingKind",
-                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
-                  },
-                  {
-                    "value-name": "ForwardingName",
-                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcPortInformation"
-                  }
-                ],
-                "fc-port": [
-                  {
-                    "local-id": "100",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
-                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
-                  },
-                  {
-                    "local-id": "200",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
-                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
-                  }
-                ]
-              },
-              {
-                "uuid": "alt-2-0-1-op-fc-is-016",
-                "name": [
-                  {
-                    "value-name": "ForwardingKind",
-                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
-                  },
-                  {
-                    "value-name": "ForwardingName",
-                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedFcPortInformation"
-                  }
-                ],
-                "fc-port": [
-                  {
-                    "local-id": "100",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
-                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
-                  },
-                  {
-                    "local-id": "200",
-                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
-                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
-                  }
-                ]
-              },
-              {
-                "uuid": "alt-2-0-1-op-fc-is-017",
-                "name": [
-                  {
-                    "value-name": "ForwardingKind",
                     "value": "core-model-1-4:FORWARDING_KIND_TYPE_PROCESS_SNIPPET"
                   },
                   {
@@ -3605,7 +3480,7 @@
                   {
                     "local-id": "100",
                     "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
-                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
+                    "logical-termination-point": "alt-2-0-1-op-s-bm-010"
                   },
                   {
                     "local-id": "200",
@@ -3641,6 +3516,131 @@
                     "local-id": "206",
                     "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
                     "logical-termination-point": "alt-2-0-1-op-c-im-okm-1-0-0-004"
+                  }
+                ]
+              },
+              {
+                "uuid": "alt-2-0-1-op-fc-is-013",
+                "name": [
+                  {
+                    "value-name": "ForwardingKind",
+                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
+                  },
+                  {
+                    "value-name": "ForwardingName",
+                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedLtpInformation"
+                  }
+                ],
+                "fc-port": [
+                  {
+                    "local-id": "100",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
+                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
+                  },
+                  {
+                    "local-id": "200",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
+                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
+                  }
+                ]
+              },
+              {
+                "uuid": "alt-2-0-1-op-fc-is-014",
+                "name": [
+                  {
+                    "value-name": "ForwardingKind",
+                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
+                  },
+                  {
+                    "value-name": "ForwardingName",
+                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedLtpInformation"
+                  }
+                ],
+                "fc-port": [
+                  {
+                    "local-id": "100",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
+                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
+                  },
+                  {
+                    "local-id": "200",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
+                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
+                  }
+                ]
+              },
+              {
+                "uuid": "alt-2-0-1-op-fc-is-015",
+                "name": [
+                  {
+                    "value-name": "ForwardingKind",
+                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
+                  },
+                  {
+                    "value-name": "ForwardingName",
+                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcInformation"
+                  }
+                ],
+                "fc-port": [
+                  {
+                    "local-id": "100",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
+                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
+                  },
+                  {
+                    "local-id": "200",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
+                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
+                  }
+                ]
+              },
+              {
+                "uuid": "alt-2-0-1-op-fc-is-016",
+                "name": [
+                  {
+                    "value-name": "ForwardingKind",
+                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
+                  },
+                  {
+                    "value-name": "ForwardingName",
+                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcPortInformation"
+                  }
+                ],
+                "fc-port": [
+                  {
+                    "local-id": "100",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
+                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
+                  },
+                  {
+                    "local-id": "200",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
+                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
+                  }
+                ]
+              },
+              {
+                "uuid": "alt-2-0-1-op-fc-is-017",
+                "name": [
+                  {
+                    "value-name": "ForwardingKind",
+                    "value": "core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET"
+                  },
+                  {
+                    "value-name": "ForwardingName",
+                    "value": "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedFcPortInformation"
+                  }
+                ],
+                "fc-port": [
+                  {
+                    "local-id": "100",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
+                    "logical-termination-point": "alt-2-0-1-op-s-is-001"
+                  },
+                  {
+                    "local-id": "200",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
+                    "logical-termination-point": "alt-2-0-1-op-c-is-alt-2-0-1-000"
                   }
                 ]
               }
