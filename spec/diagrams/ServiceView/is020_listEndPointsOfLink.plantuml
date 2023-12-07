@@ -1,0 +1,17 @@
+@startuml is020_listEndPointsOfLink
+skinparam responseMessageBelowArrow true
+
+title
+is020_listEndPointsOfLink
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/list-end-points-of-link" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml is001_regardApplication
+skinparam responseMessageBelowArrow true
+
+title
+is001_regardApplication
+end title
+
+participant "RO" as ro
+participant "ALT://v1/regard-application" as alt
+
+ro -> alt : {newApplicationName, releaseNumber, protocol, address, port} (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+note over alt #LightCyan
+ServiceRequestCausesLtpUpdateRequest
+end note
+
+note over alt #LightCyan
+ServiceRequestCausesFcUpdateRequest
+end note
+
+note over alt #LightCyan
+NewApplicationCausesRequestForTopologyChangeInformation
+end note
+
+@enduml

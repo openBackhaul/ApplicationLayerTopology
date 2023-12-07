@@ -1,0 +1,17 @@
+@startuml is003_listApplications
+skinparam responseMessageBelowArrow true
+
+title
+is003_listApplications
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/list-applications" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+@enduml

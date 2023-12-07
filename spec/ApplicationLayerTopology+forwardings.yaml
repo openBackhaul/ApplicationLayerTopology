@@ -186,7 +186,7 @@ forwardings:
       - server-name: /v1/bequeath-your-data-and-die
         uuid: alt-2-0-1-op-s-im-000
     consequent-requests:
-      - client-name: NewRelease:://v1/regard-application
+      - client-name: NewRelease://v1/regard-application
         uuid: alt-2-0-1-op-c-im-nr-2-0-1-000
 
   - forwarding-name: PromptForBequeathingDataCausesRObeingRequestedToNotifyApprovalsOfNewApplicationsToNewRelease
@@ -201,7 +201,7 @@ forwardings:
       - server-name: /v1/bequeath-your-data-and-die
         uuid: alt-2-0-1-op-s-im-000
     consequent-requests:
-      - client-name: RegistryOffice:://v1/notify-approvals
+      - client-name: RegistryOffice://v1/notify-approvals
         uuid: alt-2-0-1-op-c-im-ro-2-0-1-000
 
   - forwarding-name: PromptForBequeathingDataCausesRObeingRequestedToNotifyWithdrawnApprovalsToNewRelease
@@ -216,7 +216,7 @@ forwardings:
       - server-name: /v1/bequeath-your-data-and-die
         uuid: alt-2-0-1-op-s-im-000
     consequent-requests:
-      - client-name: RegistryOffice:://v1/notify-withdrawn-approvals
+      - client-name: RegistryOffice://v1/notify-withdrawn-approvals
         uuid: alt-2-0-1-op-c-im-ro-2-0-1-001
 
   - forwarding-name: PromptForBequeathingDataCausesRObeingRequestedToStopNotificationsToOldRelease
@@ -231,7 +231,7 @@ forwardings:
       - server-name: /v1/bequeath-your-data-and-die
         uuid: alt-2-0-1-op-s-im-000
     consequent-requests:
-      - client-name: RegistryOffice:://v1/end-subscription
+      - client-name: RegistryOffice://v1/end-subscription
         uuid: alt-2-0-1-op-c-im-ro-2-0-1-002
 
   - forwarding-name: PromptForBequeathingDataCausesRequestForBroadcastingInfoAboutServerReplacement
@@ -324,6 +324,8 @@ forwardings:
         uuid: alt-2-0-1-op-s-im-000
       - server-name: /v1/regard-application
         uuid: alt-2-0-1-op-s-is-001
+      - server-name: /v1/notify-link-updates
+        uuid: alt-2-0-1-op-s-is-022
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-ltp
         uuid: alt-2-0-1-op-c-bm-alt-2-0-1-001
@@ -362,6 +364,8 @@ forwardings:
     initiating-requests:
       - server-name: /v1/regard-application
         uuid: alt-2-0-1-op-s-is-001
+      - server-name: /v1/notify-link-updates
+        uuid: alt-2-0-1-op-s-is-022
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-fc
         uuid: alt-2-0-1-op-c-bm-alt-2-0-1-003
@@ -487,43 +491,6 @@ forwardings:
       - client-name: ApplicationLayerTopology://v1/delete-fc-port
         uuid: alt-2-0-1-op-c-bm-alt-2-0-1-005
 
-  - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation
-    uuid: alt-2-0-1-op-fc-is-001
-    forwarding-type: ProcessSnippet
-    management-requests:
-      operation-client-update:
-        - server-name: /v1/regard-application
-          uuid: alt-2-0-1-op-s-is-001
-      fc-port-update:
-        - server-name: /v1/regard-application
-          uuid: alt-2-0-1-op-s-is-001
-      fc-port-deletion:
-        - server-name: /v1/disregard-application
-          uuid: alt-2-0-1-op-s-is-002
-      operation-client-deletion:
-        - server-name: /v1/disregard-application
-          uuid: alt-2-0-1-op-s-is-002
-    initiating-requests:
-      - server-name: /v1/regard-application
-        uuid: alt-2-0-1-op-s-is-001
-    consequent-requests:
-      - client-name: RegistryOffice:://v1/redirect-topology-change-information
-        uuid: alt-2-0-1-op-c-im-ro-2-0-1-004
-      - client-name: TypeApprovalRegister:://v1/redirect-topology-change-information
-        uuid: alt-2-0-1-op-c-im-tar-1-0-0-004
-      - client-name: ExecutionAndTraceLog:://v1/redirect-topology-change-information
-        uuid: alt-2-0-1-op-c-im-eatl-1-0-0-004
-      - client-name: OamLog:://v1/redirect-topology-change-information
-        uuid: alt-2-0-1-op-c-im-ol-1-0-0-004
-      - client-name: AdministratorAdministration:://v1/redirect-topology-change-information
-        uuid: alt-2-0-1-op-c-im-aa-1-0-0-004
-      - client-name: ApplicationLayerTopology:://v1/redirect-topology-change-information
-        uuid: alt-2-0-1-op-c-im-alt-2-0-1-004
-      - client-name: OperationKeyManagement:://v1/redirect-topology-change-information
-        uuid: alt-2-0-1-op-c-im-okm-1-0-0-004
-      - client-name: CurrentController:://v1/redirect-topology-change-information
-        uuid: alt-2-0-1-op-c-im-cc-1-0-0-004
-
   - forwarding-name: LtpUpdateMightCauseOperationClientBeingAddedToLink
     uuid: alt-2-0-1-op-fc-is-002
     forwarding-type: InvariantProcessSnippet
@@ -591,5 +558,167 @@ forwardings:
       - server-name: /v1/remove-operation-client-from-link
         uuid: alt-2-0-1-op-s-is-019
     consequent-requests:
-      - client-name: OperationKeyManagement:://v1/regard-updated-link
+      - client-name: OperationKeyManagement://v1/regard-updated-link
         uuid: alt-2-0-1-op-c-is-okm-1-0-0-002
+
+  - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformationWithDefaultKey
+    uuid: alt-2-0-1-op-fc-is-010
+    forwarding-type: ProcessSnippet
+    management-requests:
+      operation-client-update:
+        - server-name: /v1/regard-application
+          uuid: alt-2-0-1-op-s-is-001
+      fc-port-update:
+        - server-name: /v1/regard-application
+          uuid: alt-2-0-1-op-s-is-001
+      fc-port-deletion:
+        - server-name: /v1/disregard-application
+          uuid: alt-2-0-1-op-s-is-002
+      operation-client-deletion:
+        - server-name: /v1/disregard-application
+          uuid: alt-2-0-1-op-s-is-002
+    initiating-requests:
+      - server-name: /v1/regard-application
+        uuid: alt-2-0-1-op-s-is-001
+    consequent-requests:
+      - client-name: RegistryOffice://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-ro-2-0-1-004
+      - client-name: TypeApprovalRegister://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-tar-1-0-0-004
+      - client-name: ExecutionAndTraceLog://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-eatl-1-0-0-004
+      - client-name: OamLog://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-ol-1-0-0-004
+      - client-name: AdministratorAdministration://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-aa-1-0-0-004
+      - client-name: ApplicationLayerTopology://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-alt-2-0-1-004
+      - client-name: OperationKeyManagement://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-okm-1-0-0-004
+
+  - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForInquiringTopologyChangeInformation
+    uuid: alt-2-0-1-op-fc-is-011
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - server-name: /v1/regard-application
+        uuid: alt-2-0-1-op-s-is-001
+    consequent-requests:
+      - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
+        uuid: alt-2-0-1-op-c-is-alt-2-0-1-000
+
+  - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformation
+    uuid: alt-2-0-1-op-fc-is-012
+    forwarding-type: ProcessSnippet
+    management-requests:
+      operation-client-update:
+        - server-name: /v1/regard-application
+          uuid: alt-2-0-1-op-s-is-001
+      fc-port-update:
+        - server-name: /v1/regard-application
+          uuid: alt-2-0-1-op-s-is-001
+      fc-port-deletion:
+        - server-name: /v1/disregard-application
+          uuid: alt-2-0-1-op-s-is-002
+      operation-client-deletion:
+        - server-name: /v1/disregard-application
+          uuid: alt-2-0-1-op-s-is-002
+    initiating-requests:
+      - server-name: /v1/regard-application
+        uuid: alt-2-0-1-op-s-is-001
+      - server-name: /v1/update-operation-key
+        uuid: alt-2-0-1-op-s-bm-010
+    consequent-requests:
+      - client-name: RegistryOffice://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-ro-2-0-1-004
+      - client-name: TypeApprovalRegister://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-tar-1-0-0-004
+      - client-name: ExecutionAndTraceLog://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-eatl-1-0-0-004
+      - client-name: OamLog://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-ol-1-0-0-004
+      - client-name: AdministratorAdministration://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-aa-1-0-0-004
+      - client-name: ApplicationLayerTopology://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-alt-2-0-1-004
+      - client-name: OperationKeyManagement://v1/redirect-topology-change-information
+        uuid: alt-2-0-1-op-c-im-okm-1-0-0-004
+
+  - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedLtpInformation
+    uuid: alt-2-0-1-op-fc-is-013
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - server-name: /v1/regard-application
+        uuid: alt-2-0-1-op-s-is-001
+    consequent-requests:
+      - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
+        uuid: alt-2-0-1-op-c-is-alt-2-0-1-000
+
+  - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedLtpInformation
+    uuid: alt-2-0-1-op-fc-is-014
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - server-name: /v1/regard-application
+        uuid: alt-2-0-1-op-s-is-001
+    consequent-requests:
+      - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
+        uuid: alt-2-0-1-op-c-is-alt-2-0-1-000
+
+  - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcInformation
+    uuid: alt-2-0-1-op-fc-is-015
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - server-name: /v1/regard-application
+        uuid: alt-2-0-1-op-s-is-001
+    consequent-requests:
+      - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
+        uuid: alt-2-0-1-op-c-is-alt-2-0-1-000
+
+  - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcPortInformation
+    uuid: alt-2-0-1-op-fc-is-016
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - server-name: /v1/regard-application
+        uuid: alt-2-0-1-op-s-is-001
+    consequent-requests:
+      - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
+        uuid: alt-2-0-1-op-c-is-alt-2-0-1-000
+
+  - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedFcPortInformation
+    uuid: alt-2-0-1-op-fc-is-017
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - server-name: /v1/regard-application
+        uuid: alt-2-0-1-op-s-is-001
+    consequent-requests:
+      - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
+        uuid: alt-2-0-1-op-c-is-alt-2-0-1-000

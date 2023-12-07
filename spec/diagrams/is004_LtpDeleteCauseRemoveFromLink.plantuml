@@ -1,0 +1,13 @@
+@startuml is004_LtpDeleteCauseRemoveFromLink
+skinparam responseMessageBelowArrow true
+
+title
+LtpDeletionCausesOperationClientBeingRemovedFromLink
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/delete-ltp-and-dependents" as altDeleteLtp
+participant "ALT://v1/remove-operation-client-from-link" as altRemoveClientFromLink
+
+
+@enduml

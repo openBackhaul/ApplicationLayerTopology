@@ -1,0 +1,16 @@
+@startuml is017_listLinkUuids
+
+title
+is017_listLinkUuids
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/list-link-uuids" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+@enduml

@@ -1,0 +1,13 @@
+@startuml is005_LinkChangeNotification
+skinparam responseMessageBelowArrow true
+
+title
+LinkChangeNotification
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/notify-link-updates" as altNotifyLinkUpdates
+participant "OKM://v1/regard-updated-link" as okmRegardUpdate
+
+
+@enduml
