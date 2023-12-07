@@ -3393,6 +3393,11 @@
                     "logical-termination-point": "alt-2-0-1-op-s-is-001"
                   },
                   {
+                    "local-id": "101",
+                    "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_INPUT",
+                    "logical-termination-point": "alt-2-0-1-op-s-bm-010"
+                  },
+                  {
                     "local-id": "200",
                     "port-direction": "core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT",
                     "logical-termination-point": "alt-2-0-1-op-c-im-ro-2-0-1-004" 
