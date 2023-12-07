@@ -4227,13 +4227,37 @@ paths:
                   application/json:
                     schema:
                       type: object
-                      required:
-                        - link-uuid
                       properties:
                         link-uuid:
                           type: string
-                      example:
-                        link-uuid: '11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000'
+                        link-end-point-list:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              application-name:
+                                type: string
+                                description: >
+                                  'Name of application that holds the link end point (operationServer or operationClient)
+                                  from [ElasticSearch://logical-termination-point=*-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/application-name]'
+                              release-number:
+                                type: string
+                                description: >
+                                  'Release of application that holds the link end point (operationServer or operationClient)
+                                  from [ElasticSearch://logical-termination-point=*-http-*-*/layer-protocol=0/http-*-interface-1-0:http-*-interface-pac/http-*-interface-*/release-number]'
+                              operation-uuid:
+                                type: string
+                                description: >
+                                  'UUID of the operation (server or client) at the link end point
+                                  from [ElasticSearch://logical-termination-point=*-op-*-*/uuid]'
+                              ltp-direction:
+                                type: string
+                                enum:
+                                  - 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
+                                  - 'core-model-1-4:TERMINATION_DIRECTION_SINK'
+                                description: >
+                                  'Identifies OperationServer (SOURCE) and OperationClient (SINK)
+                                  from [ElasticSearch://logical-termination-point=*-op-*-*/ltp-direction]'
               responses:
                 '204':
                   description: 'UUID of changed Link has been received'
