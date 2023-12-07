@@ -34,8 +34,8 @@ forwardings:
       - client-name: OldRelease://v1/bequeath-your-data-and-die
         uuid: alt-2-0-1-op-c-bm-or-1-0-0-000
 
-  - forwarding-name: PromptForEmbeddingInitiatesEmbeddingProcess.RetrieveControlConstructFromRoAndTar
-    uuid: alt-2-0-1-op-fc-im-109
+  - forwarding-name: PromptForEmbeddingInitiatesEmbeddingProcess.RetrieveControlConstructFromRo
+    uuid: alt-2-0-1-op-fc-im-001
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -48,6 +48,19 @@ forwardings:
     consequent-requests:
       - client-name: RegistryOffice://redirect-topology-change-information
         uuid: alt-2-0-1-op-c-im-ro-2-0-1-004
+
+  - forwarding-name: PromptForEmbeddingInitiatesEmbeddingProcess.RetrieveControlConstructFromTar
+    uuid: alt-2-0-1-op-fc-im-002
+    forwarding-type: InvariantProcessSnippet
+    management-requests:
+      operation-client-update:
+      fc-port-update:
+      fc-port-deletion:
+      operation-client-deletion:
+    initiating-requests:
+      - server-name: /v1/embed-yourself
+        uuid: alt-2-0-1-op-s-bm-001
+    consequent-requests:
       - client-name: TypeApprovalRegister://v1/redirect-topology-change-information
         uuid: alt-2-0-1-op-c-im-tar-1-0-0-004
 

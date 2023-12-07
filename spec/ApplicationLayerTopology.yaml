@@ -5000,7 +5000,7 @@ paths:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
-          RetrieveControlConstructFromRoAndTar: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-ro-2-0-1-000 and alt-2-0-1-tcp-c-tar-1-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-ro-2-0-1-000 and alt-2-0-1-tcp-c-tar-1-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-ro-2-0-1-000 and alt-2-0-1-tcp-c-tar-1-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-ro-2-0-1-000 and alt-2-0-1-tcp-c-tar-1-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-c-im-ro-2-0-1-004 and alt-2-0-1-op-c-im-tar-1-0-0-004/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+          RetrieveControlConstructFromRo: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-ro-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-ro-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-ro-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-ro-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-c-im-ro-2-0-1-004/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -5014,17 +5014,6 @@ paths:
                   application/json:
                     schema:
                       type: object
-                      required:
-                        - topology-application
-                        - topology-application-release-number
-                        - topology-operation-ltp-update
-                        - topology-operation-ltp-deletion
-                        - topology-operation-fc-update
-                        - topology-operation-fc-port-update
-                        - topology-operation-fc-port-deletion
-                        - topology-application-protocol
-                        - topology-application-address
-                        - topology-application-port
                       properties:
                         topology-application:
                           type: string
@@ -5087,19 +5076,6 @@ paths:
                           description: >
                             'Port of application that shall document the application layer topology
                             from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port]'
-                      example:
-                        topology-application: 'ApplicationLayerTopology'
-                        topology-application-release-number: '2.0.1'
-                        topology-operation-ltp-update: '/v1/update-ltp'
-                        topology-operation-ltp-deletion: '/v1/delete-ltp-and-dependents'
-                        topology-operation-fc-update: '/v1/update-fc'
-                        topology-operation-fc-port-update: '/v1/update-fc-port'
-                        topology-operation-fc-port-deletion: '/v1/delete-fc-port'
-                        topology-application-protocol: 'HTTP'
-                        topology-application-address:
-                          ip-address:
-                            ipv-4-address: '1.1.3.13'
-                        topology-application-port: 3013
               responses:
                 '200':
                   description: 'Client side for sending information about topology changes has been updated and current data tree has been provided. Links shall be complemented for the OperationServers.'
@@ -5107,8 +5083,6 @@ paths:
                     application/json:
                       schema:
                         type: object
-                        required:
-                          - core-model-1-4:control-construct
                         properties:
                           core-model-1-4:control-construct:
                             type: object
@@ -5127,64 +5101,10 @@ paths:
                                 uniqueItems: true
                                 items:
                                   $ref: '#/components/schemas/logicalTerminationPoint'
-                                example:
-                                  - uuid: 'ro-2-0-1-op-s-bm-000'
-                                    ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
-                                    client-ltp: []
-                                    server-ltp: ['ro-2-0-1-http-s-000']
-                                    layer-protocol:
-                                      - local-id: '0'
-                                        layer-protocol-name: 'operation-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_OPERATION_LAYER'
-                                        operation-server-interface-1-0:operation-server-interface-pac:
-                                          operation-server-interface-capability:
-                                            operation-name: '/v1/register-yourself'
-                                          operation-server-interface-configuration:
-                                            life-cycle-state: 'operation-server-interface-1-0:LIFE_CYCLE_STATE_TYPE_EXPERIMENTAL'
-                                  - uuid: 'ro-2-0-1-http-s-000'
-                                    ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
-                                    client-ltp: ['ro-2-0-1-op-s-bm-000']
-                                    server-ltp: []
-                                    layer-protocol:
-                                      - local-id: '0'
-                                        layer-protocol-name: 'http-server-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_HTTP_LAYER'
-                                        http-server-interface-1-0:http-server-interface-pac:
-                                          http-server-interface-capability:
-                                            application-name: 'RegistryOffice'
-                                            release-number: '2.0.1'
-                                            data-update-period: 'http-server-interface-1-0:DATA_UPDATE_PERIOD_TYPE_REAL_TIME'
                               forwarding-domain:
                                 type: array
                                 items:
                                   $ref: '#/components/schemas/forwardingDomain'
-                                example:
-                                  - uuid: 'ro-2-0-1-op-fd-000'
-                                    forwarding-construct:
-                                      - uuid: 'ro-2-0-1-op-fc-bm-000'
-                                        name:
-                                          - value-name: 'ForwardingKind'
-                                            value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
-                                          - value-name: 'ForwardingName'
-                                            value: 'PromptForRegisteringCausesRegistrationRequest'
-                                        fc-port:
-                                          - local-id: '000'
-                                            port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_MANAGEMENT'
-                                            logical-termination-point: 'ro-2-0-1-op-s-bm-000'
-                                          - local-id: '100'
-                                            port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
-                                            logical-termination-point: 'ro-2-0-1-op-s-bm-000'
-                                      - uuid: 'ro-2-0-1-op-fc-bm-001'
-                                        name:
-                                          - value-name: 'ForwardingKind'
-                                            value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
-                                          - value-name: 'ForwardingName'
-                                            value: 'PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData'
-                                        fc-port:
-                                          - local-id: '100'
-                                            port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
-                                            logical-termination-point: 'ro-2-0-1-op-s-bm-001'
-                                          - local-id: '200'
-                                            port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_OUTPUT'
-                                            logical-termination-point: 'ro-2-0-1-op-c-bm-ro-2-0-1-000'
                   headers:
                     x-correlator:
                       schema:
@@ -5225,6 +5145,152 @@ paths:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
                 default:
                   $ref: '#/components/responses/responseForErroredServiceRequests'
+          RetrieveControlConstructFromTar: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-tar-1-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-tar-1-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-tar-1-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-c-tar-1-0-0-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-c-im-tar-1-0-0-004/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+            post:
+              parameters:
+                - $ref: '#/components/parameters/user'
+                - $ref: '#/components/parameters/originator'
+                - $ref: '#/components/parameters/x-correlator'
+                - $ref: '#/components/parameters/trace-indicator'
+                - $ref: '#/components/parameters/customer-journey'
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        topology-application:
+                          type: string
+                          description: >
+                            'Own application name
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/application-name]'
+                        topology-application-release-number:
+                          type: string
+                          description: >
+                            'Own release number
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-number]'
+                        topology-operation-ltp-update:
+                          type: string
+                          description: >
+                            'Operation for updating an LTP
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-005/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                        topology-operation-ltp-deletion:
+                          type: string
+                          description: >
+                            'Operation for deleting an LTP and it's dependents like FC port and Link (if applicable)
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-006/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                        topology-operation-fc-update:
+                          type: string
+                          description: >
+                            'Operation for updating a ForwardingConstruct instance
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-013/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                        topology-operation-fc-port-update:
+                          type: string
+                          description: >
+                            'Operation for updating an FC port
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-014/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                        topology-operation-fc-port-deletion:
+                          type: string
+                          description: >
+                            'Operation for deleting an FC port
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-op-s-is-015/layer-protocol=0/operation-server-interface-1-0:operation-server-interface-pac/operation-server-interface-capability/operation-name]'
+                        topology-application-protocol:
+                          type: string
+                          description: >
+                            'Protocol to be used for addresing the application that shall document the application layer topology
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/remote-protocol]'
+                        topology-application-address:
+                          type: object
+                          properties:
+                            ip-address:
+                              type: object
+                              properties:
+                                ipv-4-address:
+                                  type: string
+                                  description: >
+                                    'IPv4 address of application that shall document the application layer topology
+                                    from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-address/ipv-4-address]'
+                            domain-name:
+                              type: string
+                              description: >
+                                'Domain name of application that shall document the application layer topology
+                                from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/remote-address/domain-name]'
+                        topology-application-port:
+                          type: integer
+                          description: >
+                            'Port of application that shall document the application layer topology
+                            from [/core-model-1-4:control-construct/logical-termination-point=alt-2-0-1-tcp-s-000/layer-protocol=0/tcp-server-interface-1-0:tcp-server-interface-pac/tcp-server-interface-configuration/local-port]'
+              responses:
+                '200':
+                  description: 'Client side for sending information about topology changes has been updated and current data tree has been provided. Links shall be complemented for the OperationServers.'
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          core-model-1-4:control-construct:
+                            type: object
+                            description: >
+                              'Entire internal datatree
+                              update [ElasticSearch://]'
+                            required:
+                              - uuid
+                              - logical-termination-point
+                              - forwarding-domain
+                            properties:
+                              uuid:
+                                type: string
+                              logical-termination-point:
+                                type: array
+                                uniqueItems: true
+                                items:
+                                  $ref: '#/components/schemas/logicalTerminationPoint'
+                              forwarding-domain:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/forwardingDomain'
+                  headers:
+                    x-correlator:
+                      schema:
+                        type: string
+                        example: '550e8400-e29b-11d4-a716-446655440000'
+                      description: 'UUID for the service execution flow that allows to correlate requests and responses. Its value must be identical at the response compared with its corresponding request'
+                    exec-time:
+                      schema:
+                        type: integer
+                        example: 1100
+                      description: 'Value written by the service provider, reporting the total elapsed time for the execution, including all the additional processing needed to retrieve the data from the backend service. Expressed in milliseconds'
+                    backend-time:
+                      schema:
+                        type: integer
+                        example: 850
+                      description: 'Value written by the service provider, reporting the elapsed time for data retrieval from the backend (service invocation, database access…). Expressed in milliseconds'
+                    life-cycle-state:
+                      schema:
+                        type: string
+                        enum:
+                          - 'EXPERIMENTAL'
+                          - 'OPERATIONAL'
+                          - 'DEPRECATED'
+                          - 'OBSOLETE'
+                          - 'UNKNOWN'
+                          - 'NOT_YET_DEFINED'
+                        example: 'EXPERIMENTAL'
+                      description: 'Life cycle state of the consumed service'
+                '400':
+                  $ref: '#/components/responses/responseForErroredServiceRequests'
+                '401':
+                  $ref: '#/components/responses/responseForErroredServiceRequests'
+                '403':
+                  $ref: '#/components/responses/responseForErroredServiceRequests'
+                '404':
+                  $ref: '#/components/responses/responseForErroredServiceRequests'
+                '500':
+                  $ref: '#/components/responses/responseForErroredServiceRequests'
+                default:
+                  $ref: '#/components/responses/responseForErroredServiceRequests'
+
   /v1/redirect-service-request-information:
     parameters:
       - $ref: '#/components/parameters/user'

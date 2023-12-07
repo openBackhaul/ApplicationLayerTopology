@@ -1,0 +1,47 @@
+@startuml bm001_Embedding
+skinparam responseMessageBelowArrow true
+
+title
+PromptForEmbeddingInitiatesEmbeddingProcess
+end title
+
+participant "RO" as ro
+participant "ALT://v1/embed-yourself" as alt
+participant "OR://v1/bequeath-your-data-and-die" as OldRelease
+participant "RO://redirect-topology-change-information" as CcOfRo
+participant "TAR://redirect-topology-change-information" as CcOfTar
+
+ro -> alt
+activate alt
+ro <-- alt : 204
+
+note over alt
+<u> RequestForBequeathingData </u>
+end note
+alt -> OldRelease
+alt <-- OldRelease : 204
+
+note right alt #WhiteSmoke
+When the application layer gets build from scratch, applications get instantiated in the following sequence: RO, TAR, ALT, ....
+This implies that RO+TAR don't get indicated to ALT://v1/regard-application.
+and ALT is not requesting them RO+TAR://v1/redirect-topology-change-information.
+Consequently, RO+TAR wouldn't sent topology change information and their CC wouldn't be transferred to ALT.
+To cover this particular case, TAR is catching up on RO+TAR://v1/redirect-topology-change-information as a part of its embedding process.
+Since OKM is not yet active in this particular situation, defaultApiKey is applied as a standard, which leads to 403 during a regular upgrade process.
+end note
+
+
+note over alt
+<u>RetrieveControlConstructFromRo</u>
+end note
+alt -> CcOfRo : (<font color=red><b>default</b><font color=black>ApiKey)
+alt <-- CcOfRo : {all LTPs and FD of the internal CC}
+
+note over alt
+<u>RetrieveControlConstructFromTar</u>
+end note
+alt -> CcOfTar : (<font color=red><b>default</b><font color=black>ApiKey)
+alt <-- CcOfTar : {all LTPs and FD of the internal CC}
+deactivate alt
+
+@enduml
