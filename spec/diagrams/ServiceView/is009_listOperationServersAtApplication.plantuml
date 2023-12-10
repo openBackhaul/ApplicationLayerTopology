@@ -1,0 +1,17 @@
+@startuml is009_listOperationServersAtApplication
+skinparam responseMessageBelowArrow true
+
+title
+is009_listOperationServersAtApplication
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/list-operation-servers-at-application" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml is022_notifyLinkUpdates
+skinparam responseMessageBelowArrow true
+
+title
+is022_notifyLinkUpdates
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/notify-link-updates" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+note over alt #LightCyan
+ServiceRequestCausesLtpUpdateRequest
+end note
+
+note over alt #LightCyan
+ServiceRequestCausesFcUpdateRequest
+end note
+
+note over alt #LightCyan
+LinkChangeNotification
+end note
+
+@enduml

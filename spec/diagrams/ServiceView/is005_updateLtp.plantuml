@@ -1,0 +1,25 @@
+@startuml is005_updateLtp
+skinparam responseMessageBelowArrow true
+
+title
+is005_updateLtp
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/update-ltp" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+note over alt #LightCyan
+LtpUpdateMightCauseOperationClientBeingAddedToLink
+end note
+
+note over alt #LightCyan
+LtpUpdateMightCauseOperationClientBeingRemovedFromLink
+end note
+
+@enduml
