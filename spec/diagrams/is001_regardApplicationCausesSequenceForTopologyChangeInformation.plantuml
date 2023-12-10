@@ -25,7 +25,7 @@ activate alt
 
 note over alt
 <u>RequestForInquiringTopologyChangeInformationWithDefaultKey</u>
-Request to pro-actively inform about 
+Request to pro-actively inform about
 topology change information in future
 end note
 alt -> newApplication : {topologyApplication, releaseNumber, ltpUpdateService, ltpDeletionService, fcUpdateService, fcPortUpdateService, fcPortDeletionService, protocol, address, port} (<font color=red><b>default</b><font color=black>ApiKey)
@@ -81,7 +81,7 @@ end note
 
 note over alt
 <u>RequestForInquiringTopologyChangeInformation</u>
-Request to pro-actively inform about 
+Request to pro-actively inform about
 topology change information in future
 end note
 alt -> newApplication : {topologyApplication, releaseNumber, ltpUpdateService, ltpDeletionService, fcUpdateService, fcPortUpdateService, fcPortDeletionService, protocol, address, port} (apiKey)
