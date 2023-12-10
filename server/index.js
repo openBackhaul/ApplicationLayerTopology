@@ -9,6 +9,7 @@ var PrepareApprovedLinks = require('./service/individualServices/PrepareApproved
 var serverPort = 3005;
 
 const ElasticsearchPreparation = require('./service/individualServices/ElasticsearchPreparation');
+const preApprovedLinks = require('./utils/preApprovedLinks.json');
 
 // uncomment if you do not want to validate security e.g. operation-key, basic auth, etc
 // appCommons.openApiValidatorOptions.validateSecurity = false;
@@ -25,22 +26,26 @@ var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/open
 var app = expressAppConfig.getApp();
 appCommons.setupExpressApp(app);
 
-// Initialize the Swagger middleware
-http.createServer(app).listen(serverPort, function () {
-    console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
-    console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);
-});
 
 //setting the path to the database 
 global.databasePath = './database/load.json'
 
-ElasticsearchPreparation.prepareElasticsearch().then(
-    () => {
-        const preApprovedLinks = require('./utils/preApprovedLinks.json');
-        PrepareApprovedLinks.createPreApprovedLinks(preApprovedLinks);
-    }
-).catch(err => {
+ElasticsearchPreparation.prepareElasticsearch().catch(err => {
     console.error(`Error preparing Elasticsearch : ${err}`);
-});
+}).finally(
+    () => {
+        // Initialize the Swagger middleware
+        http.createServer(app).listen(serverPort, function () {
+        console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
+        console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);
+        });
+        PrepareApprovedLinks.createPreApprovedLinks(preApprovedLinks).catch(
+            err => {
+                console.error(`Error entering preapproved links : ${err}`);
+            }
+        );
+        appCommons.performApplicationRegistration();
+    }
+);
 
-appCommons.performApplicationRegistration();
+

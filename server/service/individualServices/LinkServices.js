@@ -20,6 +20,7 @@ const {
     createResultArray
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
+const PrepareForwardingAutomation = require('./PrepareForwardingAutomation');
 const AsyncLock = require('async-lock');
 
 const lock = new AsyncLock();
@@ -33,7 +34,7 @@ const lock = new AsyncLock();
 exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
     let took = 0;
     let link = {};
-    let servingEndpointResponse = await getServingOperationUuidAsync(EndPoints);
+    let servingEndpointResponse = await exports.getServingOperationUuidAsync(EndPoints);
     took += servingEndpointResponse.took;
     let servingOperationUuid = servingEndpointResponse.servingOperationUuid;
 
@@ -42,17 +43,21 @@ exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
     let consumingOperationUuid = consumingEndpointResponse.consumingOperationUuid;
 
     if (servingOperationUuid) {
-        let linkResponse =  await exports.getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+        let linkResponse =  await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
         link = linkResponse.link;
         took += linkResponse.took;
         let createOrUpdateResponse;
-        if (link && consumingOperationUuid) {
-            createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
+        if (link) {
+             if(consumingOperationUuid) {
+              createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
+             } 
         } else {
             createOrUpdateResponse = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
             link = createOrUpdateResponse.link;
         }
-        took += createOrUpdateResponse.took;
+        if(createOrUpdateResponse) {
+            took += createOrUpdateResponse.took;
+        }
     }
     return { "linkUuid": link[onfAttributes.GLOBAL_CLASS.UUID], "took": took };
 }
@@ -66,7 +71,7 @@ exports.deleteOperationClientFromTheEndPointsAsync = async function (EndPoints) 
     let linkUuid;
     let took = 0;
 
-    let servingEndpointResponse = await getServingOperationUuidAsync(EndPoints);
+    let servingEndpointResponse = await exports.getServingOperationUuidAsync(EndPoints);
     took += servingEndpointResponse.took;
     let servingOperationUuid = servingEndpointResponse.servingOperationUuid;
 
@@ -75,7 +80,7 @@ exports.deleteOperationClientFromTheEndPointsAsync = async function (EndPoints) 
     let consumingOperationUuid = consumingEndpointResponse.consumingOperationUuid;
 
     if (servingOperationUuid && consumingOperationUuid) {
-        let linkResponse = await exports.getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+        let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
         let link = linkResponse.link;
         took += linkResponse.took;
         linkUuid = link[onfAttributes.GLOBAL_CLASS.UUID];
@@ -90,7 +95,7 @@ exports.deleteOperationClientFromTheEndPointsAsync = async function (EndPoints) 
     return { "linkUuid": linkUuid, "took": took };
 }
 
-async function getServingOperationUuidAsync(EndPoints) {
+exports.getServingOperationUuidAsync = async function(EndPoints) {
     let servingApplicationName = EndPoints["serving-application-name"];
     let servingApplicationReleaseNumber = EndPoints["serving-application-release-number"];
     let operationName = EndPoints["operation-name"];
@@ -137,7 +142,7 @@ async function getConsumingOperationUuidAsync(EndPoints) {
  * @param {Enumerator} portDirection
  * @returns {Promise<Object>} { link, took }
  */
-exports.getLinkOfTheOperationAsync = async function (operationUuid, portDirection) {
+async function getLinkOfTheOperationAsync(operationUuid, portDirection) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
@@ -235,7 +240,7 @@ async function createLinkAsync(consumingOperationUuid, servingOperationUuid) {
     return await addLinkAsync(link);
 }
 
-exports.createCompleteLinkAsync = async function (consumingOperationUuids, servingOperationUuid) {
+async function createCompleteLinkAsync(consumingOperationUuids, servingOperationUuid) {
     let linkUuid = await uuidv4();
     let link = {
         [onfAttributes.GLOBAL_CLASS.UUID]: linkUuid,
@@ -247,6 +252,7 @@ exports.createCompleteLinkAsync = async function (consumingOperationUuids, servi
         [onfAttributes.LINK.PORT_DIRECTION]: LinkPort.portDirectionEnum.OUTPUT,
         [onfAttributes.LINK.LOGICAL_TERMINATION_POINT]: servingOperationUuid
     };
+    link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
     if (consumingOperationUuids.length !== 0) {
         for (let consumingOperationUuid of consumingOperationUuids) {
             let consumingOperationLocalId = LinkPort.generateNextLocalId(link);
@@ -258,7 +264,6 @@ exports.createCompleteLinkAsync = async function (consumingOperationUuids, servi
             link[onfAttributes.LINK.LINK_PORT].push(consumingOperationLinkPort);
         }
     }
-    link[onfAttributes.LINK.LINK_PORT].push(servingOperationLinkPort);
     return await addLinkAsync(link);
 }
 
@@ -500,5 +505,20 @@ async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
     } else {
         throw new Error('link-port was not updated');
     }
+}
+
+exports.prepareLinkChangeNotificationForwardingsAsync = async function(servingOperationUuid, consumingOperationUuidList) {
+    let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+    let existingLink = linkResponse.link;
+
+    if (!existingLink) {
+        let response = await createCompleteLinkAsync(consumingOperationUuidList, servingOperationUuid);
+        let linkUuid = response.link[onfAttributes.GLOBAL_CLASS.UUID];
+        console.log(`Adding new link: ${linkUuid}`);
+        return PrepareForwardingAutomation.createLinkChangeNotificationForwardings(
+            linkUuid
+        );
+    }
+    return undefined;
 }
 
