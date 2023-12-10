@@ -1,0 +1,13 @@
+@startuml is003_LtpUpdateCauseRemoveFromLink
+skinparam responseMessageBelowArrow true
+
+title
+LtpUpdateMightCauseOperationClientBeingRemovedFromLink
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/update-ltp" as altUpdateLtp
+participant "ALT://v1/remove-operation-client-from-link" as altRemoveClientFromLink
+
+
+@enduml

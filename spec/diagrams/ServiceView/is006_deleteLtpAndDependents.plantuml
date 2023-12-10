@@ -1,0 +1,21 @@
+@startuml is006_deleteLtpAndDependents
+skinparam responseMessageBelowArrow true
+
+title
+is006_deleteLtpAndDependents
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/delete-ltp-and-dependents" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+note over alt #LightCyan
+LtpDeletionCausesOperationClientBeingRemovedFromLink
+end note
+
+@enduml

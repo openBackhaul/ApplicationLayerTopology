@@ -1,0 +1,21 @@
+@startuml is018_addOperationClientToLink
+skinparam responseMessageBelowArrow true
+
+title
+is018_addOperationClientToLink
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/add-operation-client-to-link" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+note over alt #LightCyan
+LinkChangeNotification
+end note
+
+@enduml

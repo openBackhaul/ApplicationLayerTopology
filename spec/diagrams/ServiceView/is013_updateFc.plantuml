@@ -1,0 +1,17 @@
+@startuml is013_updateFc
+skinparam responseMessageBelowArrow true
+
+title
+is013_updateFc
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/update-fc" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+@enduml

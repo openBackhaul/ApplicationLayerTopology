@@ -1,0 +1,17 @@
+@startuml is004_updateAllLtpsAndFcs
+skinparam responseMessageBelowArrow true
+
+title
+is004_updateAllLtpsAndFcs
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/update-all-ltps-and-fcs" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+@enduml

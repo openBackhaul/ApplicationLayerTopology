@@ -1,0 +1,21 @@
+@startuml is019_removeOperationClientFromLink
+skinparam responseMessageBelowArrow true
+
+title
+is019_removeOperationClientFromLink
+end title
+
+participant "Requestor" as requestor
+participant "ALT://v1/remove-operation-client-from-link" as alt
+
+requestor -> alt : (apiKey)
+
+note over alt #LightCyan
+ServiceRequestCausesLoggingRequest
+end note
+
+note over alt #LightCyan
+LinkChangeNotification
+end note
+
+@enduml
