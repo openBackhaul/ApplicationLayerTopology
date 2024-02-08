@@ -26,4 +26,6 @@ note over alt #LightCyan
 NewApplicationCausesRequestForTopologyChangeInformation
 end note
 
+ro <-- alt : {successfullyConnected, reasonOfFailure}
+
 @enduml
