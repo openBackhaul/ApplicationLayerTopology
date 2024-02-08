@@ -883,7 +883,7 @@ paths:
                                           - value-name: 'ForwardingKind'
                                             value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
                                           - value-name: 'ForwardingName'
-                                            value: 'PromptForEmbeddingCausesRequestForBequeathingData'
+                                            value: 'PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData'
                                         fc-port:
                                           - local-id: '100'
                                             port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
@@ -1189,7 +1189,7 @@ paths:
                                           - value-name: 'ForwardingKind'
                                             value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
                                           - value-name: 'ForwardingName'
-                                            value: 'PromptForEmbeddingCausesRequestForBequeathingData'
+                                            value: 'PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData'
                                         fc-port:
                                           - local-id: '100'
                                             port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
@@ -2004,7 +2004,7 @@ paths:
                                 - value-name: 'ForwardingKind'
                                   value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
                                 - value-name: 'ForwardingName'
-                                  value: 'PromptForEmbeddingCausesRequestForBequeathingData'
+                                  value: 'PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData'
                               fc-port:
                                 - local-id: '100'
                                   port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'
@@ -4667,8 +4667,8 @@ paths:
         default:
           $ref: '#/components/responses/responseForErroredServiceRequests'
       callbacks:
-        PromptForEmbeddingCausesRequestForBequeathingData:
-          url: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-tcp-c-or-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-tcp-c-or-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-tcp-c-or-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-tcp-c-or-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-op-c-bm-or-2-0-1-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
+        PromptForEmbeddingInitiatesEmbeddingProcess:
+          RequestForBequeathingData: #[/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-tcp-c-or-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-protocol]://[/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-tcp-c-or-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/domain-name or /core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-tcp-c-or-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-address/ip-address/ipv-4-address]:[/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-tcp-c-or-2-0-1-000/layer-protocol=0/tcp-client-interface-1-0:tcp-client-interface-pac/tcp-client-interface-configuration/remote-port][/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-op-c-bm-or-2-0-1-000/layer-protocol=0/operation-client-interface-1-0:operation-client-interface-pac/operation-client-interface-configuration/operation-name]
             post:
               parameters:
                 - $ref: '#/components/parameters/user'
@@ -6110,7 +6110,7 @@ paths:
                                   - value-name: 'ForwardingKind'
                                     value: 'core-model-1-4:FORWARDING_KIND_TYPE_INVARIANT_PROCESS_SNIPPET'
                                   - value-name: 'ForwardingName'
-                                    value: 'PromptForEmbeddingCausesRequestForBequeathingData'
+                                    value: 'PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData'
                                 fc-port:
                                   - local-id: '100'
                                     port-direction: 'core-model-1-4:PORT_DIRECTION_TYPE_INPUT'

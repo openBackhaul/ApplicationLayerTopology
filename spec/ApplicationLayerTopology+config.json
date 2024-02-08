@@ -2512,7 +2512,7 @@
                   },
                   {
                     "value-name": "ForwardingName",
-                    "value": "PromptForEmbeddingCausesRequestForBequeathingData"
+                    "value": "PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData"
                   }
                 ],
                 "fc-port": [

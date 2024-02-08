@@ -19,7 +19,7 @@ forwardings:
       - client-name: RegistryOffice://v2/register-application
         uuid: alt-2-1-0-op-c-bm-ro-2-1-0-000
 
-  - forwarding-name: PromptForEmbeddingCausesRequestForBequeathingData
+  - forwarding-name: PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData
     uuid: alt-2-1-0-op-fc-bm-001
     forwarding-type: InvariantProcessSnippet
     management-requests:
