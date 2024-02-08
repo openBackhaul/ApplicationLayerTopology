@@ -177,12 +177,6 @@ clients:
           - operation-name: /v1/relay-operation-update
             uuid: alt-2-1-0-op-c-bm-ro-2-1-0-003
         individual:
-          - operation-name: /v1/notify-approvals
-            uuid: alt-2-1-0-op-c-im-ro-2-1-0-000
-          - operation-name: /v1/notify-withdrawn-approvals
-            uuid: alt-2-1-0-op-c-im-ro-2-1-0-001
-          - operation-name: /v1/end-subscription
-            uuid: alt-2-1-0-op-c-im-ro-2-1-0-002
           - operation-name: /v1/redirect-topology-change-information
             uuid: alt-2-1-0-op-c-im-ro-2-1-0-004
       service:

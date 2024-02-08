@@ -64,6 +64,17 @@ while applying the default OperationKey for addressing
 newApplicationName://v1/update-operation-key
 end note
 
+note right okmRegardLink #red
+Error!
+OKM cannot address the new application here as it 
+doesn't have Http- and TcpClient of the new application.
+
+Potential solutions:
+- ALT calling OKM://regard-application with into about new application in body
+- creating new service ALT://provide-tcp-ip-client-information and OKM calling it after realizing the missing data
+
+end note
+
 okmRegardLink -[#LightGrey]> newApplicationUpdateKey : (<font color=red><b>default</b><font color=black>ApiKey)
 newApplicationUpdateKey --[#LightGrey]> okmRegardLink
 
