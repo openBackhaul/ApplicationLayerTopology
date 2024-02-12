@@ -89,7 +89,7 @@ servers:
           uuid: alt-2-1-0-op-s-is-022
   http-server:
     own-application-name: ApplicationLayerTopology
-    own-release-number: 2.1.0
+    own-release-number: 2.1.1
     uuid: alt-2-1-0-http-s-000
   tcp-server:
     - description: Without TLS layer
@@ -111,8 +111,10 @@ clients:
       tcp-port: 3015
       uuid: alt-2-1-0-tcp-c-es-1-0-0-000
     elasticsearch-client:
-      uuid: alt-2-1-0-es-c-es-1-0-0-000
-      index-alias: alt-2-0-1
+      - uuid: alt-2-1-0-es-c-es-1-0-0-000
+        index-alias: alt-2-0-1
+      - uuid: alt-2-1-0-es-c-es-1-0-0-001
+        index-alias: alt-links-2-0-1
 
   - http-client:
       application-name: OldRelease
@@ -148,10 +150,6 @@ clients:
         individual:
           - operation-name: /v1/regard-application
             uuid: alt-2-1-0-op-c-im-nr-2-1-0-000
-          - operation-name: /v1/update-all-ltps-and-fcs
-            uuid: alt-2-1-0-op-c-im-nr-2-1-0-001
-          - operation-name: /v1/add-operation-client-to-link
-            uuid: alt-2-1-0-op-c-im-nr-2-1-0-002
       service:
         basic:
         individual:
@@ -177,12 +175,6 @@ clients:
           - operation-name: /v1/relay-operation-update
             uuid: alt-2-1-0-op-c-bm-ro-2-1-0-003
         individual:
-          - operation-name: /v1/notify-approvals
-            uuid: alt-2-1-0-op-c-im-ro-2-1-0-000
-          - operation-name: /v1/notify-withdrawn-approvals
-            uuid: alt-2-1-0-op-c-im-ro-2-1-0-001
-          - operation-name: /v1/end-subscription
-            uuid: alt-2-1-0-op-c-im-ro-2-1-0-002
           - operation-name: /v1/redirect-topology-change-information
             uuid: alt-2-1-0-op-c-im-ro-2-1-0-004
       service:
@@ -231,7 +223,7 @@ clients:
 
   - http-client:
       application-name: OamLog
-      release-number: 2.1.0
+      release-number: 2.0.1
       uuid: alt-2-1-0-http-c-ol-2-0-1-000
     tcp-client:
       remote-protocol: http
