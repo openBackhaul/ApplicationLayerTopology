@@ -123,7 +123,7 @@ profile-instances:
     uuid: 'alt-2-1-0-integer-p-000'
     capability:
       integer-name: 'maximumWaitTimeToReceiveOperationKey'
-      purpose: 'Limit the waiting for an event to happen'
+      purpose: 'Creating a Link in ALT was successful if an OperationKey could be received. This attribute limits waiting for the OperationKey to be received.'
       unit: 'millisecond'
       minimum: '0'
       maximum: '5000'

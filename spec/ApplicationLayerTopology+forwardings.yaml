@@ -538,8 +538,6 @@ forwardings:
         - server-name: /v1/end-subscription
           uuid: alt-2-1-0-op-s-bm-004
       operation-client-deletion:
-        - server-name: /v1/end-subscription
-          uuid: alt-2-1-0-op-s-bm-004
     initiating-requests:
       - server-name: /v1/add-operation-client-to-link
         uuid: alt-2-1-0-op-s-is-018

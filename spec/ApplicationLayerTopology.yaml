@@ -665,6 +665,7 @@ paths:
                           - 'ALT_ALT_UNKNOWN'
                           - 'ALT_NOT_REACHABLE'
                           - 'ALT_UNKNOWN'
+                          - 'ALT_MAXIMUM_WAIT_TIME_TO_RECEIVE_OPERATION_KEY_EXCEEDED'
                         description: 'Reasons provided by ALT to be pre-fixed with ALT_. If (NOT (200 OR 204)) respond ALT_NOT_REACHABLE'
               examples:
                 if-successful:
@@ -3590,13 +3591,13 @@ paths:
                               from [ElasticSearch://logical-termination-point=*-op-*-*/ltp-direction]'
                 example:
                   link-end-point-list:
-                    - application-name: 'RegistryOffice'
-                      release-number: '2.0.1'
-                      operation-uuid: 'ro-2-1-0-op-c-im-alt-1-0-0-000'
+                    - application-name: 'ConsumingApplication'
+                      release-number: '34.0.15'
+                      operation-uuid: 'ca-34-0-15-op-c-im-sa-13-0-5-000'
                       ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SINK'
-                    - application-name: 'ApplicationLayerTopology'
-                      release-number: '2.0.1'
-                      operation-uuid: 'alt-2-1-0-op-s-bm-001'
+                    - application-name: 'ServingApplication'
+                      release-number: '13.0.5'
+                      operation-uuid: 'sa-13-0-5-op-s-bm-001'
                       ltp-direction: 'core-model-1-4:TERMINATION_DIRECTION_SOURCE'
           headers:
             x-correlator:
@@ -3652,7 +3653,7 @@ paths:
       operationId: listLinksToOperationClientsOfApplication
       summary: 'Provides list of applications and names of operations that are connected by links to an application'
       description: >
-        'Browses list of links for UUIDs of OperationClients at (application-name,application-release-number) as INPUT and
+        'Browses list of links for UUIDs of OperationClients at (application-name,release-number) as INPUT and
         returns (serving-application-name,serving-application-release-number,operation-name) for OperationServers of UUIDs that are stated as OUTPUT.'
       tags:
         - IndividualServices

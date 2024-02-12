@@ -9,9 +9,9 @@ participant "RO" as ro
 participant "ALT://v1/regard-application" as alt
 participant "ALT://v1/update-operation-key" as atmUpdateKey
 participant "ALT://v1/add-operation-client-to-link" as altAddClientToLink
-participant "OKM://v1/regard-updated-link" as okmRegardLink
-participant "newApplicationName://v1/update-operation-key" as newApplicationUpdateKey
-participant "newApplicationName://v1/redirect-topology-change-information" as newApplication
+participant "OKM://v2/regard-updated-link" as okmRegardLink
+participant "NewApp://v1/update-operation-key" as newApplicationUpdateKey
+participant "NewApp://v1/redirect-topology-change-information" as newApplication
 
 note right alt #WhiteSmoke
 The CC of the new application must already be in the ALT when attempting to create the Links.
@@ -34,63 +34,61 @@ alt <-- newApplication: {all LTPs and FD of the internal CC}
 note over alt
 <u>CreateLinkForInquiringTopologyChangeInformation</u>
 Request for automatically creating the Link:
-ALT => newApplicationName://v1/redirect-topology-change-information
+ALT => NewApp://v1/redirect-topology-change-information
 end note
 alt -> altAddClientToLink : { servingApplicationName == requestBody.newApplicationName,\n servingApplicationReleaseNumber == requestBody.releaseNumber,\n operationName == /v1/redirect-topology-change-information,\n consumingApplicationName == ApplicationLayerTopology,\n consumingApplicationReleaseNumber == 2.1.0 } (apiKey)
-alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure}
+alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure }
 
 note left alt
 IF (NOT 200) OR (client-successfully-added==false)
 end note
-ro <-- alt : { successfully-connected==false,  reason-of-failure}
+ro <-- alt : { successfully-connected==false,  reason-of-failure }
 
-note over altAddClientToLink #WhiteSmoke
-Now, the newApplicationName://v1/redirect-topology-change-information OperationClient in ALT
-got added to the Link starting from the
-/v1/redirect-topology-change-information OperationServer in the new application in ALT ...
+note over alt
+ELSE
 end note
 
 note over altAddClientToLink #WhiteSmoke
-... and ALT notifies OKM about the changed Link
+If client-successfully-added==true, the corresponding
+OperationClient from inside ALT got added to the Link towards
+NewApp://v1/redirect-topology-change-information
+and ALT notifies OKM about the changed Link
 end note
 
 altAddClientToLink -[#LightGrey]> okmRegardLink
-okmRegardLink --[#LightGrey]> altAddClientToLink
+altAddClientToLink <-[#LightGrey]- okmRegardLink
 
 note over okmRegardLink #WhiteSmoke
-Now, OKM configures a new OperationKey at the
-/v1/redirect-topology-change-information OperationServer in the new application
-while applying the default OperationKey for addressing
-newApplicationName://v1/update-operation-key
+Usually, OKM would now configure a new OperationKey into the OperationServer
+/v1/redirect-topology-change-information inside the new application, but
+OKM does not have TcpClient and HttpClient for addressing the new application.
+For not locking the door by single-sided configuration of an OperationKey
+OKM is configuring the default OperationKey into all OperationClients
+that are connected with an unknown OperationServer.
 end note
-
-note right okmRegardLink #red
-Error!
-OKM cannot address the new application here as it 
-doesn't have Http- and TcpClient of the new application.
-
-Potential solutions:
-- ALT calling OKM://regard-application with into about new application in body
-- creating new service ALT://provide-tcp-ip-client-information and OKM calling it after realizing the missing data
-
-end note
-
-okmRegardLink -[#LightGrey]> newApplicationUpdateKey : (<font color=red><b>default</b><font color=black>ApiKey)
-newApplicationUpdateKey --[#LightGrey]> okmRegardLink
 
 note over okmRegardLink #WhiteSmoke
 Finally, OKM configures the same OperationKey at the
-newApplicationName://v1/redirect-topology-change-information OperationClient in ALT
+NewApp://v1/redirect-topology-change-information OperationClient in ALT
 end note
 
-okmRegardLink -[#LightGrey]> atmUpdateKey
+okmRegardLink -[#LightGrey]> atmUpdateKey : {default OperationKey} (ApiKey)
 atmUpdateKey --[#LightGrey]> okmRegardLink
+
+note left alt #Orange
+IF waiting > maximumWaitTimeToReceiveOperationKey
+end note
+ro <-- alt : { successfully-connected==false,  reason-of-failure }
 
 note over alt
 ELSE
 end note
 
 note over alt
+After receiving an updated operation-key
+for the operation-client
+NewApp://v1/redirect-topology-change-information
+
 <u>RequestForInquiringTopologyChangeInformation</u>
 Request to pro-actively inform about
 topology change information in future
@@ -107,7 +105,7 @@ end note
 note left alt
 IF (NOT 200)
 end note
-ro <-- alt : { successfully-connected==false,  reason-of-failure}
+ro <-- alt : { successfully-connected==false,  reason-of-failure }
 
 note over alt
 ELSE
@@ -119,12 +117,12 @@ Request for automatically creating the Link:
 newApplication => ALT://v1/update-ltp
 end note
 alt -> altAddClientToLink : { servingApplicationName == ApplicationLayerTopology,\n servingApplicationReleaseNumber == 2.1.0,\n operationName == /v1/update-ltp,\n consumingApplicationName == requestBody.newApplicationName,\n consumingApplicationReleaseNumber == requestBody.releaseNumber } (apiKey)
-alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure}
+alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure }
 
 note left alt
 IF (NOT 200) OR (client-successfully-added==false)
 end note
-ro <-- alt : { successfully-connected==false,  reason-of-failure}
+ro <-- alt : { successfully-connected==false,  reason-of-failure }
 
 note over alt
 ELSE
@@ -136,12 +134,12 @@ Request for automatically creating the Link:
 newApplication => ALT://v1/delete-ltp-and-dependents
 end note
 alt -> altAddClientToLink : { servingApplicationName == ApplicationLayerTopology,\n servingApplicationReleaseNumber == 2.1.0,\n operationName == /v1/delete-ltp-and-dependents,\n consumingApplicationName == requestBody.newApplicationName,\n consumingApplicationReleaseNumber == requestBody.releaseNumber } (apiKey)
-alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure}
+alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure }
 
 note left alt
 IF (NOT 200) OR (client-successfully-added==false)
 end note
-ro <-- alt : { successfully-connected==false,  reason-of-failure}
+ro <-- alt : { successfully-connected==false,  reason-of-failure }
 
 note over alt
 ELSE
@@ -153,12 +151,12 @@ Request for automatically creating the Link:
 newApplication => ALT://v1/update-fc
 end note
 alt -> altAddClientToLink : { servingApplicationName == ApplicationLayerTopology,\n servingApplicationReleaseNumber == 2.1.0,\n operationName == /v1/update-fc,\n consumingApplicationName == requestBody.newApplicationName,\n consumingApplicationReleaseNumber == requestBody.releaseNumber } (apiKey)
-alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure}
+alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure }
 
 note left alt
 IF (NOT 200) OR (client-successfully-added==false)
 end note
-ro <-- alt : { successfully-connected==false,  reason-of-failure}
+ro <-- alt : { successfully-connected==false,  reason-of-failure }
 
 note over alt
 ELSE
@@ -170,12 +168,12 @@ Request for automatically creating the Link:
 newApplication => ALT://v1/update-fc-port
 end note
 alt -> altAddClientToLink : { servingApplicationName == ApplicationLayerTopology,\n servingApplicationReleaseNumber == 2.1.0,\n operationName == /v1/update-fc-port,\n consumingApplicationName == requestBody.newApplicationName,\n consumingApplicationReleaseNumber == requestBody.releaseNumber } (apiKey)
-alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure}
+alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure }
 
 note left alt
 IF (NOT 200) OR (client-successfully-added==false)
 end note
-ro <-- alt : { successfully-connected==false,  reason-of-failure}
+ro <-- alt : { successfully-connected==false,  reason-of-failure }
 
 note over alt
 ELSE
@@ -186,12 +184,12 @@ note over alt
 newApplication => ALT://v1/delete-fc-port
 end note
 alt -> altAddClientToLink : { servingApplicationName == ApplicationLayerTopology,\n servingApplicationReleaseNumber == 2.1.0,\n operationName == /v1/delete-fc-port,\n consumingApplicationName == requestBody.newApplicationName,\n consumingApplicationReleaseNumber == requestBody.releaseNumber } (apiKey)
-alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure}
+alt <-- altAddClientToLink : {client-successfully-added, reason-of-failure }
 
 note left alt
 IF (NOT 200) OR (client-successfully-added==false)
 end note
-ro <-- alt : { successfully-connected==false,  reason-of-failure}
+ro <-- alt : { successfully-connected==false,  reason-of-failure }
 
 note over alt
 ELSE
