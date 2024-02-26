@@ -6,7 +6,7 @@ var http = require('http');
 var oas3Tools = require('openbackhaul-oas3-tools');
 var appCommons = require('onf-core-model-ap/applicationPattern/commons/AppCommons');
 var PrepareApprovedLinks = require('./service/individualServices/PrepareApprovedLinks');
-var serverPort = 3005;
+var serverPort = 3029;
 
 const ElasticsearchPreparation = require('./service/individualServices/ElasticsearchPreparation');
 const preApprovedLinks = require('./utils/preApprovedLinks.json');
@@ -28,7 +28,7 @@ appCommons.setupExpressApp(app);
 
 
 //setting the path to the database 
-global.databasePath = './database/load.json'
+global.databasePath = './database/config.json'
 
 ElasticsearchPreparation.prepareElasticsearch().catch(err => {
     console.error(`Error preparing Elasticsearch : ${err}`);
