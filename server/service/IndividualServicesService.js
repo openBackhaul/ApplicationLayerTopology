@@ -5,7 +5,7 @@ const LogicalTerminationPointService = require('onf-core-model-ap/applicationPat
 const prepareALTForwardingAutomation = require('onf-core-model-ap-bs/basicServices/services/PrepareALTForwardingAutomation');
 
 const LinkServices = require('./individualServices/LinkServices');
-const LogicalTerminationPointServiceOfUtility = require('onf-core-model-ap-bs/basicServices/utility/LogicalTerminationPoint');
+const ServiceUtils = require('onf-core-model-ap-bs/basicServices/utility/LogicalTerminationPoint');
 const individualServicesOperationsMapping = require('./individualServices/IndividualServicesOperationsMapping');
 const ForwardingConfigurationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructConfigurationServices');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
@@ -89,7 +89,7 @@ exports.bequeathYourDataAndDie = function (body, user, originator, xCorrelator, 
        * Prepare logicalTerminatinPointConfigurationInput object to 
        * configure logical-termination-point
        ****************************************************************************************/
-      let httpClientUuidList = await LogicalTerminationPointServiceOfUtility.resolveHttpTcpAndOperationClientUuidOfNewRelease()
+      let httpClientUuidList = await ServiceUtils.resolveHttpTcpAndOperationClientUuidOfNewRelease()
       let newReleaseHttpClientLtpUuid = httpClientUuidList.httpClientUuid
       let tcpclientUuid = httpClientUuidList.tcpClientUuid
 
@@ -327,7 +327,7 @@ exports.disregardApplication = async function (body, user, originator, xCorrelat
  **/
 exports.listApplications = async function () {
   const forwardingName = 'NewApplicationCausesRequestForTopologyChangeInformation';
-  let applicationList = await LogicalTerminationPointServiceOfUtility.getAllApplicationList(forwardingName);
+  let applicationList = await ServiceUtils.getAllApplicationList(forwardingName);
   return onfAttributeFormatter.modifyJsonObjectKeysToKebabCase(applicationList);
 }
 
@@ -635,13 +635,15 @@ exports.notifyLinkUpdates = async function (body, user, originator, xCorrelator,
     operationNamesByAttributes,
     individualServicesOperationsMapping.individualServicesOperationsMapping
   );
-  let logicalTerminationPointconfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationLtpsAsync(
-    ltpConfigurationInput
+  const roApplicationName = await ServiceUtils.resolveRegistryOfficeApplicationNameFromForwardingAsync();
+  const ltpConfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationLtpsAsync(
+    ltpConfigurationInput,
+    roApplicationName === applicationName
   );
 
   let forwardingConfigurationInputList = [];
   let forwardingConstructConfigurationStatus;
-  let operationClientConfigurationStatusList = logicalTerminationPointconfigurationStatus.operationClientConfigurationStatusList;
+  let operationClientConfigurationStatusList = ltpConfigurationStatus.operationClientConfigurationStatusList;
 
   if (operationClientConfigurationStatusList) {
     forwardingConfigurationInputList = await prepareForwardingConfiguration.notifyLinkUpdates(
@@ -655,7 +657,7 @@ exports.notifyLinkUpdates = async function (body, user, originator, xCorrelator,
     );
   }
   let forwardingAutomationInputList = await prepareForwardingAutomation.notifyLinkUpdates(
-    logicalTerminationPointconfigurationStatus,
+    ltpConfigurationStatus,
     forwardingConstructConfigurationStatus
   );
   ForwardingAutomationService.automateForwardingConstructAsync(
@@ -681,11 +683,7 @@ exports.notifyLinkUpdates = async function (body, user, originator, xCorrelator,
 exports.regardApplication = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
   let applicationName = body["application-name"];
   let releaseNumber = body["release-number"];
-  let tcpServerList = [{
-    protocol: body["protocol"],
-    address: body["address"],
-    port: body["port"]
-  }];
+  let tcpServerList = [new TcpObject(body["protocol"], body["address"], body["port"])];
 
   let redirectTopologyInformationOperation = "/v1/redirect-topology-change-information";
 
@@ -695,7 +693,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
   let httpClientUuid = await httpClientInterface.getHttpClientUuidExcludingOldReleaseAndNewRelease(
     applicationName, releaseNumber, NEW_RELEASE_FORWARDING_NAME
   )
-  let logicalTerminatinPointConfigurationInput = new LogicalTerminationPointConfigurationInput(
+  let ltpConfigurationInput = new LogicalTerminationPointConfigurationInput(
     httpClientUuid,
     applicationName,
     releaseNumber,
@@ -704,8 +702,10 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
     operationNamesByAttributes,
     individualServicesOperationsMapping.individualServicesOperationsMapping
   );
-  let ltpConfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationLtpsAsync(
-    logicalTerminatinPointConfigurationInput
+  const roApplicationName = await ServiceUtils.resolveRegistryOfficeApplicationNameFromForwardingAsync();
+  const ltpConfigurationStatus = await LogicalTerminationPointService.createOrUpdateApplicationLtpsAsync(
+    ltpConfigurationInput,
+    roApplicationName === applicationName
   );
 
   let forwardingConfigurationInputList = [];
@@ -763,7 +763,8 @@ async function automateForwarding(forwardingAutomationInput, headers, applicatio
     forwardingAutomationInput,
     headers
   );
-  if (response === undefined || response.data === undefined || Object.keys(response).length === 0) {
+  if (response === undefined || response.data === undefined || response.data.code === "500") {
+    console.log(`Unexpected response ${JSON.stringify(response["data"])}`);
     return;
   }
   // response is full control construct of regarded application
