@@ -13,47 +13,6 @@ const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriv
 const ControlConstructService = require('./ControlConstructService');
 const LinkServices = require('./LinkServices');
 
-exports.regardApplication = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus, clientApplicationName,
-    clientReleaseNumber) {
-    return new Promise(async function (resolve, reject) {
-        let forwardingConstructAutomationList = [];
-        try {
-            let forwardingAutomation;
-
-            /***********************************************************************************
-             * NewApplicationCausesRequestForTopologyChangeInformation /v1/redirect-topology-change-information
-             ************************************************************************************/
-            let topologyChangeInformationForwardingName = "NewApplicationCausesRequestForTopologyChangeInformation";
-            let topologyChangeInformationContext = clientApplicationName + clientReleaseNumber;
-            let topologyChangeInformationRequestBody = {};
-            topologyChangeInformationRequestBody.topologyApplication = await httpServerInterface.getApplicationNameAsync();
-            topologyChangeInformationRequestBody.topologyApplicationReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-            topologyChangeInformationRequestBody.topologyApplicationProtocol = await tcpServerInterface.getLocalProtocol();
-            topologyChangeInformationRequestBody.topologyApplicationAddress = await tcpServerInterface.getLocalAddressForForwarding();
-            topologyChangeInformationRequestBody.topologyApplicationPort = await tcpServerInterface.getLocalPort();
-            topologyChangeInformationRequestBody.topologyOperationApplicationUpdate = "/v1/update-all-ltps-and-fcs";
-            topologyChangeInformationRequestBody.topologyOperationLtpUpdate = "/v1/update-ltp";
-            topologyChangeInformationRequestBody.topologyOperationLtpDeletion = "/v1/delete-ltp-and-dependents";
-            topologyChangeInformationRequestBody.topologyOperationFcUpdate = "/v1/update-fc";
-            topologyChangeInformationRequestBody.topologyOperationFcPortUpdate = "/v1/update-fc-port";
-            topologyChangeInformationRequestBody.topologyOperationFcPortDeletion = "/v1/delete-fc-port";
-            
-
-            topologyChangeInformationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(topologyChangeInformationRequestBody);
-            forwardingAutomation = new forwardingConstructAutomationInput(
-                topologyChangeInformationForwardingName,
-                topologyChangeInformationRequestBody,
-                topologyChangeInformationContext
-            );
-            forwardingConstructAutomationList.push(forwardingAutomation);
-
-            resolve(forwardingConstructAutomationList);
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
 exports.disregardApplication = function (logicalTerminationPointconfigurationStatus, forwardingConstructConfigurationStatus) {
     return new Promise(async function (resolve, reject) {
         let forwardingConstructAutomationList = [];

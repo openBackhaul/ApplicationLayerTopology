@@ -6,8 +6,6 @@ const forwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/
 const FcPort = require('onf-core-model-ap/applicationPattern/onfModel/models/FcPort');
 const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
 
-
-
 exports.regardApplication = function (operationClientConfigurationStatusList,
     redirectTopologyInformationOperation) {
     return new Promise(async function (resolve, reject) {
@@ -19,18 +17,26 @@ exports.regardApplication = function (operationClientConfigurationStatusList,
                 let operationClientName = await operationClientInterface.
                 getOperationNameAsync(operationClientUuid);
                 let forwardingConfigurationInput;
-                let forwardingName;
                 if (operationClientName == redirectTopologyInformationOperation) {
-                    forwardingName =
-                        "NewApplicationCausesRequestForTopologyChangeInformation";
+                    let forwardingNameForInquiringTopologyChangeInformationWithDefaultKey =
+                        "NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformationWithDefaultKey";
                     forwardingConfigurationInput = new forwardingConstructConfigurationInput(
-                        forwardingName,
+                        forwardingNameForInquiringTopologyChangeInformationWithDefaultKey,
                         operationClientUuid
                     );
+                    forwardingConfigurationInputList.push(
+                        forwardingConfigurationInput
+                    );
+                    let forwardingNameForInquiringTopologyChangeInformation =
+                        "NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformation";
+                    forwardingConfigurationInput = new forwardingConstructConfigurationInput(
+                        forwardingNameForInquiringTopologyChangeInformation,
+                        operationClientUuid
+                    );
+                    forwardingConfigurationInputList.push(
+                        forwardingConfigurationInput
+                    );
                 }
-                forwardingConfigurationInputList.push(
-                    forwardingConfigurationInput
-                );
             }
             resolve(forwardingConfigurationInputList);
         } catch (error) {
