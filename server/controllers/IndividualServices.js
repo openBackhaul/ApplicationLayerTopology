@@ -8,10 +8,11 @@ var executionAndTraceService = require('onf-core-model-ap/applicationPattern/ser
 
 module.exports.addOperationClientToLink = async function addOperationClientToLink(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
-  let responseCode = responseCodeEnum.code.NO_CONTENT;
-  let responseBodyToDocument = undefined;
+  let responseCode = responseCodeEnum.code.OK;
+  let responseBodyToDocument = {};
   await IndividualServices.addOperationClientToLink(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
     .then(async function (responseBody) {
+      responseBodyToDocument = responseBody.response;
       let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
@@ -252,10 +253,11 @@ module.exports.notifyLinkUpdates = async function notifyLinkUpdates(req, res, ne
 
 module.exports.regardApplication = async function regardApplication(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
-  let responseCode = responseCodeEnum.code.NO_CONTENT;
-  let responseBodyToDocument = undefined;
+  let responseCode = responseCodeEnum.code.OK;
+  let responseBodyToDocument = {};
   await IndividualServices.regardApplication(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
     .then(async function (responseBody) {
+      responseBodyToDocument = responseBody;
       let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })

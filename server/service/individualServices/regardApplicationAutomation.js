@@ -4,12 +4,17 @@ const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfMod
 const tcpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpServerInterface');
 const ControlConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ControlConstruct');
 const operationServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
+const OperationClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
+const integerProfileOperation = require('onf-core-model-ap/applicationPattern/onfModel/models/profile/IntegerProfile');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
+const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
+const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
 
 const ControlConstructService = require('./ControlConstructService');
 const IndividualServicesUtility = require('./IndividualServicesUtility');
 const LinkServices = require('./LinkServices');
+const OperationServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
 
 exports.regardApplication = async function (body, requestHeaders) {
   let result = {};
@@ -19,12 +24,12 @@ exports.regardApplication = async function (body, requestHeaders) {
     let releaseNumber = body["release-number"];
     requestHeaders.traceIndicatorIncrementer = traceIndicatorIncrementer;
     result = await RequestForInquiringTopologyChangeInformationWithDefaultKey(applicationName, releaseNumber, requestHeaders);
-    result = await CreateLinkForInquiringTopologyChangeInformation(body, requestHeaders);
+    result = await CreateLinkForInquiringTopologyChangeInformation(applicationName, releaseNumber, requestHeaders);
     if (!result["successfully-connected"]) return result;
     let forwardingForInquiringTopologyInformation = "NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformation";
     let operationClientUuid = await IndividualServicesUtility.getConsequentOperationClientUuid(forwardingForInquiringTopologyInformation, applicationName, releaseNumber);
     let waitingTime = await integerProfileOperation.getIntegerValueForTheIntegerProfileNameAsync("maximumWaitTimeToReceiveOperationKey");
-    isOperationKeyUpdated = await OperationClientInterface.waitUntilOperationKeyIsUpdated(operationClientUuid, requestHeaders.timestampOfCurrentRequest, waitingTime);
+    let isOperationKeyUpdated = await OperationClientInterface.waitUntilOperationKeyIsUpdated(operationClientUuid, requestHeaders.timestampOfCurrentRequest, waitingTime);
     if (!isOperationKeyUpdated) {
       result["successfully-connected"] = false;
       result["reason-of-failure"] = `ALT_MAXIMUM_WAIT_TIME_TO_RECEIVE_OPERATION_KEY_EXCEEDED`;
@@ -103,6 +108,10 @@ async function RequestForInquiringTopologyChangeInformationWithDefaultKey(applic
       }
     }
     console.log(`${forwardingName} has been triggered with response ${response.status}`);
+    if(result["successfully-connected"]) {
+      console.log("update of control-construct to Elasticsearch is successful");
+    }
+    
   } catch (error) {
     console.log(error);
     result["successfully-connected"] = false;
@@ -211,7 +220,7 @@ async function CreateLinkForProvidingUpdatedLtpInformation(applicationName, rele
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-005";
-    requestBody["operation-name"] = await OperationClientInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -243,7 +252,7 @@ async function CreateLinkForProvidingDeletedLtpInformation(applicationName, rele
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-006";
-    requestBody["operation-name"] = await OperationClientInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -275,7 +284,7 @@ async function CreateLinkForProvidingUpdatedFcInformation(applicationName, relea
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-013";
-    requestBody["operation-name"] = await OperationClientInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -307,7 +316,7 @@ async function CreateLinkForProvidingUpdatedFcPortInformation(applicationName, r
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-014";
-    requestBody["operation-name"] = await OperationClientInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -339,7 +348,7 @@ async function CreateLinkForProvidingDeletedFcPortInformation(applicationName, r
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-015";
-    requestBody["operation-name"] = await OperationClientInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -393,6 +402,7 @@ function processResponseForCreatingLinkService(response) {
 
 async function UpdateControlConstructAndLinksInDataBase(controlConstruct, applicationName, releaseNumber, requestHeaders) {
   try {
+    controlConstruct = controlConstruct["core-model-1-4:control-construct"];
     let took = (await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct))["took"];
     if (took == -1) {
       console.log(`control construct of ${controlConstruct[onfAttributes.GLOBAL_CLASS.UUID]} has not been updated in database `);
@@ -415,7 +425,7 @@ async function UpdateControlConstructAndLinksInDataBase(controlConstruct, applic
         forwardings.push(forwarding);
       }
     }
-    let operationServerUuidForCreatingLinks = (await ControlConstruct.getUuidAsync()) + "-op-s-is-013";
+    let operationServerUuidForCreatingLinks = (await ControlConstruct.getUuidAsync()) + "-op-s-is-018";
     let creatingLinksOperationServerName = await operationServerInterface.getOperationNameAsync(operationServerUuidForCreatingLinks);
     ForwardingAutomationService.automateForwardingConstructAsync(
       creatingLinksOperationServerName,
@@ -440,8 +450,7 @@ async function UpdateControlConstructAndLinksInDataBase(controlConstruct, applic
 function getAllOperationServerNameAsync(logicalTerminationPoints) {
   let operationServerNames = [];
   for (let logicalTerminationPoint of logicalTerminationPoints) {
-    let protocols = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL];
-    let protocol = protocols[0];
+    let protocol = logicalTerminationPoint[onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
     let protocolName = protocol[onfAttributes.LAYER_PROTOCOL.LAYER_PROTOCOL_NAME];
     if (LayerProtocol.layerProtocolNameEnum.OPERATION_SERVER === protocolName) {
       let operationServerPac = protocol[onfAttributes.LAYER_PROTOCOL.OPERATION_SERVER_INTERFACE_PAC];

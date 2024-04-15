@@ -31,7 +31,7 @@ exports.automateForwardingConstructAsync = async function (forwardingAutomationI
         fcp[onfAttributes.FC_PORT.PORT_DIRECTION] === FcPort.portDirectionEnum.OUTPUT
     );
     let found = await findOutputMatchesContextAsync(fcOutputPortList, forwardingAutomationInput.context);
-    return await dispatchEvent(
+    return await exports.dispatchEvent(
         found[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT],
         forwardingAutomationInput.attributeList,
         headers.user,
@@ -71,7 +71,7 @@ async function findOutputMatchesContextAsync(fcPortList, context) {
  * @param {String} traceIndicator Sequence number of the request. 
  * @param {String} customerJourney Holds information supporting customer’s journey to which the execution applies.
  */
-async function dispatchEvent(operationClientUuid, httpRequestBody, user, xCorrelator, traceIndicator, customerJourney) {
+exports.dispatchEvent = async function (operationClientUuid, httpRequestBody, user, xCorrelator, traceIndicator, customerJourney) {
     let operationKey = await OperationClientInterface.getOperationKeyAsync(
         operationClientUuid);
     let operationName = await OperationClientInterface.getOperationNameAsync(
@@ -137,7 +137,7 @@ exports.dispatchEventWithDefaultOperationKey = async function (operationClientUu
         let httpClientUuid = await LogicalTerminationPoint.getServerLtpListAsync(operationClientUuid);
         let serverApplicationName = await HttpClientInterface.getApplicationNameAsync(httpClientUuid[0]);
         let serverApplicationReleaseNumber = await HttpClientInterface.getReleaseNumberAsync(httpClientUuid[0]);
-        let originator = await httpServerInterface.getApplicationNameAsync();
+        let originator = await HttpServerInterface.getApplicationNameAsync();
         let httpRequestHeader = new RequestHeader(
             user,
             originator,
@@ -172,6 +172,7 @@ exports.dispatchEventWithDefaultOperationKey = async function (operationClientUu
         }
         return response;
     } catch (error) {
+        console.log(error)
         return createHttpError.InternalServerError(`${error}`);
     }
 }
