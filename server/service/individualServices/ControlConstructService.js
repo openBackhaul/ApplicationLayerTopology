@@ -438,6 +438,8 @@ class ControlConstructService {
     let intermitent = (backendTime[0] * 1000 + backendTime[1] / 1000000);
     if (res.body.result === 'created' || res.body.result === 'updated') {
       return { "took": took + intermitent };
+    } else {
+      return { "took": -1 };
     }
   }
 

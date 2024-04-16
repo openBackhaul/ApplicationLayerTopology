@@ -12,7 +12,7 @@ module.exports.addOperationClientToLink = async function addOperationClientToLin
   let responseBodyToDocument = {};
   await IndividualServices.addOperationClientToLink(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
     .then(async function (responseBody) {
-      responseBodyToDocument = responseBody;
+      responseBodyToDocument = responseBody.responseBody;
       let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })

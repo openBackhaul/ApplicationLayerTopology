@@ -9,6 +9,7 @@
 
 const ControlConstructService = require('./ControlConstructService');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
+const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
 const LinkPort = require('../models/LinkPort');
 const {
     v4: uuidv4
@@ -21,6 +22,7 @@ const {
 } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
 const ElasticsearchPreparation = require('./ElasticsearchPreparation');
 const PrepareForwardingAutomation = require('./PrepareForwardingAutomation');
+const individualServiceUtility = require('./IndividualServicesUtility');
 const AsyncLock = require('async-lock');
 
 const lock = new AsyncLock();
@@ -34,32 +36,49 @@ const lock = new AsyncLock();
 exports.findOrCreateLinkForTheEndPointsAsync = async function (EndPoints) {
     let took = 0;
     let link = {};
-    let servingEndpointResponse = await exports.getServingOperationUuidAsync(EndPoints);
-    took += servingEndpointResponse.took;
-    let servingOperationUuid = servingEndpointResponse.servingOperationUuid;
-
-    let consumingEndpointResponse = await getConsumingOperationUuidAsync(EndPoints);
-    took += consumingEndpointResponse.took;
-    let consumingOperationUuid = consumingEndpointResponse.consumingOperationUuid;
-
-    if (servingOperationUuid) {
-        let linkResponse =  await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
-        link = linkResponse.link;
-        took += linkResponse.took;
-        let createOrUpdateResponse;
-        if (link) {
-             if(consumingOperationUuid) {
-              createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
-             } 
+    let response = {};
+    try {
+        let servingEndpointResponse = await exports.getServingOperationUuidAsync(EndPoints);
+        took += servingEndpointResponse.took;
+        if (servingEndpointResponse["reason-of-failure"]) {
+            response["reason-of-failure"] = servingEndpointResponse["reason-of-failure"];
+            response["took"] = took;
         } else {
-            createOrUpdateResponse = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
-            link = createOrUpdateResponse.link;
+            let servingOperationUuid = servingEndpointResponse.servingOperationUuid;
+            let consumingEndpointResponse = await getConsumingOperationUuidAsync(EndPoints);
+            took += consumingEndpointResponse.took;
+            if (consumingEndpointResponse["reason-of-failure"]) {
+                response["reason-of-failure"] = consumingEndpointResponse["reason-of-failure"];
+                response["took"] = took;
+            } else {
+                let consumingOperationUuid = consumingEndpointResponse.consumingOperationUuid;
+                if (servingOperationUuid) {
+                    let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+                    link = linkResponse.link;
+                    took += linkResponse.took;
+                    let createOrUpdateResponse;
+                    if (link) {
+                        if (consumingOperationUuid) {
+                            createOrUpdateResponse = await updateLinkAsync(link, consumingOperationUuid);
+                        }
+                    } else {
+                        createOrUpdateResponse = await createLinkAsync(consumingOperationUuid, servingOperationUuid);
+                        link = createOrUpdateResponse.link;
+                    }
+                    if (createOrUpdateResponse) {
+                        took += createOrUpdateResponse.took;
+                    }
+                    response["linkUuid"] = link[onfAttributes.GLOBAL_CLASS.UUID];
+                    response["took"] = took;
+                }
+            }
         }
-        if(createOrUpdateResponse) {
-            took += createOrUpdateResponse.took;
-        }
+    } catch (error) {
+        console.log(error);
+        response["reason-of-failure"] = "ALT_UNKNOWN";
+        response["took"] = took;
     }
-    return { "linkUuid": link[onfAttributes.GLOBAL_CLASS.UUID], "took": took };
+    return response;
 }
 
 /**
@@ -95,44 +114,82 @@ exports.deleteOperationClientFromTheEndPointsAsync = async function (EndPoints) 
     return { "linkUuid": linkUuid, "took": took };
 }
 
-exports.getServingOperationUuidAsync = async function(EndPoints) {
+exports.getServingOperationUuidAsync = async function (EndPoints) {
+    let response = {};
     let servingApplicationName = EndPoints["serving-application-name"];
     let servingApplicationReleaseNumber = EndPoints["serving-application-release-number"];
-    let operationName = EndPoints["operation-name"];
-    let servingApplicationCCResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-        servingApplicationName,
-        servingApplicationReleaseNumber);
-    if (!servingApplicationCCResponse.controlConstruct) {
-        return { "servingOperationUuid": undefined, "took": servingApplicationCCResponse.took };
+    if (await individualServiceUtility.isHttpClientForApplicationNameExists(servingApplicationName)) {
+        if (httpClientInterface.isApplicationExists(servingApplicationName, servingApplicationReleaseNumber)) {
+            let servingApplicationCCResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+                servingApplicationName,
+                servingApplicationReleaseNumber);
+            if (servingApplicationCCResponse.controlConstruct) {
+                let operationName = EndPoints["operation-name"];
+                let servingOperationUuid = ControlConstructService.getOperationServerUuid(
+                    servingApplicationCCResponse.controlConstruct,
+                    operationName);
+                if (servingOperationUuid) {
+                    response["servingOperationUuid"] = servingOperationUuid;
+                    response["took"] = servingApplicationCCResponse.took;
+                } else {
+                    response["reason-of-failure"] = "ALT_OPERATION_NAME_UNKNOWN";
+                    response["took"] = servingApplicationCCResponse.took;
+                }
+            } else {
+                response["reason-of-failure"] = "ALT_SERVING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
+                response["took"] = servingApplicationCCResponse.took;
+            }
+        } else {
+            response["reason-of-failure"] = "ALT_SERVING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
+            response["took"] = 0;
+        }
+    } else {
+        response["reason-of-failure"] = "ALT_SERVING_APPLICATION_NAME_UNKNOWN";
+        response["took"] = 0;
     }
-    let servingOperationUuid = ControlConstructService.getOperationServerUuid(
-        servingApplicationCCResponse.controlConstruct,
-        operationName);
-    return { "servingOperationUuid": servingOperationUuid, "took": servingApplicationCCResponse.took };
+    return response;
+
 }
 
 async function getConsumingOperationUuidAsync(EndPoints) {
+    let response = {};
     let servingApplicationName = EndPoints["serving-application-name"];
     let servingApplicationReleaseNumber = EndPoints["serving-application-release-number"];
     let operationName = EndPoints["operation-name"];
     let consumingApplicationName = EndPoints["consuming-application-name"];
     let consumingApplicationReleaseNumber = EndPoints["consuming-application-release-number"];
-    if (consumingApplicationName === undefined && consumingApplicationReleaseNumber === undefined) {
-        return { "consumingOperationUuid": undefined, "took": 0 };
+    if (consumingApplicationName && (await individualServiceUtility.isHttpClientForApplicationNameExists(consumingApplicationName))) {
+        if (consumingApplicationReleaseNumber && (await httpClientInterface.isApplicationExists(consumingApplicationName, consumingApplicationReleaseNumber))) {
+            let consumingApplicationCCResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
+                consumingApplicationName,
+                consumingApplicationReleaseNumber);
+            if (consumingApplicationCCResponse.controlConstruct) {
+                let consumingOperationUuid = ControlConstructService.getOperationClientUuid(
+                    consumingApplicationCCResponse.controlConstruct,
+                    operationName,
+                    servingApplicationName,
+                    servingApplicationReleaseNumber
+                );
+                if (consumingOperationUuid) {
+                    response["consumingOperationUuid"] = consumingOperationUuid;
+                    response["took"] = consumingApplicationCCResponse.took;
+                } else {
+                    response["reason-of-failure"] = "ALT_OPERATION_NAME_UNKNOWN";
+                    response["took"] = servingApplicationCCResponse.took;
+                }
+            } else {
+                response["reason-of-failure"] = "ALT_CONSUMING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
+                response["took"] = consumingApplicationCCResponse.took;
+            }
+        } else {
+            response["reason-of-failure"] = "ALT_CONSUMING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
+            response["took"] = 0;
+        }
+    } else {
+        response["reason-of-failure"] = "ALT_CONSUMING_APPLICATION_NAME_UNKNOWN";
+        response["took"] = 0;
     }
-    let consumingApplicationCCResponse = await ControlConstructService.getControlConstructOfTheApplicationAsync(
-        consumingApplicationName,
-        consumingApplicationReleaseNumber);
-    if (!consumingApplicationCCResponse.controlConstruct) {
-        return { "consumingOperationUuid": undefined, "took": consumingApplicationCCResponse.took };
-    }
-    let consumingOperationUuid = ControlConstructService.getOperationClientUuid(
-        consumingApplicationCCResponse.controlConstruct,
-        operationName,
-        servingApplicationName,
-        servingApplicationReleaseNumber
-    );
-    return { "consumingOperationUuid": consumingOperationUuid, "took": consumingApplicationCCResponse.took };
+    return response;
 }
 
 /**
@@ -507,7 +564,7 @@ async function deleteLinkPortAsync(linkUuid, linkPortLocalId) {
     }
 }
 
-exports.prepareLinkChangeNotificationForwardingsAsync = async function(servingOperationUuid, consumingOperationUuidList) {
+exports.prepareLinkChangeNotificationForwardingsAsync = async function (servingOperationUuid, consumingOperationUuidList) {
     let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
     let existingLink = linkResponse.link;
 
