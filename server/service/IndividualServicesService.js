@@ -44,22 +44,32 @@ const NEW_RELEASE_FORWARDING_NAME = 'PromptForBequeathingDataCausesTransferOfLis
  * no response value expected for this operation
  **/
 exports.addOperationClientToLink = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
+
+  let addOperationClientToLinkResponse = {};
   let response = await LinkServices.findOrCreateLinkForTheEndPointsAsync(body);
-  let linkUuid = response.linkUuid;
-  let forwardingAutomationInput = prepareForwardingAutomation.createLinkChangeNotificationForwardings(
-    linkUuid
-  );
-  ForwardingAutomationService.automateForwardingConstructAsync(
-    operationServerName,
-    [forwardingAutomationInput],
-    user,
-    xCorrelator,
-    traceIndicator,
-    customerJourney
-  );
-  return {
-    "took": response.took
-  };
+  if(response["linkUuid"]) {
+    let forwardingAutomationInput = await prepareForwardingAutomation.createLinkChangeNotificationForwardings(
+      response["linkUuid"]
+    );
+    ForwardingAutomationService.automateForwardingConstructAsync(
+      operationServerName,
+      [forwardingAutomationInput],
+      user,
+      xCorrelator,
+      traceIndicator,
+      customerJourney
+    );
+    addOperationClientToLinkResponse.responseBody = {
+      "client-successfully-added": true
+    }
+  } else {
+    addOperationClientToLinkResponse.responseBody = {
+      "client-successfully-added": false,
+      "reason-of-failure": response["reason-of-failure"]
+    }
+  }
+  addOperationClientToLinkResponse.took = response.took;  
+  return addOperationClientToLinkResponse;
 }
 
 /**

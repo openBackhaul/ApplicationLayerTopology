@@ -2,13 +2,10 @@
 
 const eventDispatcher = require('./ForwardingAutomationServiceWithResponse');
 const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
-const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
-const ResponseProfile = require('onf-core-model-ap/applicationPattern/onfModel/models/profile/ResponseProfile');
-const ProfileCollection = require('onf-core-model-ap/applicationPattern/onfModel/models/ProfileCollection');
+const controlConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ControlConstruct');
 const ForwardingDomain = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingDomain');
-const ForwardingConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ForwardingConstruct');
 const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
-const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
+const layerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 const FcPort = require('onf-core-model-ap/applicationPattern/onfModel/models/FcPort');
 
@@ -189,4 +186,30 @@ async function isOutputMatchesContextAsync(fcPort, context) {
     let applicationName = await httpClientInterface.getApplicationNameAsync(httpClientUuid);
     let releaseNumber = await httpClientInterface.getReleaseNumberAsync(httpClientUuid);
     return (context == (applicationName + releaseNumber));
+}
+
+exports.isHttpClientForApplicationNameExists = async function(applicationName) {
+    try {
+        const logicalTerminationPointList = await controlConstruct.getLogicalTerminationPointListAsync(
+            layerProtocol.layerProtocolNameEnum.HTTP_CLIENT);
+            if (logicalTerminationPointList) {
+                for (let i = 0; i < logicalTerminationPointList.length; i++) {
+                    let logicalTerminationPoint = logicalTerminationPointList[i];
+                    let layerProtocol = logicalTerminationPoint[
+                        onfAttributes.LOGICAL_TERMINATION_POINT.LAYER_PROTOCOL][0];
+                    let httpClientPac = layerProtocol[
+                        onfAttributes.LAYER_PROTOCOL.HTTP_CLIENT_INTERFACE_PAC];
+                    if (httpClientPac != undefined) {
+                        let httpClientConfiguration = httpClientPac[onfAttributes.HTTP_CLIENT.CONFIGURATION];
+                        let _applicationName = httpClientConfiguration[onfAttributes.HTTP_CLIENT.APPLICATION_NAME];
+                        if (_applicationName != undefined && _applicationName == applicationName) {
+                                return true;
+                        }
+                    }
+                }
+            }
+    } catch (error) {
+        console.log(error);
+    }
+    return false;
 }
