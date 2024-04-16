@@ -80,6 +80,9 @@ module.exports.deleteLtpAndDependents = async function deleteLtpAndDependents(re
   executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
 };
 
+/**
+ * @deprecated since version 2.1.0
+ */
 module.exports.disregardApplication = async function disregardApplication(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;
@@ -287,7 +290,9 @@ module.exports.removeOperationClientFromLink = async function removeOperationCli
     });
   executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
 };
-
+/**
+ * @deprecated since version 2.1.0
+ */
 module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;

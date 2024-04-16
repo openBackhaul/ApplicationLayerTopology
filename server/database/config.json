@@ -1328,7 +1328,7 @@
                   "auth": {
                     "api-key": "API key not yet defined."
                   },
-                  "index-alias": "alt-testing"
+                  "index-alias": "alt-2-0-1"
                 },
                 "elasticsearch-client-interface-status": {
                   "operational-state": "elasticsearch-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
@@ -1355,7 +1355,7 @@
                   "auth": {
                     "api-key": "API key not yet defined."
                   },
-                  "index-alias": "alt-links-2-0-1-testing"
+                  "index-alias": "alt-links-2-0-1"
                 },
                 "elasticsearch-client-interface-status": {
                   "operational-state": "elasticsearch-client-interface-1-0:OPERATIONAL_STATE_TYPE_NOT_YET_DEFINED",
@@ -1405,10 +1405,10 @@
                   "remote-protocol": "tcp-client-interface-1-0:PROTOCOL_TYPE_HTTP",
                   "remote-address": {
                     "ip-address": {
-                      "ipv-4-address": "172.28.127.20"
+                      "ipv-4-address": "127.0.0.1"
                     }
                   },
-                  "remote-port": 9200
+                  "remote-port": 3015
                 }
               }
             }
@@ -2383,7 +2383,7 @@
                       "ipv-4-address": "127.0.0.1"
                     }
                   },
-                  "remote-port": 3029
+                  "remote-port": 3013
                 }
               }
             }
