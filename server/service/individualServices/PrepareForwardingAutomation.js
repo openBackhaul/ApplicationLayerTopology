@@ -8,6 +8,7 @@ const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/on
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const operationServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
 const onfPaths = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfPaths');
+const individualServices = require('../IndividualServicesService');
 
 const fileOperation = require('onf-core-model-ap/applicationPattern/databaseDriver/JSONDriver');
 const ControlConstructService = require('./ControlConstructService');
@@ -94,13 +95,13 @@ exports.notifyLinkUpdates = function (logicalTerminationPointconfigurationStatus
     });
 }
 
-exports.createLinkChangeNotificationForwardings = function (linkUuid) {
+exports.createLinkChangeNotificationForwardings = async function (linkUuid) {
     let linkChangeNotificationForwardingName = "LinkChangeNotification";
     let linkChangeNotificationContext;
     let linkChangeNotificationRequestBody = {};
-    linkChangeNotificationRequestBody.linkUuid = linkUuid;
-
-    linkChangeNotificationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(linkChangeNotificationRequestBody);
+    linkChangeNotificationRequestBody["link-uuid"] = linkUuid;
+    let linkEndPointList = await individualServices.listEndPointsOfLink(linkChangeNotificationRequestBody);
+    linkChangeNotificationRequestBody["link-end-point-list"] = linkEndPointList.body["link-end-point-list"];
     return new forwardingConstructAutomationInput(
         linkChangeNotificationForwardingName,
         linkChangeNotificationRequestBody,
@@ -120,9 +121,10 @@ exports.removeOperationClientFromLink = function (linkUuid) {
             let linkChangeNotificationForwardingName = "LinkChangeNotification";
             let linkChangeNotificationContext;
             let linkChangeNotificationRequestBody = {};
-            linkChangeNotificationRequestBody.linkUuid = linkUuid;
+            linkChangeNotificationRequestBody["link-uuid"] = linkUuid;
+            let linkEndPointList = await individualServices.listEndPointsOfLink(linkChangeNotificationRequestBody);
+            linkChangeNotificationRequestBody["link-end-point-list"] = linkEndPointList.body["link-end-point-list"];
 
-            linkChangeNotificationRequestBody = onfFormatter.modifyJsonObjectKeysToKebabCase(linkChangeNotificationRequestBody);
             forwardingAutomation = new forwardingConstructAutomationInput(
                 linkChangeNotificationForwardingName,
                 linkChangeNotificationRequestBody,
@@ -136,7 +138,7 @@ exports.removeOperationClientFromLink = function (linkUuid) {
     });
 }
 
-exports.updateLtp = async function(existingLtp, newLtp) {
+exports.updateLtp = async function (existingLtp, newLtp) {
     let consumingHttpServerCapabilityResponse = await ControlConstructService.findHttpServerCapabilityFromLtpUuidAsync(existingLtp.uuid);
     let consumingHttpServerCapability = consumingHttpServerCapabilityResponse.httpServerCapability;
     let took = consumingHttpServerCapabilityResponse.took;
@@ -147,19 +149,19 @@ exports.updateLtp = async function(existingLtp, newLtp) {
         let forwardingConstructAutomationListResponse = await updateOperationClientLtp(existingLtp, newLtp, consumingHttpServerCapability);
         took += forwardingConstructAutomationListResponse.took;
         return {
-            "forwardingAutomationInputList" : forwardingConstructAutomationListResponse.forwardingConstructAutomationList,
+            "forwardingAutomationInputList": forwardingConstructAutomationListResponse.forwardingConstructAutomationList,
             "took": took
         };
     } else if (LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT === protocolName) {
         let forwardingConstructAutomationListResponse = await updateHttpClientLtp(existingLtp, newLtp, consumingHttpServerCapability);
         took += forwardingConstructAutomationListResponse.took;
         return {
-            "forwardingAutomationInputList" : forwardingConstructAutomationListResponse.forwardingConstructAutomationList,
+            "forwardingAutomationInputList": forwardingConstructAutomationListResponse.forwardingConstructAutomationList,
             "took": took
         };
     }
     return {
-        "forwardingAutomationInputList" : [],
+        "forwardingAutomationInputList": [],
         "took": took
     };
 }
@@ -191,7 +193,7 @@ async function updateHttpClientLtp(existingLtp, newLtp, consumingHttpServerCapab
             let forwardingAutomation = createForwarding(
                 servingHttpServerCapability,
                 operationClientName,
-                "LtpUpdateMightCauseOperationClientBeingRemovedFromLink", 
+                "LtpUpdateMightCauseOperationClientBeingRemovedFromLink",
                 consumingHttpServerCapability);
             returnObject.forwardingConstructAutomationList.push(forwardingAutomation);
         }
@@ -203,7 +205,7 @@ async function updateHttpClientLtp(existingLtp, newLtp, consumingHttpServerCapab
             let forwardingAutomation = createForwarding(
                 servingHttpServerCapability,
                 operationClientName,
-                "LtpUpdateMightCauseOperationClientBeingAddedToLink", 
+                "LtpUpdateMightCauseOperationClientBeingAddedToLink",
                 consumingHttpServerCapability);
             returnObject.forwardingConstructAutomationList.push(forwardingAutomation);
         }
@@ -241,7 +243,7 @@ async function updateOperationClientLtp(existingLtp, newLtp, consumingHttpServer
     let forwardingAutomation = createForwarding(
         servingHttpServerCapability,
         operationClientExistingName,
-        "LtpUpdateMightCauseOperationClientBeingRemovedFromLink", 
+        "LtpUpdateMightCauseOperationClientBeingRemovedFromLink",
         consumingHttpServerCapability);
     returnObject.forwardingConstructAutomationList.push(forwardingAutomation);
     // send add
@@ -252,7 +254,7 @@ async function updateOperationClientLtp(existingLtp, newLtp, consumingHttpServer
         let forwardingAutomation = createForwarding(
             servingHttpServerCapability,
             operationClientNewName,
-            "LtpUpdateMightCauseOperationClientBeingAddedToLink", 
+            "LtpUpdateMightCauseOperationClientBeingAddedToLink",
             consumingHttpServerCapability);
         returnObject.forwardingConstructAutomationList.push(forwardingAutomation);
     }
