@@ -277,7 +277,7 @@ module.exports.removeOperationClientFromLink = async function removeOperationCli
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;
   let responseBodyToDocument = undefined;
-  await IndividualServices.removeOperationClientFromLink(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+  await IndividualServices.removeOperationClientFromLink(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
     .then(async function (responseBody) {
       let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
