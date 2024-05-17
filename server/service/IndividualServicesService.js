@@ -225,15 +225,19 @@ exports.deleteLtpAndDependents = async function (body) {
       break;
     }
     case LayerProtocol.layerProtocolNameEnum.HTTP_CLIENT: {
-      for (let clientUUID of ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]) {
+      let clientLtpUuidList = [];
+      clientLtpUuidList.push.apply(clientLtpUuidList, ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]);
+      let serverLtpUuidList = [];
+      serverLtpUuidList.push.apply(serverLtpUuidList, ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP]);
+      for (let clientUUID of clientLtpUuidList) {
         let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, clientUUID);
         took += delFcResponse.took;
         let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
         took += delLPResponse.took;
-        ControlConstructService.deleteLtpFromCCObject(ltps, clientUUID);
+        ltps = ControlConstructService.deleteLtpFromCCObject(ltps, clientUUID);
       }
-      for (let serverUUID of ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP]) {
-        ControlConstructService.deleteLtpFromCCObject(ltps, serverUUID);
+      for (let serverUUID of serverLtpUuidList) {
+        ltps = ControlConstructService.deleteLtpFromCCObject(ltps, serverUUID);
       }
       break;
     }
@@ -241,14 +245,16 @@ exports.deleteLtpAndDependents = async function (body) {
       let httpClientUuid = ltpToBeRemoved[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP][0];
       let httpClient = ltps.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === httpClientUuid);
       if (httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.SERVER_LTP].length === 1) {
-        for (let clientUUID of httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]) {
+        let clientLtpUuidList = [];
+        clientLtpUuidList.push.apply(clientLtpUuidList, httpClient[onfAttributes.LOGICAL_TERMINATION_POINT.CLIENT_LTP]);
+        for (let clientUUID of clientLtpUuidList) {
           let delFcResponse = await ControlConstructService.deleteDependentFcPorts(controlConstructUuid, clientUUID);
           took += delFcResponse.took;
           let delLPResponse = await LinkServices.deleteDependentLinkPortsAsync(clientUUID);
           took += delLPResponse.took;
-          ControlConstructService.deleteLtpFromCCObject(ltps, clientUUID);
+          ltps = ControlConstructService.deleteLtpFromCCObject(ltps, clientUUID);
         }
-        ControlConstructService.deleteLtpFromCCObject(ltps, httpClientUuid);
+        ltps = ControlConstructService.deleteLtpFromCCObject(ltps, httpClientUuid);
       }
       break;
     }
@@ -359,7 +365,10 @@ exports.listEndPointsOfLink = async function (body) {
   if (!link) {
     console.log(`Link with UUID ${linkUuid} could not be found.`);
     return {
-      "took": took
+      "took": took,
+      "body": {
+        "link-end-point-list": []
+      }
     }
   }
   for (let linkPort of link[onfAttributes.LINK.LINK_PORT]) {
@@ -1074,6 +1083,6 @@ async function checkIfApplicationExists(controlConstruct) {
   let releaseNumber = ControlConstructService.getReleaseNumber(controlConstruct);
   let httpClientUuid = await httpClientInterface.getHttpClientUuidAsync(applicationName, releaseNumber);
   if (httpClientUuid === undefined) {
-    throw new Error(`Application ${applicationName} is not in the list of known applications.`);
+    throw new createHttpError.BadRequest(`Application ${applicationName} : ${releaseNumber} is not in the list of known applications.`);
   }
 }
