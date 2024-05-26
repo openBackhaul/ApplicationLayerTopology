@@ -175,7 +175,7 @@ async function getConsumingOperationUuidAsync(EndPoints) {
                     response["took"] = consumingApplicationCCResponse.took;
                 } else {
                     response["reason-of-failure"] = "ALT_OPERATION_NAME_UNKNOWN";
-                    response["took"] = servingApplicationCCResponse.took;
+                    response["took"] = consumingApplicationCCResponse.took;
                 }
             } else {
                 response["reason-of-failure"] = "ALT_CONSUMING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
