@@ -14,8 +14,13 @@ const ForwardingAutomationService = require('onf-core-model-ap/applicationPatter
 const ControlConstructService = require('./ControlConstructService');
 const IndividualServicesUtility = require('./IndividualServicesUtility');
 const LinkServices = require('./LinkServices');
-const OperationServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationServerInterface');
 
+/**
+ * This function acts as main block that initiates and coordinated the forwarding process for regard-application 
+ * @param {Object} body contains {application-name, release-number, protocol, address, port} of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey} of incoming request
+ * @returns {Object} result - contains status of embedding process
+ */
 exports.regardApplication = async function (body, requestHeaders) {
   let result = {};
   let traceIndicatorIncrementer = '1';
@@ -55,6 +60,14 @@ exports.regardApplication = async function (body, requestHeaders) {
   return result;
 }
 
+/**
+ * This function acts triggers and process callback for forwarding 
+ *      "NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformationWithDefaultKey"
+ * @param {String} applicationName - name of regarded application
+ * @param {String} releaseNumber - release of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey, traceIndicatorIncrementor} of incoming request
+ * @returns {Object} result - contains status of embedding process
+ */
 async function RequestForInquiringTopologyChangeInformationWithDefaultKey(applicationName, releaseNumber, requestHeaders) {
   let result = {};
   let forwardingName = "NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformationWithDefaultKey";
@@ -120,6 +133,14 @@ async function RequestForInquiringTopologyChangeInformationWithDefaultKey(applic
   return result;
 }
 
+/**
+ * This function acts triggers and process callback for forwarding 
+ *      "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForInquiringTopologyChangeInformation"
+ * @param {String} applicationName - name of regarded application
+ * @param {String} releaseNumber - release of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey, traceIndicatorIncrementor} of incoming request
+ * @returns {Object} result - contains status of embedding process
+ */
 async function CreateLinkForInquiringTopologyChangeInformation(applicationName, releaseNumber, requestHeaders) {
   let result = {};
   let forwardingName = "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForInquiringTopologyChangeInformation";
@@ -153,6 +174,14 @@ async function CreateLinkForInquiringTopologyChangeInformation(applicationName, 
   return result;
 }
 
+/**
+ * This function acts triggers and process callback for forwarding 
+ *      "NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformation"
+ * @param {String} applicationName - name of regarded application
+ * @param {String} releaseNumber - release of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey, traceIndicatorIncrementor} of incoming request
+ * @returns {Object} result - contains status of embedding process
+ */
 async function RequestForInquiringTopologyChangeInformation(applicationName, releaseNumber, requestHeaders) {
   let result = {};
   let forwardingName = "NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformation";
@@ -211,6 +240,14 @@ async function RequestForInquiringTopologyChangeInformation(applicationName, rel
   return result;
 }
 
+/**
+ * This function acts triggers and process callback for forwarding 
+ *      "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedLtpInformation"
+ * @param {String} applicationName - name of regarded application
+ * @param {String} releaseNumber - release of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey, traceIndicatorIncrementor} of incoming request
+ * @returns {Object} result - contains status of embedding process
+ */
 async function CreateLinkForProvidingUpdatedLtpInformation(applicationName, releaseNumber, requestHeaders) {
   let result = {};
   let forwardingName = "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedLtpInformation";
@@ -220,7 +257,7 @@ async function CreateLinkForProvidingUpdatedLtpInformation(applicationName, rele
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-005";
-    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await operationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -243,6 +280,14 @@ async function CreateLinkForProvidingUpdatedLtpInformation(applicationName, rele
   return result;
 }
 
+/**
+ * This function acts triggers and process callback for forwarding 
+ *      "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedLtpInformation"
+ * @param {String} applicationName - name of regarded application
+ * @param {String} releaseNumber - release of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey, traceIndicatorIncrementor} of incoming request
+ * @returns {Object} result - contains status of embedding process
+ */
 async function CreateLinkForProvidingDeletedLtpInformation(applicationName, releaseNumber, requestHeaders) {
   let result = {};
   let forwardingName = "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedLtpInformation";
@@ -252,7 +297,7 @@ async function CreateLinkForProvidingDeletedLtpInformation(applicationName, rele
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-006";
-    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await operationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -275,6 +320,14 @@ async function CreateLinkForProvidingDeletedLtpInformation(applicationName, rele
   return result;
 }
 
+/**
+ * This function acts triggers and process callback for forwarding 
+ *      "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcInformation"
+ * @param {String} applicationName - name of regarded application
+ * @param {String} releaseNumber - release of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey, traceIndicatorIncrementor} of incoming request
+ * @returns {Object} result - contains status of embedding process
+ */
 async function CreateLinkForProvidingUpdatedFcInformation(applicationName, releaseNumber, requestHeaders) {
   let result = {};
   let forwardingName = "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcInformation";
@@ -284,7 +337,7 @@ async function CreateLinkForProvidingUpdatedFcInformation(applicationName, relea
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-013";
-    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await operationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -307,6 +360,14 @@ async function CreateLinkForProvidingUpdatedFcInformation(applicationName, relea
   return result;
 }
 
+/**
+ * This function acts triggers and process callback for forwarding 
+ *      "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcPortInformation"
+ * @param {String} applicationName - name of regarded application
+ * @param {String} releaseNumber - release of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey, traceIndicatorIncrementor} of incoming request
+ * @returns {Object} result - contains status of embedding process
+ */
 async function CreateLinkForProvidingUpdatedFcPortInformation(applicationName, releaseNumber, requestHeaders) {
   let result = {};
   let forwardingName = "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcPortInformation";
@@ -316,7 +377,7 @@ async function CreateLinkForProvidingUpdatedFcPortInformation(applicationName, r
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-014";
-    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await operationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -339,6 +400,14 @@ async function CreateLinkForProvidingUpdatedFcPortInformation(applicationName, r
   return result;
 }
 
+/**
+ * This function acts triggers and process callback for forwarding 
+ *      "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedFcPortInformation"
+ * @param {String} applicationName - name of regarded application
+ * @param {String} releaseNumber - release of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey, traceIndicatorIncrementor} of incoming request
+ * @returns {Object} result - contains status of embedding process
+ */
 async function CreateLinkForProvidingDeletedFcPortInformation(applicationName, releaseNumber, requestHeaders) {
   let result = {};
   let forwardingName = "NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedFcPortInformation";
@@ -348,7 +417,7 @@ async function CreateLinkForProvidingDeletedFcPortInformation(applicationName, r
     requestBody["serving-application-name"] = await httpServerInterface.getApplicationNameAsync();
     requestBody["serving-application-release-number"] = await httpServerInterface.getReleaseNumberAsync();
     let operationClientUuid = (await ControlConstruct.getUuidAsync()) + "-op-s-is-015";
-    requestBody["operation-name"] = await OperationServerInterface.getOperationNameAsync(operationClientUuid);
+    requestBody["operation-name"] = await operationServerInterface.getOperationNameAsync(operationClientUuid);
     requestBody["consuming-application-name"] = applicationName;
     requestBody["consuming-application-release-number"] = releaseNumber;
 
@@ -371,6 +440,11 @@ async function CreateLinkForProvidingDeletedFcPortInformation(applicationName, r
   return result;
 }
 
+/**
+ * This function is a generic code to formulate result for link-creating services
+ * @param {Object} response contains response of add-operation-clients-to-link
+ * @returns {Object} result - contains status of embedding process
+ */
 function processResponseForCreatingLinkService(response) {
   let result = {};
   try {
@@ -400,14 +474,24 @@ function processResponseForCreatingLinkService(response) {
   return result;
 }
 
+/**
+ * This function updates the control-construct and creates link to Elasticsearch database 
+ * @param {Object} controlConstruct - control-construct of regarded application
+ * @param {String} applicationName - name of regarded application
+ * @param {String} releaseNumber - release of regarded application
+ * @param {Object} requestHeaders {user, originator, x-correlator, trace-indicator, customer-journey, traceIndicatorIncrementor} of incoming request
+ * @returns {Boolean} - contains status of data update in database
+ */
 async function UpdateControlConstructAndLinksInDataBase(controlConstruct, applicationName, releaseNumber, requestHeaders) {
   try {
+    // creates/update control-construct of application into database
     controlConstruct = controlConstruct["core-model-1-4:control-construct"];
     let took = (await ControlConstructService.createOrUpdateControlConstructAsync(controlConstruct))["took"];
     if (took == -1) {
       console.log(`control construct of ${controlConstruct[onfAttributes.GLOBAL_CLASS.UUID]} has not been updated in database `);
       return false;
     }
+    // creates links for operation-servers of the application if not already exists into database
     let logicalTerminationPoints = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
     let forwardings = [];
@@ -425,6 +509,7 @@ async function UpdateControlConstructAndLinksInDataBase(controlConstruct, applic
         forwardings.push(forwarding);
       }
     }
+    // initiates forwarding of newly created links to OperationKeyManagement
     let operationServerUuidForCreatingLinks = (await ControlConstruct.getUuidAsync()) + "-op-s-is-018";
     let creatingLinksOperationServerName = await operationServerInterface.getOperationNameAsync(operationServerUuidForCreatingLinks);
     ForwardingAutomationService.automateForwardingConstructAsync(
