@@ -17,7 +17,7 @@ const softwareUpgrade = require('./individualServices/SoftwareUpgrade');
 const ConfigurationStatus = require('onf-core-model-ap/applicationPattern/onfModel/services/models/ConfigurationStatus');
 const httpServerInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpServerInterface');
 const httpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/HttpClientInterface');
-const OperationClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/OperationClientInterface');
+const operationKeyUpdateNotificationService = require('onf-core-model-ap/applicationPattern/onfModel/services/OperationKeyUpdateNotificationService');
 const onfAttributeFormatter = require('onf-core-model-ap/applicationPattern/onfModel/utility/OnfAttributeFormatter');
 
 const tcpClientInterface = require('onf-core-model-ap/applicationPattern/onfModel/models/layerProtocols/TcpClientInterface');
@@ -763,9 +763,9 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
 
     let timestampOfCurrentRequest = new Date();
     let headers = { user, xCorrelator, traceIndicator, customerJourney, timestampOfCurrentRequest }
-    OperationClientInterface.turnONNotificationChannel(timestampOfCurrentRequest);
+    operationKeyUpdateNotificationService.turnONNotificationChannel(timestampOfCurrentRequest);
     let response = await regardApplicationAutomation.regardApplication(body, headers);
-    OperationClientInterface.turnOFFNotificationChannel(timestampOfCurrentRequest);
+    operationKeyUpdateNotificationService.turnOFFNotificationChannel(timestampOfCurrentRequest);
     return response;
   } catch (error) {
     console.log(error);

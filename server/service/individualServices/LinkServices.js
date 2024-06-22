@@ -331,7 +331,7 @@ async function createCompleteLinkAsync(consumingOperationUuids, servingOperation
  **/
 async function addLinkAsync(link) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
-    let client = await elasticsearchService.getClient(true, esUuid);
+    let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let startTime = process.hrtime();
     let res = await client.index({
@@ -432,7 +432,7 @@ exports.deleteDependentLinkPortsAsync = async function (ltpUuid) {
  **/
 exports.getLinkAsync = async function (linkUuid) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
-    let client = await elasticsearchService.getClient(true, esUuid);
+    let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
         index: indexAlias,
@@ -455,7 +455,7 @@ exports.getLinkAsync = async function (linkUuid) {
  **/
 exports.getLinkListAsync = async function () {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
-    let client = await elasticsearchService.getClient(true, esUuid);
+    let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let res = await client.search({
         index: indexAlias,
@@ -497,7 +497,7 @@ function getLocalIdOfTheConsumingOperation(link, clientOperationUuid) {
  **/
 async function addLinkPortAsync(linkUuid, linkPort) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(true);
-    let client = await elasticsearchService.getClient(true, esUuid);
+    let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
     let response = await lock.acquire(linkUuid, async () => {
         let r = await client.updateByQuery({
