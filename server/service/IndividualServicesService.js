@@ -862,10 +862,7 @@ exports.updateFcPort = async function (body) {
  **/
 exports.updateLtp = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
   let logicalTerminationPointUuid = body[onfAttributes.GLOBAL_CLASS.UUID];
-  let ltpDirection = body[onfAttributes.LOGICAL_TERMINATION_POINT.LTP_DIRECTION];
-  if (ltpDirection.includes("TERMINATION_DIRECTION_SOURCE")) {
-    throw new createHttpError.BadRequest(`LTP with ltp-direction ${ltpDirection} could not be updated.`);
-  }
+  
   let existingLtps = [];
   let forwardingAutomationInputList = [];
   // try get CC using ltp uuid - direct querying from ES
