@@ -511,14 +511,15 @@ async function UpdateControlConstructAndLinksInDataBase(controlConstruct, applic
       }
     }
     // initiates forwarding of newly created links to OperationKeyManagement
-    let operationServerUuidForCreatingLinks = (await ControlConstruct.getUuidAsync()) + "-op-s-is-018";
+    let operationServerUuidForCreatingLinks = (await ControlConstruct.getUuidAsync()) + "-op-s-is-018";    
+    let newTraceIndicator = requestHeaders.traceIndicator + "." + (requestHeaders.traceIndicatorIncrementer - 1);
     let creatingLinksOperationServerName = await operationServerInterface.getOperationNameAsync(operationServerUuidForCreatingLinks);
     ForwardingAutomationService.automateForwardingConstructAsync(
       creatingLinksOperationServerName,
       forwardings,
       requestHeaders.user,
       requestHeaders.xCorrelator,
-      requestHeaders.traceIndicator,
+      newTraceIndicator,
       requestHeaders.customerJourney
     );
     return true;
