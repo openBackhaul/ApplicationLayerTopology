@@ -11,6 +11,7 @@ const onfFormatter = require('onf-core-model-ap/applicationPattern/onfModel/util
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
 const ForwardingAutomationService = require('onf-core-model-ap/applicationPattern/onfModel/services/ForwardingConstructAutomationServices');
 
+const operationKeyUpdateNotificationService = require('onf-core-model-ap/applicationPattern/onfModel/services/OperationKeyUpdateNotificationService');
 const ControlConstructService = require('./ControlConstructService');
 const IndividualServicesUtility = require('./IndividualServicesUtility');
 const LinkServices = require('./LinkServices');
@@ -34,7 +35,7 @@ exports.regardApplication = async function (body, requestHeaders) {
     let forwardingForInquiringTopologyInformation = "NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformation";
     let operationClientUuid = await IndividualServicesUtility.getConsequentOperationClientUuid(forwardingForInquiringTopologyInformation, applicationName, releaseNumber);
     let waitingTime = await integerProfileOperation.getIntegerValueForTheIntegerProfileNameAsync("maximumWaitTimeToReceiveOperationKey");
-    let isOperationKeyUpdated = await OperationClientInterface.waitUntilOperationKeyIsUpdated(operationClientUuid, requestHeaders.timestampOfCurrentRequest, waitingTime);
+    let isOperationKeyUpdated = await operationKeyUpdateNotificationService.waitUntilOperationKeyIsUpdated(operationClientUuid, requestHeaders.timestampOfCurrentRequest, waitingTime);
     if (!isOperationKeyUpdated) {
       result["successfully-connected"] = false;
       result["reason-of-failure"] = `ALT_MAXIMUM_WAIT_TIME_TO_RECEIVE_OPERATION_KEY_EXCEEDED`;
