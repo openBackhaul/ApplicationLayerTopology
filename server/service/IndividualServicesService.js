@@ -751,7 +751,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
         forwardingConstructConfigurationStatus
       );
 
-      ForwardingAutomationService.automateForwardingConstructAsync(
+      await ForwardingAutomationService.automateForwardingConstructAsync(
         operationServerName,
         applicationLayerTopologyForwardingInputList,
         user,
@@ -908,7 +908,7 @@ exports.updateLtp = async function (body, user, xCorrelator, traceIndicator, cus
     took += forwardingAutomationInputListResponse.took;
 
     if (forwardingAutomationInputList.length !== 0) {
-      ForwardingAutomationService.automateForwardingConstructAsync(
+      await ForwardingAutomationService.automateForwardingConstructAsync(
         operationServerName,
         forwardingAutomationInputList,
         user,
