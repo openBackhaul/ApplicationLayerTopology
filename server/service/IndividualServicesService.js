@@ -705,6 +705,7 @@ exports.notifyLinkUpdates = async function (body, user, originator, xCorrelator,
  **/
 exports.regardApplication = async function (body, user, xCorrelator, traceIndicator, customerJourney, operationServerName) {
   try {
+    let applicationLayerTopologyForwardingInputList;
     let applicationName = body["application-name"];
     let releaseNumber = body["release-number"];
     let tcpServer = new TcpObject(body["protocol"], body["address"], body["port"]);
@@ -746,7 +747,7 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
           );
       }
 
-      let applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputAsync(
+      applicationLayerTopologyForwardingInputList = await prepareALTForwardingAutomation.getALTForwardingAutomationInputAsync(
         ltpConfigurationStatus,
         forwardingConstructConfigurationStatus
       );
@@ -760,9 +761,9 @@ exports.regardApplication = async function (body, user, xCorrelator, traceIndica
         customerJourney
       );
     });
-
+    let traceIndicatorIncrementer = applicationLayerTopologyForwardingInputList.length + 1;
     let timestampOfCurrentRequest = new Date();
-    let headers = { user, xCorrelator, traceIndicator, customerJourney, timestampOfCurrentRequest }
+    let headers = { user, xCorrelator, traceIndicator, customerJourney, traceIndicatorIncrementer, timestampOfCurrentRequest }
     operationKeyUpdateNotificationService.turnONNotificationChannel(timestampOfCurrentRequest);
     let response = await regardApplicationAutomation.regardApplication(body, headers);
     operationKeyUpdateNotificationService.turnOFFNotificationChannel(timestampOfCurrentRequest);

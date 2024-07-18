@@ -24,11 +24,9 @@ const LinkServices = require('./LinkServices');
  */
 exports.regardApplication = async function (body, requestHeaders) {
   let result = {};
-  let traceIndicatorIncrementer = '1';
   try {
     let applicationName = body["application-name"];
     let releaseNumber = body["release-number"];
-    requestHeaders.traceIndicatorIncrementer = traceIndicatorIncrementer;
     result = await RequestForInquiringTopologyChangeInformationWithDefaultKey(applicationName, releaseNumber, requestHeaders);
     result = await CreateLinkForInquiringTopologyChangeInformation(applicationName, releaseNumber, requestHeaders);
     if (!result["successfully-connected"]) return result;
