@@ -384,6 +384,7 @@ exports.listEndPointsOfLink = async function (body) {
     if (controlConstruct) {
       let logicalTerminationPointList = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
       let found = logicalTerminationPointList.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID] === logicalTerminationPoint);
+      if(!found) continue;
       linkEndPoint.ltpDirection = found[onfAttributes.LOGICAL_TERMINATION_POINT.LTP_DIRECTION];
       linkEndPoint.applicationName = ControlConstructService.getApplicationName(controlConstruct);
       linkEndPoint.releaseNumber = ControlConstructService.getReleaseNumber(controlConstruct);
