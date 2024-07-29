@@ -8,10 +8,11 @@ var executionAndTraceService = require('onf-core-model-ap/applicationPattern/ser
 
 module.exports.addOperationClientToLink = async function addOperationClientToLink(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
-  let responseCode = responseCodeEnum.code.NO_CONTENT;
-  let responseBodyToDocument = undefined;
+  let responseCode = responseCodeEnum.code.OK;
+  let responseBodyToDocument = {};
   await IndividualServices.addOperationClientToLink(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
     .then(async function (responseBody) {
+      responseBodyToDocument = responseBody.responseBody;
       let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
@@ -21,7 +22,10 @@ module.exports.addOperationClientToLink = async function addOperationClientToLin
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.bequeathYourDataAndDie = async function bequeathYourDataAndDie(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -40,7 +44,10 @@ module.exports.bequeathYourDataAndDie = async function bequeathYourDataAndDie(re
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.deleteFcPort = async function deleteFcPort(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -58,7 +65,10 @@ module.exports.deleteFcPort = async function deleteFcPort(req, res, next, body, 
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.deleteLtpAndDependents = async function deleteLtpAndDependents(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -76,9 +86,15 @@ module.exports.deleteLtpAndDependents = async function deleteLtpAndDependents(re
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
+/**
+ * @deprecated since version 2.1.0
+ */
 module.exports.disregardApplication = async function disregardApplication(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;
@@ -95,7 +111,10 @@ module.exports.disregardApplication = async function disregardApplication(req, r
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.listApplications = async function listApplications(req, res, next, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -114,7 +133,10 @@ module.exports.listApplications = async function listApplications(req, res, next
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.listEndPointsOfLink = async function listEndPointsOfLink(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -133,7 +155,10 @@ module.exports.listEndPointsOfLink = async function listEndPointsOfLink(req, res
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.listLinkUuids = async function listLinkUuids(req, res, next, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -152,7 +177,10 @@ module.exports.listLinkUuids = async function listLinkUuids(req, res, next, user
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.listLinksToOperationClientsOfApplication = async function listLinksToOperationClientsOfApplication(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -171,7 +199,10 @@ module.exports.listLinksToOperationClientsOfApplication = async function listLin
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+  let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+  if (!execTime) execTime = 0;
+  else execTime = Math.round(execTime);
+  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.listOperationClientsAtApplication = async function listOperationClientsAtApplication(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -190,7 +221,10 @@ module.exports.listOperationClientsAtApplication = async function listOperationC
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.listOperationClientsReactingOnOperationServer = async function listOperationClientsReactingOnOperationServer(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -209,7 +243,10 @@ module.exports.listOperationClientsReactingOnOperationServer = async function li
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.listOperationServersAtApplication = async function listOperationServersAtApplication(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -228,7 +265,10 @@ module.exports.listOperationServersAtApplication = async function listOperationS
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.notifyLinkUpdates = async function notifyLinkUpdates(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -247,15 +287,19 @@ module.exports.notifyLinkUpdates = async function notifyLinkUpdates(req, res, ne
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.regardApplication = async function regardApplication(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
-  let responseCode = responseCodeEnum.code.NO_CONTENT;
-  let responseBodyToDocument = undefined;
+  let responseCode = responseCodeEnum.code.OK;
+  let responseBodyToDocument = {};
   await IndividualServices.regardApplication(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
     .then(async function (responseBody) {
+      responseBodyToDocument = responseBody;
       let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
@@ -265,14 +309,17 @@ module.exports.regardApplication = async function regardApplication(req, res, ne
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.removeOperationClientFromLink = async function removeOperationClientFromLink(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;
   let responseBodyToDocument = undefined;
-  await IndividualServices.removeOperationClientFromLink(body, user, originator, xCorrelator, traceIndicator, customerJourney, req.url)
+  await IndividualServices.removeOperationClientFromLink(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
     .then(async function (responseBody) {
       let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, responseBody.took);
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
@@ -283,9 +330,15 @@ module.exports.removeOperationClientFromLink = async function removeOperationCli
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
+/**
+ * @deprecated since version 2.1.0
+ */
 module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;
@@ -301,7 +354,10 @@ module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs(req, res
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.updateFc = async function updateFc(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -319,7 +375,10 @@ module.exports.updateFc = async function updateFc(req, res, next, body, user, or
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.updateFcPort = async function updateFcPort(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -337,7 +396,10 @@ module.exports.updateFcPort = async function updateFcPort(req, res, next, body, 
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
 
 module.exports.updateLtp = async function updateLtp(req, res, next, body, user, originator, xCorrelator, traceIndicator, customerJourney) {
@@ -355,5 +417,8 @@ module.exports.updateLtp = async function updateLtp(req, res, next, body, user, 
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
     });
-  executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument);
+    let execTime = await restResponseHeader.executionTimeInMilliseconds(startTime);
+    if (!execTime) execTime = 0;
+    else execTime = Math.round(execTime);
+    executionAndTraceService.recordServiceRequest(xCorrelator, traceIndicator, user, originator, req.url, responseCode, req.body, responseBodyToDocument, execTime);
 };
