@@ -223,6 +223,25 @@
             }
           },
           {
+            "uuid": "alt-2-1-0-response-p-009",
+            "profile-name": "response-profile-1-0:PROFILE_NAME_TYPE_GENERIC_RESPONSE_PROFILE",
+            "response-profile-1-0:response-profile-pac": {
+              "response-profile-capability": {
+                "operation-name": "/v1/inform-about-release-history-in-generic-representation",
+                "field-name": {
+                  "field-name-reference": "/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=2/release-number"
+                },
+                "description": "List of release numbers and changes",
+                "datatype": "string"
+              },
+              "response-profile-configuration": {
+                "value": {
+                  "value-reference": "/core-model-1-4:control-construct/logical-termination-point=alt-2-1-0-http-s-000/layer-protocol=0/http-server-interface-1-0:http-server-interface-pac/http-server-interface-capability/release-list=2/changes"
+                }
+              }
+            }
+          },
+          {
             "uuid": "alt-2-1-0-integer-p-000",
             "profile-name": "integer-profile-1-0:PROFILE_NAME_TYPE_INTEGER_PROFILE",
             "integer-profile-1-0:integer-profile-pac": {
@@ -1528,7 +1547,7 @@
               "http-client-interface-1-0:http-client-interface-pac": {
                 "http-client-interface-configuration": {
                   "application-name": "NewRelease",
-                  "release-number": "2.1.0"
+                  "release-number": "2.1.1"
                 }
               }
             }
@@ -1705,7 +1724,7 @@
               "http-client-interface-1-0:http-client-interface-pac": {
                 "http-client-interface-configuration": {
                   "application-name": "RegistryOffice",
-                  "release-number": "2.1.0"
+                  "release-number": "2.1.1"
                 }
               }
             }
@@ -1778,7 +1797,7 @@
               "http-client-interface-1-0:http-client-interface-pac": {
                 "http-client-interface-configuration": {
                   "application-name": "TypeApprovalRegister",
-                  "release-number": "2.1.0"
+                  "release-number": "2.1.1"
                 }
               }
             }
@@ -1878,7 +1897,7 @@
               "http-client-interface-1-0:http-client-interface-pac": {
                 "http-client-interface-configuration": {
                   "application-name": "ExecutionAndTraceLog",
-                  "release-number": "2.0.1"
+                  "release-number": "2.1.1"
                 }
               }
             }
@@ -1977,7 +1996,7 @@
               "http-client-interface-1-0:http-client-interface-pac": {
                 "http-client-interface-configuration": {
                   "application-name": "OamLog",
-                  "release-number": "2.0.1"
+                  "release-number": "2.1.1"
                 }
               }
             }
@@ -2075,8 +2094,8 @@
               "layer-protocol-name": "http-client-interface-1-0:LAYER_PROTOCOL_NAME_TYPE_HTTP_LAYER",
               "http-client-interface-1-0:http-client-interface-pac": {
                 "http-client-interface-configuration": {
-                  "application-name": "AdministratorAdministration",
-                  "release-number": "2.0.1"
+                  "application-name": "AccessAdministration",
+                  "release-number": "2.1.1"
                 }
               }
             }
@@ -2357,7 +2376,7 @@
               "http-client-interface-1-0:http-client-interface-pac": {
                 "http-client-interface-configuration": {
                   "application-name": "ApplicationLayerTopology",
-                  "release-number": "2.0.1"
+                  "release-number": "2.1.1"
                 }
               }
             }
@@ -2456,7 +2475,7 @@
               "http-client-interface-1-0:http-client-interface-pac": {
                 "http-client-interface-configuration": {
                   "application-name": "OperationKeyManagement",
-                  "release-number": "2.0.1"
+                  "release-number": "2.1.1"
                 }
               }
             }
