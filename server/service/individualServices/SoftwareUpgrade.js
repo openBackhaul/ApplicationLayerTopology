@@ -68,9 +68,9 @@ async function PromptForBequeathingDataCausesTransferOfListOfApplications(user, 
              * Preparing requestBody and transfering the data one by one
              ************************************************************************************/
 
-            let inquiryForApplicationTypeApprovalFCName = "NewApplicationCausesRequestForTopologyChangeInformation";
+            let redirectTopologyChangeInformationForwardingName = "NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformation";
 
-            let forwardingConstructInstance = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(inquiryForApplicationTypeApprovalFCName);
+            let forwardingConstructInstance = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(redirectTopologyChangeInformationForwardingName);
             let operationClientUuidList = getFcPortOutputLogicalTerminationPointList(forwardingConstructInstance);
 
             for (let i = 0; i < operationClientUuidList.length; i++) {
@@ -143,7 +143,7 @@ async function promptForBequeathingDataCausesRequestForBroadcastingInfoAboutServ
 
                 let applicationName = await httpServerInterface.getApplicationNameAsync();
                 let oldReleaseNumber = await httpServerInterface.getReleaseNumberAsync();
-                let newApplicationName = await httpClientInterface.getApplicationNameAsync(newReleaseHttpClientUuid)
+                let newApplicationName = await httpClientInterface.getApplicationNameAsync(newReleaseHttpClientUuid);
                 let newReleaseNumber = await httpClientInterface.getReleaseNumberAsync(newReleaseHttpClientUuid);
                 let applicationAddress = await tcpClientInterface.getRemoteAddressAsync(newReleaseTcpClientUuid);
                 let applicationPort = await tcpClientInterface.getRemotePortAsync(newReleaseTcpClientUuid);

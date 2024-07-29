@@ -5,6 +5,7 @@ var responseCodeEnum = require('onf-core-model-ap/applicationPattern/rest/server
 var RestResponseHeader = require('onf-core-model-ap/applicationPattern/rest/server/ResponseHeader');
 var RestResponseBuilder = require('onf-core-model-ap/applicationPattern/rest/server/ResponseBuilder');
 var ExecutionAndTraceService = require('onf-core-model-ap/applicationPattern/services/ExecutionAndTraceService');
+var BasicServiceCustom = require('../service/BasicServciesService');
 
 const NEW_RELEASE_FORWARDING_NAME = 'PromptForBequeathingDataCausesTransferOfListOfApplications';
 const OLD_RELEASE_FORWARDING_NAME = 'PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData';
@@ -13,7 +14,7 @@ module.exports.embedYourself = async function embedYourself(req, res, next, body
   let startTime = process.hrtime();
   let responseCode = responseCodeEnum.code.NO_CONTENT;
   let responseBodyToDocument;
-  await BasicServices.embedYourself(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
+  await BasicServiceCustom.embedYourself(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
     .then(async function (responseBody) {
       responseBodyToDocument = responseBody;
       let responseHeader = await RestResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
