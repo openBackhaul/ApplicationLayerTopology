@@ -65,6 +65,46 @@ class ControlConstructService {
   }
 
   /**
+ * @description creates one LTP in control-construct.
+ * @param {String} controlConstructUuid
+ * @param {Object} ltpToBeAdded
+ * @returns {Promise<Object>} { took }
+ */
+  static async createControlConstructLtp(controlConstructUuid, ltpToBeAdded) {
+    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
+    let client = await elasticsearchService.getClient(false, esUuid);
+    let indexAlias = await getIndexAliasAsync(esUuid);
+    let response = await lock.acquire(controlConstructUuid, async () => {
+      let r = await client.updateByQuery({
+        index: indexAlias,
+        refresh: true,
+        body: {
+          script: {
+            source: `ctx._source['logical-termination-point'].add(params['ltpToBeAdded'])`,
+            params: {
+              "ltpToBeAdded": ltpToBeAdded
+            }
+          },
+          query: {
+            term: {
+              "uuid": controlConstructUuid
+            }
+          }
+        }
+      });
+      return r;
+    })
+    if (response.body.updated === 1) {
+      return { "took": response.body.took };
+    } else {
+      if (response.body.total === 0) {
+        throw new createHttpError.BadRequest(`CC with uuid ${controlConstructUuid} does not exist.`)
+      }
+      throw new Error("LTP was not updated")
+    }
+  }
+
+  /**
    * @description Replaces forwarding-construct in control-construct
    * @param {String} controlConstructUuid
    * @param {Object} newForwardingConstruct
@@ -438,6 +478,8 @@ class ControlConstructService {
     let intermitent = (backendTime[0] * 1000 + backendTime[1] / 1000000);
     if (res.body.result === 'created' || res.body.result === 'updated') {
       return { "took": took + intermitent };
+    } else {
+      return { "took": -1 };
     }
   }
 

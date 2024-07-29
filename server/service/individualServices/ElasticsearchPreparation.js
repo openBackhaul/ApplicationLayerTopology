@@ -1,6 +1,7 @@
 const { elasticsearchService, getIndexAliasAsync, operationalStateEnum } = require('onf-core-model-ap/applicationPattern/services/ElasticsearchService');
-const logicalTerminationPoint = require('onf-core-model-ap/applicationPattern/onfModel/models/LogicalTerminationPoint');
 const LayerProtocol = require('onf-core-model-ap/applicationPattern/onfModel/models/LayerProtocol');
+const controlConstruct = require('onf-core-model-ap/applicationPattern/onfModel/models/ControlConstruct');
+const onfAttributes = require('onf-core-model-ap/applicationPattern/onfModel/constants/OnfAttributes');
 
 module.exports = {
     prepareElasticsearch,
@@ -13,8 +14,12 @@ module.exports = {
  * @returns {Promise<String>} LINKS ES UUID or CC ES UUID
  */
 async function getCorrectEsUuid(links) {
-    let uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
-    return links ? uuids.find(uuid => uuid.endsWith('001')) : uuids.find(uuid => uuid.endsWith('000'));
+    let ltpList = await controlConstruct.getLogicalTerminationPointListAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
+    if(links) {
+        return ltpList.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID].endsWith('001'))[onfAttributes.GLOBAL_CLASS.UUID];
+    } else {
+        return ltpList.find(ltp => ltp[onfAttributes.GLOBAL_CLASS.UUID].endsWith('000'))[onfAttributes.GLOBAL_CLASS.UUID];
+    }
 }
 
 /**
@@ -32,8 +37,9 @@ async function getCorrectEsUuid(links) {
  */
 async function prepareElasticsearch() {
     console.log("Configuring Elasticsearch...");
-    let uuids = await logicalTerminationPoint.getUuidListForTheProtocolAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
-    for (let uuid of uuids) {
+    let ltpList = await controlConstruct.getLogicalTerminationPointListAsync(LayerProtocol.layerProtocolNameEnum.ES_CLIENT);
+    for (let ltp of ltpList) {
+        let uuid = ltp[onfAttributes.GLOBAL_CLASS.UUID];
         let ping = await elasticsearchService.getElasticsearchClientOperationalStateAsync(uuid);
         if (ping === operationalStateEnum.UNAVAILABLE) {
            let err = new Error(`Elasticsearch unavailable. Skipping Elasticsearch configuration.`);
