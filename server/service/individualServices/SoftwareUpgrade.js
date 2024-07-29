@@ -291,22 +291,6 @@ function forwardRequest(forwardingKindName, attributeList, user, xCorrelator, tr
 }
 
 
-/**********************************************************************************************************
- * Generic functions used across 
- **********************************************************************************************************/
-
-async function getOperationNamesOutOfForwardingKindNameAsync(forwardingKindNameOfTheBequeathOperation) {
-    let operationNamesList = [];
-    let forwardingConstruct = await ForwardingDomain.getForwardingConstructForTheForwardingNameAsync(forwardingKindNameOfTheBequeathOperation);
-    let filteredFcPorts = await ForwardingConstruct.getOutputFcPortsAsync(forwardingConstruct.uuid);
-    for (let fcOutputPort of filteredFcPorts) {
-        let operationName = await operationClientInterface.getOperationNameAsync(fcOutputPort[onfAttributes.FC_PORT.LOGICAL_TERMINATION_POINT]);
-        operationNamesList.push(operationName);
-    }
-    return operationNamesList;
-}
-
-
 
 
 
