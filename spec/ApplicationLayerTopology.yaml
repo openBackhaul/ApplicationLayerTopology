@@ -231,8 +231,17 @@ paths:
                             ipv-4-address: '127.0.0.1'
                         port: 3024
               responses:
-                '204':
+                '200':
                   description: 'Application will be represented in the application layer topology'
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          successfully-connected:
+                            type: boolean
+                          reason-of-failure:
+                            type: string
                   headers:
                     x-correlator:
                       schema:
