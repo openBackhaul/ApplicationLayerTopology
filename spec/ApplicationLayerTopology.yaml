@@ -672,10 +672,11 @@ paths:
                           - 'ALT_ALT_CONSUMING_APPLICATION_NAME_UNKNOWN'
                           - 'ALT_ALT_CONSUMING_APPLICATION_RELEASE_NUMBER_UNKNOWN'
                           - 'ALT_ALT_UNKNOWN'
-                          - 'ALT_NOT_REACHABLE'
+                          - 'ALT_DID_NOT_REACH_ALT'
+                          - 'ALT_DID_NOT_REACH_NEW_APPLICATION'
                           - 'ALT_UNKNOWN'
                           - 'ALT_MAXIMUM_WAIT_TIME_TO_RECEIVE_OPERATION_KEY_EXCEEDED'
-                        description: 'Reasons provided by ALT to be pre-fixed with ALT_. If (NOT (200 OR 204)) respond ALT_NOT_REACHABLE'
+                        description: 'Reasons provided by ALT to be pre-fixed with ALT_. If (NOT (200 OR 204)) respond ALT_DID_NOT_REACH_*'
               examples:
                 if-successful:
                   value:
@@ -5356,7 +5357,7 @@ paths:
                   type: string
                   description: >
                     'Name of application that shall record the OaM requests
-                    find or update, but not at OldRelease or NewRelease, [/core-model-1-4:control-construct/logical-termination-point=alt-2-1-2-http-c-aa-2-1-2-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
+                    find or update, but not at OldRelease or NewRelease, [/core-model-1-4:control-construct/logical-termination-point=alt-2-1-2-http-c-ol-2-1-2-000/layer-protocol=0/http-client-interface-1-0:http-client-interface-pac/http-client-interface-configuration/application-name]'
                 oam-log-application-release-number:
                   type: string
                   pattern: '^([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})$'
