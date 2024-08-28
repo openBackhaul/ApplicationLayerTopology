@@ -112,7 +112,7 @@ clients:
       uuid: alt-2-1-2-tcp-c-es-1-0-0-000
     elasticsearch-client:
       - uuid: alt-2-1-2-es-c-es-1-0-0-000
-        index-alias: alt-2-1-2
+        index-alias: alt-2-0-1
       - uuid: alt-2-1-2-es-c-es-1-0-0-001
         index-alias: alt-links-2-0-1
 
