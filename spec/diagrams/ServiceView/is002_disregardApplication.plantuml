@@ -18,8 +18,4 @@ note over alt #LightCyan
 ServiceRequestCausesLtpDeletionRequest
 end note
 
-note over alt #LightCyan
-NewApplicationCausesRequestForTopologyChangeInformation
-end note
-
 @enduml

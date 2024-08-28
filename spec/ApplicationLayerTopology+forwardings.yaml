@@ -1,45 +1,45 @@
 forwardings:
 
   - forwarding-name: PromptForRegisteringCausesRegistrationRequest
-    uuid: alt-2-1-0-op-fc-bm-999
+    uuid: alt-2-1-2-op-fc-bm-999
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/register-yourself
-          uuid: alt-2-1-0-op-s-bm-000
+          uuid: alt-2-1-2-op-s-bm-000
       fc-port-update:
         - server-name: /v1/register-yourself
-          uuid: alt-2-1-0-op-s-bm-000
+          uuid: alt-2-1-2-op-s-bm-000
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/register-yourself
-        uuid: alt-2-1-0-op-s-bm-000
+        uuid: alt-2-1-2-op-s-bm-000
     consequent-requests:
       - client-name: RegistryOffice://v2/register-application
-        uuid: alt-2-1-0-op-c-bm-ro-2-1-0-000
+        uuid: alt-2-1-2-op-c-bm-ro-2-1-2-000
 
   - forwarding-name: PromptForRegisteringCausesRegistrationRequest2
-    uuid: alt-2-1-0-op-fc-bm-000
+    uuid: alt-2-1-2-op-fc-bm-000
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/register-yourself
-          uuid: alt-2-1-0-op-s-bm-000
+          uuid: alt-2-1-2-op-s-bm-000
       fc-port-update:
         - server-name: /v1/register-yourself
-          uuid: alt-2-1-0-op-s-bm-000
+          uuid: alt-2-1-2-op-s-bm-000
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/register-yourself
-        uuid: alt-2-1-0-op-s-bm-000
+        uuid: alt-2-1-2-op-s-bm-000
     consequent-requests:
       - client-name: RegistryOffice://v2/register-application
-        uuid: alt-2-1-0-op-c-bm-ro-2-1-0-000
+        uuid: alt-2-1-2-op-c-bm-ro-2-1-2-000
 
   - forwarding-name: PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData
-    uuid: alt-2-1-0-op-fc-bm-001
+    uuid: alt-2-1-2-op-fc-bm-001
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -48,13 +48,13 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/embed-yourself
-        uuid: alt-2-1-0-op-s-bm-001
+        uuid: alt-2-1-2-op-s-bm-001
     consequent-requests:
       - client-name: OldRelease://v1/bequeath-your-data-and-die
-        uuid: alt-2-1-0-op-c-bm-or-2-0-1-000
+        uuid: alt-2-1-2-op-c-bm-or-2-1-1-000
 
   - forwarding-name: PromptForEmbeddingInitiatesEmbeddingProcess.RetrieveControlConstructFromRo
-    uuid: alt-2-1-0-op-fc-im-001
+    uuid: alt-2-1-2-op-fc-im-001
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -63,13 +63,13 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/embed-yourself
-        uuid: alt-2-1-0-op-s-bm-001
+        uuid: alt-2-1-2-op-s-bm-001
     consequent-requests:
       - client-name: RegistryOffice://redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-ro-2-1-0-004
+        uuid: alt-2-1-2-op-c-im-ro-2-1-2-004
 
   - forwarding-name: PromptForEmbeddingInitiatesEmbeddingProcess.RetrieveControlConstructFromTar
-    uuid: alt-2-1-0-op-fc-im-002
+    uuid: alt-2-1-2-op-fc-im-002
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -78,150 +78,150 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/embed-yourself
-        uuid: alt-2-1-0-op-s-bm-001
+        uuid: alt-2-1-2-op-s-bm-001
     consequent-requests:
       - client-name: TypeApprovalRegister://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-tar-2-1-0-004
+        uuid: alt-2-1-2-op-c-im-tar-2-1-2-004
 
   - forwarding-name: ServiceRequestCausesLoggingRequest
-    uuid: alt-2-1-0-op-fc-bm-002
+    uuid: alt-2-1-2-op-fc-bm-002
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-service-request-information
-          uuid: alt-2-1-0-op-s-bm-002
+          uuid: alt-2-1-2-op-s-bm-002
       fc-port-update:
         - server-name: /v1/redirect-service-request-information
-          uuid: alt-2-1-0-op-s-bm-002
+          uuid: alt-2-1-2-op-s-bm-002
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/register-yourself
-        uuid: alt-2-1-0-op-s-bm-000
+        uuid: alt-2-1-2-op-s-bm-000
       - server-name: /v1/embed-yourself
-        uuid: alt-2-1-0-op-s-bm-001
+        uuid: alt-2-1-2-op-s-bm-001
       - server-name: /v1/redirect-service-request-information
-        uuid: alt-2-1-0-op-s-bm-002
+        uuid: alt-2-1-2-op-s-bm-002
       - server-name: /v1/redirect-oam-request-information
-        uuid: alt-2-1-0-op-s-bm-003
+        uuid: alt-2-1-2-op-s-bm-003
       - server-name: /v1/end-subscription
-        uuid: alt-2-1-0-op-s-bm-004
+        uuid: alt-2-1-2-op-s-bm-004
       - server-name: /v1/inquire-oam-request-approvals
-        uuid: alt-2-1-0-op-s-bm-005
+        uuid: alt-2-1-2-op-s-bm-005
       - server-name: /v1/update-client
-        uuid: alt-2-1-0-op-s-bm-007
+        uuid: alt-2-1-2-op-s-bm-007
       - server-name: /v1/list-ltps-and-fcs
-        uuid: alt-2-1-0-op-s-bm-008
+        uuid: alt-2-1-2-op-s-bm-008
       - server-name: /v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-s-bm-009
+        uuid: alt-2-1-2-op-s-bm-009
       - server-name: /v1/update-operation-key
-        uuid: alt-2-1-0-op-s-bm-010
+        uuid: alt-2-1-2-op-s-bm-010
       - server-name: /v1/update-operation-client
-        uuid: alt-2-1-0-op-s-bm-011
+        uuid: alt-2-1-2-op-s-bm-011
       - server-name: /v1/inquire-basic-auth-approvals
-        uuid: alt-2-1-0-op-s-bm-012
+        uuid: alt-2-1-2-op-s-bm-012
       - server-name: /v1/dispose-remainders-of-deregistered-application
-        uuid: alt-2-1-0-op-s-bm-013
+        uuid: alt-2-1-2-op-s-bm-013
       - server-name: /v1/inform-about-preceding-release
-        uuid: alt-2-1-0-op-s-bm-014
+        uuid: alt-2-1-2-op-s-bm-014
       - server-name: /v1/update-client-of-subsequent-release
-        uuid: alt-2-1-0-op-s-bm-015
+        uuid: alt-2-1-2-op-s-bm-015
       - server-name: /v1/bequeath-your-data-and-die
-        uuid: alt-2-1-0-op-s-im-000
+        uuid: alt-2-1-2-op-s-im-000
       - server-name: /v1/start-application-in-generic-representation
-        uuid: alt-2-1-0-op-s-bs-000
+        uuid: alt-2-1-2-op-s-bs-000
       - server-name: /v1/inform-about-application
-        uuid: alt-2-1-0-op-s-bs-001
+        uuid: alt-2-1-2-op-s-bs-001
       - server-name: /v1/inform-about-application-in-generic-representation
-        uuid: alt-2-1-0-op-s-bs-002
+        uuid: alt-2-1-2-op-s-bs-002
       - server-name: /v1/inform-about-release-history
-        uuid: alt-2-1-0-op-s-bs-003
+        uuid: alt-2-1-2-op-s-bs-003
       - server-name: /v1/inform-about-release-history-in-generic-representation
-        uuid: alt-2-1-0-op-s-bs-004
+        uuid: alt-2-1-2-op-s-bs-004
       - server-name: /docs
-        uuid: alt-2-1-0-op-s-bs-005
+        uuid: alt-2-1-2-op-s-bs-005
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
       - server-name: /v1/disregard-application
-        uuid: alt-2-1-0-op-s-is-002
+        uuid: alt-2-1-2-op-s-is-002
       - server-name: /v1/list-applications
-        uuid: alt-2-1-0-op-s-is-003
+        uuid: alt-2-1-2-op-s-is-003
       - server-name: /v1/update-all-ltps-and-fcs
-        uuid: alt-2-1-0-op-s-is-004
+        uuid: alt-2-1-2-op-s-is-004
       - server-name: /v1/update-ltp
-        uuid: alt-2-1-0-op-s-is-005
+        uuid: alt-2-1-2-op-s-is-005
       - server-name: /v1/delete-ltp-and-dependents
-        uuid: alt-2-1-0-op-s-is-006
+        uuid: alt-2-1-2-op-s-is-006
       - server-name: /v1/list-operation-servers-at-application
-        uuid: alt-2-1-0-op-s-is-009
+        uuid: alt-2-1-2-op-s-is-009
       - server-name: /v1/list-operation-clients-at-application
-        uuid: alt-2-1-0-op-s-is-010
+        uuid: alt-2-1-2-op-s-is-010
       - server-name: /v1/update-fc
-        uuid: alt-2-1-0-op-s-is-013
+        uuid: alt-2-1-2-op-s-is-013
       - server-name: /v1/update-fc-port
-        uuid: alt-2-1-0-op-s-is-014
+        uuid: alt-2-1-2-op-s-is-014
       - server-name: /v1/delete-fc-port
-        uuid: alt-2-1-0-op-s-is-015
+        uuid: alt-2-1-2-op-s-is-015
       - server-name: /v1/list-operation-clients-reacting-on-operation-server
-        uuid: alt-2-1-0-op-s-is-016
+        uuid: alt-2-1-2-op-s-is-016
       - server-name: /v1/list-link-uuids
-        uuid: alt-2-1-0-op-s-is-017
+        uuid: alt-2-1-2-op-s-is-017
       - server-name: /v1/add-operation-client-to-link
-        uuid: alt-2-1-0-op-s-is-018
+        uuid: alt-2-1-2-op-s-is-018
       - server-name: /v1/remove-operation-client-from-link
-        uuid: alt-2-1-0-op-s-is-019
+        uuid: alt-2-1-2-op-s-is-019
       - server-name: /v1/list-end-points-of-link
-        uuid: alt-2-1-0-op-s-is-020
+        uuid: alt-2-1-2-op-s-is-020
       - server-name: /v1/list-links-to-operation-clients-of-application
-        uuid: alt-2-1-0-op-s-is-021
+        uuid: alt-2-1-2-op-s-is-021
       - server-name: /v1/notify-link-updates
-        uuid: alt-2-1-0-op-s-is-022
+        uuid: alt-2-1-2-op-s-is-022
     consequent-requests:
       - client-name: ExecutionAndTraceLog://v1/record-service-request
-        uuid: alt-2-1-0-op-c-bs-eatl-2-0-1-000
+        uuid: alt-2-1-2-op-c-bs-eatl-2-1-2-000
 
   - forwarding-name: OamRequestCausesLoggingRequest
-    uuid: alt-2-1-0-op-fc-bm-003
+    uuid: alt-2-1-2-op-fc-bm-003
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-oam-request-information
-          uuid: alt-2-1-0-op-s-bm-003
+          uuid: alt-2-1-2-op-s-bm-003
       fc-port-update:
         - server-name: /v1/redirect-oam-request-information
-          uuid: alt-2-1-0-op-s-bm-003
+          uuid: alt-2-1-2-op-s-bm-003
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       # [all oam requests]
     consequent-requests:
       - client-name: OamLog://v1/record-oam-request
-        uuid: alt-2-1-0-op-c-bs-ol-2-0-1-000
+        uuid: alt-2-1-2-op-c-bs-ol-2-1-2-000
 
   - forwarding-name: BasicAuthRequestCausesInquiryForAuthentication
-    uuid: alt-2-1-0-op-fc-bm-005
+    uuid: alt-2-1-2-op-fc-bm-005
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/inquire-basic-auth-approvals
-          uuid: alt-2-1-0-op-s-bm-012
+          uuid: alt-2-1-2-op-s-bm-012
         - server-name: /v1/inquire-oam-request-approvals
-          uuid: alt-2-1-0-op-s-bm-005
+          uuid: alt-2-1-2-op-s-bm-005
       fc-port-update:
         - server-name: /v1/inquire-basic-auth-approvals
-          uuid: alt-2-1-0-op-s-bm-012
+          uuid: alt-2-1-2-op-s-bm-012
         - server-name: /v1/inquire-oam-request-approvals
-          uuid: alt-2-1-0-op-s-bm-005
+          uuid: alt-2-1-2-op-s-bm-005
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       # [all oam requests]
     consequent-requests:
-      - client-name: AdministratorAdministration://v1/approve-oam-request
-        uuid: alt-2-1-0-op-c-bs-aa-2-0-1-000
+      - client-name: AccessAdministration://v1/approve-basic-auth-request
+        uuid: alt-2-1-2-op-c-bs-aa-2-1-2-000
 
   - forwarding-name: PromptForBequeathingDataCausesTransferOfListOfApplications
-    uuid: alt-2-1-0-op-fc-im-110
+    uuid: alt-2-1-2-op-fc-im-110
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -230,276 +230,276 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/bequeath-your-data-and-die
-        uuid: alt-2-1-0-op-s-im-000
+        uuid: alt-2-1-2-op-s-im-000
     consequent-requests:
       - client-name: NewRelease://v1/regard-application
-        uuid: alt-2-1-0-op-c-im-nr-2-1-0-000
+        uuid: alt-2-1-2-op-c-im-nr-2-1-2-000
 
   - forwarding-name: PromptForBequeathingDataCausesRequestForBroadcastingInfoAboutServerReplacement
-    uuid: alt-2-1-0-op-fc-bm-105
+    uuid: alt-2-1-2-op-fc-bm-105
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/embed-yourself
-          uuid: alt-2-1-0-op-s-bm-001
+          uuid: alt-2-1-2-op-s-bm-001
       fc-port-update:
         - server-name: /v1/embed-yourself
-          uuid: alt-2-1-0-op-s-bm-001
+          uuid: alt-2-1-2-op-s-bm-001
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/bequeath-your-data-and-die
-        uuid: alt-2-1-0-op-s-im-000
+        uuid: alt-2-1-2-op-s-im-000
     consequent-requests:
       - client-name: RegistryOffice://v1/relay-server-replacement
-        uuid: alt-2-1-0-op-c-bm-ro-2-1-0-001
+        uuid: alt-2-1-2-op-c-bm-ro-2-1-2-001
 
   - forwarding-name: PromptForBequeathingDataCausesRequestForDeregisteringOfOldRelease
-    uuid: alt-2-1-0-op-fc-bm-106
+    uuid: alt-2-1-2-op-fc-bm-106
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/embed-yourself
-          uuid: alt-2-1-0-op-s-bm-001
+          uuid: alt-2-1-2-op-s-bm-001
       fc-port-update:
         - server-name: /v1/embed-yourself
-          uuid: alt-2-1-0-op-s-bm-001
+          uuid: alt-2-1-2-op-s-bm-001
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/bequeath-your-data-and-die
-        uuid: alt-2-1-0-op-s-im-000
+        uuid: alt-2-1-2-op-s-im-000
     consequent-requests:
       - client-name: RegistryOffice://v1/deregister-application
-        uuid: alt-2-1-0-op-c-bm-ro-2-1-0-002
+        uuid: alt-2-1-2-op-c-bm-ro-2-1-2-002
 
   - forwarding-name: PromptingNewReleaseForUpdatingServerCausesRequestForBroadcastingInfoAboutBackwardCompatibleUpdateOfOperation
-    uuid: alt-2-1-0-op-fc-bm-107
+    uuid: alt-2-1-2-op-fc-bm-107
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/embed-yourself
-          uuid: alt-2-1-0-op-s-bm-001
+          uuid: alt-2-1-2-op-s-bm-001
       fc-port-update:
         - server-name: /v1/embed-yourself
-          uuid: alt-2-1-0-op-s-bm-001
+          uuid: alt-2-1-2-op-s-bm-001
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/update-client
-        uuid: alt-2-1-0-op-s-bm-007
+        uuid: alt-2-1-2-op-s-bm-007
     consequent-requests:
       - client-name: RegistryOffice://v1/relay-operation-update
-        uuid: alt-2-1-0-op-c-bm-ro-2-1-0-003
+        uuid: alt-2-1-2-op-c-bm-ro-2-1-2-003
 
   - forwarding-name: ServiceRequestCausesLtpUpdateRequest
-    uuid: alt-2-1-0-op-fc-bm-006
+    uuid: alt-2-1-2-op-fc-bm-006
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/register-yourself
-        uuid: alt-2-1-0-op-s-bm-000
+        uuid: alt-2-1-2-op-s-bm-000
       - server-name: /v1/embed-yourself
-        uuid: alt-2-1-0-op-s-bm-001
+        uuid: alt-2-1-2-op-s-bm-001
       - server-name: /v1/redirect-service-request-information
-        uuid: alt-2-1-0-op-s-bm-002
+        uuid: alt-2-1-2-op-s-bm-002
       - server-name: /v1/redirect-oam-request-information
-        uuid: alt-2-1-0-op-s-bm-003
+        uuid: alt-2-1-2-op-s-bm-003
       - server-name: /v1/inquire-oam-request-approvals
-        uuid: alt-2-1-0-op-s-bm-005
+        uuid: alt-2-1-2-op-s-bm-005
       - server-name: /v1/update-client
-        uuid: alt-2-1-0-op-s-bm-007
+        uuid: alt-2-1-2-op-s-bm-007
       - server-name: /v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-s-bm-009
+        uuid: alt-2-1-2-op-s-bm-009
       - server-name: /v1/update-operation-client
-        uuid: alt-2-1-0-op-s-bm-011
+        uuid: alt-2-1-2-op-s-bm-011
       - server-name: /v1/inquire-basic-auth-approvals
-        uuid: alt-2-1-0-op-s-bm-012
+        uuid: alt-2-1-2-op-s-bm-012
       - server-name: /v1/update-client-of-subsequent-release
-        uuid: alt-2-1-0-op-s-bm-015
+        uuid: alt-2-1-2-op-s-bm-015
       - server-name: /v1/bequeath-your-data-and-die
-        uuid: alt-2-1-0-op-s-im-000
+        uuid: alt-2-1-2-op-s-im-000
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
       - server-name: /v1/notify-link-updates
-        uuid: alt-2-1-0-op-s-is-022
+        uuid: alt-2-1-2-op-s-is-022
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-ltp
-        uuid: alt-2-1-0-op-c-bm-alt-2-1-0-001
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-001
 
   - forwarding-name: ServiceRequestCausesLtpDeletionRequest
-    uuid: alt-2-1-0-op-fc-bm-007
+    uuid: alt-2-1-2-op-fc-bm-007
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/dispose-remainders-of-deregistered-application
-        uuid: alt-2-1-0-op-s-bm-013
+        uuid: alt-2-1-2-op-s-bm-013
       - server-name: /v1/disregard-application
-        uuid: alt-2-1-0-op-s-is-002
+        uuid: alt-2-1-2-op-s-is-002
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/delete-ltp-and-dependents
-        uuid: alt-2-1-0-op-c-bm-alt-2-1-0-002
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-002
 
   - forwarding-name: ServiceRequestCausesFcUpdateRequest
-    uuid: alt-2-1-0-op-fc-bm-008
+    uuid: alt-2-1-2-op-fc-bm-008
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
       - server-name: /v1/notify-link-updates
-        uuid: alt-2-1-0-op-s-is-022
+        uuid: alt-2-1-2-op-s-is-022
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-fc
-        uuid: alt-2-1-0-op-c-bm-alt-2-0-1-003
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-003
 
   - forwarding-name: ServiceRequestCausesFcPortUpdateRequest
-    uuid: alt-2-1-0-op-fc-bm-009
+    uuid: alt-2-1-2-op-fc-bm-009
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-fc-port
-        uuid: alt-2-1-0-op-c-bm-alt-2-0-1-004
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-004
 
   - forwarding-name: ServiceRequestCausesFcPortDeletionRequest
-    uuid: alt-2-1-0-op-fc-bm-010
+    uuid: alt-2-1-2-op-fc-bm-010
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/end-subscription
-        uuid: alt-2-1-0-op-s-bm-004
+        uuid: alt-2-1-2-op-s-bm-004
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/delete-fc-port
-        uuid: alt-2-1-0-op-c-bm-alt-2-0-1-005
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-005
 
   - forwarding-name: OamRequestCausesLtpUpdateRequest
-    uuid: alt-2-1-0-op-fc-bm-011
+    uuid: alt-2-1-2-op-fc-bm-011
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-ltp
-        uuid: alt-2-1-0-op-c-bm-alt-2-0-1-001
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-001
 
   - forwarding-name: OamRequestCausesLtpDeletionRequest
-    uuid: alt-2-1-0-op-fc-bm-012
+    uuid: alt-2-1-2-op-fc-bm-012
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/delete-ltp-and-dependents
-        uuid: alt-2-1-0-op-c-bm-alt-2-0-1-002
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-002
 
   - forwarding-name: OamRequestCausesFcUpdateRequest
-    uuid: alt-2-1-0-op-fc-bm-013
+    uuid: alt-2-1-2-op-fc-bm-013
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-fc
-        uuid: alt-2-1-0-op-c-bm-alt-2-0-1-003
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-003
 
   - forwarding-name: OamRequestCausesFcPortUpdateRequest
-    uuid: alt-2-1-0-op-fc-bm-014
+    uuid: alt-2-1-2-op-fc-bm-014
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/update-fc-port
-        uuid: alt-2-1-0-op-c-bm-alt-2-0-1-004
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-004
 
   - forwarding-name: OamRequestCausesFcPortDeletionRequest
-    uuid: alt-2-1-0-op-fc-bm-015
+    uuid: alt-2-1-2-op-fc-bm-015
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-update:
         - server-name: /v1/redirect-topology-change-information
-          uuid: alt-2-1-0-op-s-bm-009
+          uuid: alt-2-1-2-op-s-bm-009
       fc-port-deletion:
       operation-client-deletion:
     initiating-requests:
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/delete-fc-port
-        uuid: alt-2-1-0-op-c-bm-alt-2-0-1-005
+        uuid: alt-2-1-2-op-c-bm-alt-2-1-2-005
 
   - forwarding-name: LtpUpdateMightCauseOperationClientBeingAddedToLink
-    uuid: alt-2-1-0-op-fc-is-002
+    uuid: alt-2-1-2-op-fc-is-002
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -508,13 +508,13 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/update-ltp
-        uuid: alt-2-1-0-op-s-is-005
+        uuid: alt-2-1-2-op-s-is-005
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
-        uuid: alt-2-1-0-op-c-is-alt-2-0-1-000
+        uuid: alt-2-1-2-op-c-is-alt-2-1-2-000
 
   - forwarding-name: LtpUpdateMightCauseOperationClientBeingRemovedFromLink
-    uuid: alt-2-1-0-op-fc-is-003
+    uuid: alt-2-1-2-op-fc-is-003
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -523,13 +523,13 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/update-ltp
-        uuid: alt-2-1-0-op-s-is-005
+        uuid: alt-2-1-2-op-s-is-005
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/remove-operation-client-from-link
-        uuid: alt-2-1-0-op-c-is-alt-2-0-1-001
+        uuid: alt-2-1-2-op-c-is-alt-2-1-2-001
 
   - forwarding-name: LtpDeletionCausesOperationClientBeingRemovedFromLink
-    uuid: alt-2-1-0-op-fc-is-004
+    uuid: alt-2-1-2-op-fc-is-004
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -538,71 +538,71 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/delete-ltp-and-dependents
-        uuid: alt-2-1-0-op-s-is-006
+        uuid: alt-2-1-2-op-s-is-006
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/remove-operation-client-from-link
-        uuid: alt-2-1-0-op-c-is-alt-2-0-1-001
+        uuid: alt-2-1-2-op-c-is-alt-2-1-2-001
 
   - forwarding-name: LinkChangeNotification
-    uuid: alt-2-1-0-op-fc-is-005
+    uuid: alt-2-1-2-op-fc-is-005
     forwarding-type: Subscription
     management-requests:
       operation-client-update:
         - server-name: /v1/notify-link-updates
-          uuid: alt-2-1-0-op-s-is-022
+          uuid: alt-2-1-2-op-s-is-022
       fc-port-update:
         - server-name: /v1/notify-link-updates
-          uuid: alt-2-1-0-op-s-is-022
+          uuid: alt-2-1-2-op-s-is-022
       fc-port-deletion:
         - server-name: /v1/end-subscription
-          uuid: alt-2-1-0-op-s-bm-004
+          uuid: alt-2-1-2-op-s-bm-004
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/add-operation-client-to-link
-        uuid: alt-2-1-0-op-s-is-018
+        uuid: alt-2-1-2-op-s-is-018
       - server-name: /v1/remove-operation-client-from-link
-        uuid: alt-2-1-0-op-s-is-019
+        uuid: alt-2-1-2-op-s-is-019
     consequent-requests:
       - client-name: OperationKeyManagement://v1/regard-updated-link
-        uuid: alt-2-1-0-op-c-is-okm-2-0-1-002
+        uuid: alt-2-1-2-op-c-is-okm-2-1-2-002
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformationWithDefaultKey
-    uuid: alt-2-1-0-op-fc-is-010
+    uuid: alt-2-1-2-op-fc-is-010
     forwarding-type: ProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/regard-application
-          uuid: alt-2-1-0-op-s-is-001
+          uuid: alt-2-1-2-op-s-is-001
       fc-port-update:
         - server-name: /v1/regard-application
-          uuid: alt-2-1-0-op-s-is-001
+          uuid: alt-2-1-2-op-s-is-001
       fc-port-deletion:
         - server-name: /v1/dispose-remainders-of-deregistered-application
-          uuid: alt-2-1-0-op-s-bm-013
+          uuid: alt-2-1-2-op-s-bm-013
       operation-client-deletion:
         - server-name: /v1/dispose-remainders-of-deregistered-application
-          uuid: alt-2-1-0-op-s-bm-013
+          uuid: alt-2-1-2-op-s-bm-013
     initiating-requests:
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
     consequent-requests:
       - client-name: RegistryOffice://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-ro-2-1-0-004
+        uuid: alt-2-1-2-op-c-im-ro-2-1-2-004
       - client-name: TypeApprovalRegister://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-tar-2-1-0-004
+        uuid: alt-2-1-2-op-c-im-tar-2-1-2-004
       - client-name: ExecutionAndTraceLog://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-eatl-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-eatl-2-1-2-004
       - client-name: OamLog://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-ol-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-ol-2-1-2-004
       - client-name: AdministratorAdministration://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-aa-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-aa-2-1-2-004
       - client-name: ApplicationLayerTopology://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-alt-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-alt-2-1-2-004
       - client-name: OperationKeyManagement://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-okm-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-okm-2-1-2-004
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForInquiringTopologyChangeInformation
-    uuid: alt-2-1-0-op-fc-is-011
+    uuid: alt-2-1-2-op-fc-is-011
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -611,50 +611,50 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
-        uuid: alt-2-1-0-op-c-is-alt-2-0-1-000
+        uuid: alt-2-1-2-op-c-is-alt-2-1-2-000
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.RequestForInquiringTopologyChangeInformation
-    uuid: alt-2-1-0-op-fc-is-012
+    uuid: alt-2-1-2-op-fc-is-012
     forwarding-type: ProcessSnippet
     management-requests:
       operation-client-update:
         - server-name: /v1/regard-application
-          uuid: alt-2-1-0-op-s-is-001
+          uuid: alt-2-1-2-op-s-is-001
       fc-port-update:
         - server-name: /v1/regard-application
-          uuid: alt-2-1-0-op-s-is-001
+          uuid: alt-2-1-2-op-s-is-001
       fc-port-deletion:
         - server-name: /v1/dispose-remainders-of-deregistered-application
-          uuid: alt-2-1-0-op-s-bm-013
+          uuid: alt-2-1-2-op-s-bm-013
       operation-client-deletion:
         - server-name: /v1/dispose-remainders-of-deregistered-application
-          uuid: alt-2-1-0-op-s-bm-013
+          uuid: alt-2-1-2-op-s-bm-013
     initiating-requests:
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
       - server-name: /v1/update-operation-key
-        uuid: alt-2-1-0-op-s-bm-010
+        uuid: alt-2-1-2-op-s-bm-010
     consequent-requests:
       - client-name: RegistryOffice://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-ro-2-1-0-004
+        uuid: alt-2-1-2-op-c-im-ro-2-1-2-004
       - client-name: TypeApprovalRegister://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-tar-2-1-0-004
+        uuid: alt-2-1-2-op-c-im-tar-2-1-2-004
       - client-name: ExecutionAndTraceLog://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-eatl-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-eatl-2-1-2-004
       - client-name: OamLog://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-ol-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-ol-2-1-2-004
       - client-name: AdministratorAdministration://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-aa-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-aa-2-1-2-004
       - client-name: ApplicationLayerTopology://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-alt-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-alt-2-1-2-004
       - client-name: OperationKeyManagement://v1/redirect-topology-change-information
-        uuid: alt-2-1-0-op-c-im-okm-2-0-1-004
+        uuid: alt-2-1-2-op-c-im-okm-2-1-2-004
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedLtpInformation
-    uuid: alt-2-1-0-op-fc-is-013
+    uuid: alt-2-1-2-op-fc-is-013
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -663,13 +663,13 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
-        uuid: alt-2-1-0-op-c-is-alt-2-0-1-000
+        uuid: alt-2-1-2-op-c-is-alt-2-1-2-000
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedLtpInformation
-    uuid: alt-2-1-0-op-fc-is-014
+    uuid: alt-2-1-2-op-fc-is-014
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -678,13 +678,13 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
-        uuid: alt-2-1-0-op-c-is-alt-2-0-1-000
+        uuid: alt-2-1-2-op-c-is-alt-2-1-2-000
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcInformation
-    uuid: alt-2-1-0-op-fc-is-015
+    uuid: alt-2-1-2-op-fc-is-015
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -693,13 +693,13 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
-        uuid: alt-2-1-0-op-c-is-alt-2-0-1-000
+        uuid: alt-2-1-2-op-c-is-alt-2-1-2-000
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingUpdatedFcPortInformation
-    uuid: alt-2-1-0-op-fc-is-016
+    uuid: alt-2-1-2-op-fc-is-016
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -708,13 +708,13 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
-        uuid: alt-2-1-0-op-c-is-alt-2-0-1-000
+        uuid: alt-2-1-2-op-c-is-alt-2-1-2-000
 
   - forwarding-name: NewApplicationCausesRequestForTopologyChangeInformation.CreateLinkForProvidingDeletedFcPortInformation
-    uuid: alt-2-1-0-op-fc-is-017
+    uuid: alt-2-1-2-op-fc-is-017
     forwarding-type: InvariantProcessSnippet
     management-requests:
       operation-client-update:
@@ -723,7 +723,7 @@ forwardings:
       operation-client-deletion:
     initiating-requests:
       - server-name: /v1/regard-application
-        uuid: alt-2-1-0-op-s-is-001
+        uuid: alt-2-1-2-op-s-is-001
     consequent-requests:
       - client-name: ApplicationLayerTopology://v1/add-operation-client-to-link
-        uuid: alt-2-1-0-op-c-is-alt-2-0-1-000
+        uuid: alt-2-1-2-op-c-is-alt-2-1-2-000
