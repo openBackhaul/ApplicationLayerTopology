@@ -5242,6 +5242,7 @@ paths:
                         - release-number
                         - operation-name
                         - response-code
+                        - timestamp
                       properties:
                         x-correlator:
                           type: string
@@ -7205,7 +7206,7 @@ paths:
               properties:
                 operation-uuid:
                   type: string
-                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-([sc])-([bi][ms])((-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})){0,1})-([0-9]{3})$'
+                  pattern: '^([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})-op-([sc])(-(get|put|post|del|pat))?-([bi][ms])((-([a-z]{2,6})-([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})){0,1})-([0-9]{3})$'
                   description: >
                     'UUID of LTP that is target of the updating of the operation key
                     find [/core-model-1-4:control-construct/logical-termination-point=uuid]'
