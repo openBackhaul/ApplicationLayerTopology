@@ -106,7 +106,7 @@ async function RequestForInquiringTopologyChangeInformationWithDefaultKey(applic
     let responseCode = response.status;
     if (!responseCode.toString().startsWith("2")) {
       result["successfully-connected"] = false;
-      result["reason-of-failure"] = `ALT_DID_NOT_REACH_NEW_APPLICATION`;
+      result["reason-of-failure"] = `ALT_NOT_REACHABLE`;
       if(responseCode.toString() == "401") {
         console.log(`${forwardingName} is failed with response code ${responseCode}. \n Probably, links to the regarded application is already available and operation-keys in server and client would have updated \n Proceeding to further callbacks`);
       }
@@ -220,7 +220,7 @@ async function RequestForInquiringTopologyChangeInformation(applicationName, rel
     let responseCode = response.status;
     if (!responseCode.toString().startsWith("2")) {
       result["successfully-connected"] = false;
-      result["reason-of-failure"] = `ALT_DID_NOT_REACH_NEW_APPLICATION`;
+      result["reason-of-failure"] = `ALT_NOT_REACHABLE`;
     } else {
       let isControlConstructUpdated = await UpdateControlConstructAndLinksInDataBase(response.data, applicationName, releaseNumber, requestHeaders);
       if(!isControlConstructUpdated) {
@@ -451,7 +451,7 @@ function processResponseForCreatingLinkService(response) {
     if (!responseCode.toString().startsWith("2")) {
       if (responseCode.toString() == "404" || responseCode.toString() == "408") {
         result["successfully-connected"] = false;
-        result["reason-of-failure"] = `ALT_DID_NOT_REACH_ALT`;
+        result["reason-of-failure"] = `ALT_NOT_REACHABLE`;
       } else {
         result["successfully-connected"] = false;
         result["reason-of-failure"] = `ALT_ALT_UNKNOWN`;
