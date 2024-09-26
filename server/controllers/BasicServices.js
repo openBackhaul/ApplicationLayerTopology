@@ -287,8 +287,7 @@ module.exports.registerYourself = async function registerYourself(req, res, next
     customerJourney = req.headers["customer-journey"];
   }
   
-  let beaqueathYourDataAndDieForwardingName = "PromptForEmbeddingInitiatesEmbeddingProcess.RequestForBequeathingData";
-  await BasicServices.registerYourself(body, user, xCorrelator, traceIndicator, customerJourney, req.url, beaqueathYourDataAndDieForwardingName)
+  await BasicServices.registerYourself(body, user, xCorrelator, traceIndicator, customerJourney, req.url, OLD_RELEASE_FORWARDING_NAME)
     .then(async function (responseBody) {
       responseBodyToDocument = responseBody;
       let responseHeader = await RestResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
