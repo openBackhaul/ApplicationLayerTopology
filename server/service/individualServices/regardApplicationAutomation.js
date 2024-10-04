@@ -106,7 +106,7 @@ async function RequestForInquiringTopologyChangeInformationWithDefaultKey(applic
     let responseCode = response.status;
     if (!responseCode.toString().startsWith("2")) {
       result["successfully-connected"] = false;
-      if (responseCode.toString() == "404" || responseCode.toString() == "408" || responseCode.toString() == "503") {
+      if (responseCode == 404 || responseCode == 408 || responseCode == 503) {
         result["reason-of-failure"] = `ALT_DID_NOT_REACH_NEW_APPLICATION`;
       } else {
         result["reason-of-failure"] = `ALT_UNKNOWN`;
@@ -221,7 +221,7 @@ async function RequestForInquiringTopologyChangeInformation(applicationName, rel
     let responseCode = response.status;
     if (!responseCode.toString().startsWith("2")) {
       result["successfully-connected"] = false;
-      if (responseCode.toString() == "404" || responseCode.toString() == "408" || responseCode.toString() == "503") {
+      if (responseCode == 404 || responseCode == 408 || responseCode == 503) {
         result["reason-of-failure"] = `ALT_DID_NOT_REACH_NEW_APPLICATION`;
       } else {
         result["reason-of-failure"] = `ALT_UNKNOWN`;
@@ -454,7 +454,7 @@ function processResponseForCreatingLinkService(response) {
   try {
     let responseCode = response.status;
     if (!responseCode.toString().startsWith("2")) {
-      if (responseCode.toString() == "404" || responseCode.toString() == "408" || responseCode.toString() == "503") {
+      if (responseCode == 404 || responseCode == 408 || responseCode == 503) {
         result["successfully-connected"] = false;
         result["reason-of-failure"] = `ALT_DID_NOT_REACH_ALT`;
       } else {
