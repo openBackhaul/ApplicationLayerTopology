@@ -136,8 +136,15 @@ exports.getServingOperationUuidAsync = async function (EndPoints) {
                     response["took"] = servingApplicationCCResponse.took;
                 }
             } else {
-                response["reason-of-failure"] = "ALT_SERVING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
-                response["took"] = servingApplicationCCResponse.took;
+                let servingApplicationNameCCResponse = await ControlConstructService.getControlConstructOfTheApplicationNameAsync(
+                    servingApplicationName);
+                if (servingApplicationNameCCResponse.controlConstruct) {
+                    response["reason-of-failure"] = "ALT_SERVING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
+                    response["took"] = servingApplicationNameCCResponse.took;
+                } else {
+                    response["reason-of-failure"] = "ALT_SERVING_APPLICATION_NAME_UNKNOWN";
+                    response["took"] = servingApplicationNameCCResponse.took;
+                }
             }
         } else {
             response["reason-of-failure"] = "ALT_SERVING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
@@ -178,8 +185,15 @@ async function getConsumingOperationUuidAsync(EndPoints) {
                     response["took"] = consumingApplicationCCResponse.took;
                 }
             } else {
-                response["reason-of-failure"] = "ALT_CONSUMING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
-                response["took"] = consumingApplicationCCResponse.took;
+                let consumingApplicationNameCCResponse = await ControlConstructService.getControlConstructOfTheApplicationNameAsync(
+                    consumingApplicationName);
+                if (consumingApplicationNameCCResponse.controlConstruct) {
+                    response["reason-of-failure"] = "ALT_CONSUMING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
+                    response["took"] = consumingApplicationCCResponse.took;
+                } else {
+                    response["reason-of-failure"] = "ALT_CONSUMING_APPLICATION_NAME_UNKNOWN";
+                    response["took"] = consumingApplicationCCResponse.took;
+                }
             }
         } else {
             response["reason-of-failure"] = "ALT_CONSUMING_APPLICATION_RELEASE_NUMBER_UNKNOWN";
