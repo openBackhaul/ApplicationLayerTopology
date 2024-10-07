@@ -456,7 +456,7 @@ function processResponseForCreatingLinkService(response) {
     if (!responseCode.toString().startsWith("2")) {
       if (responseCode == 404 || responseCode == 408 || responseCode == 503) {
         result["successfully-connected"] = false;
-        result["reason-of-failure"] = `ALT_DID_NOT_REACH_ALT`;
+        result["reason-of-failure"] = `ALT_NOT_REACHABLE`;
       } else {
         result["successfully-connected"] = false;
         result["reason-of-failure"] = `ALT_ALT_UNKNOWN`;
