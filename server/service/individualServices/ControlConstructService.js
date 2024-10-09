@@ -409,40 +409,6 @@ class ControlConstructService {
   }
 
   /**
-   * @description This function returns control-construct for given application name and release number.
-   * @param {String} applicationName
-   * @returns {Promise<Object>} { controlConstruct, took }
-   **/
-  static async getControlConstructOfTheApplicationNameAsync(applicationName, releaseNumber) {
-    let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
-    let client = await elasticsearchService.getClient(false, esUuid);
-    let indexAlias = await getIndexAliasAsync(esUuid);
-    let res = await client.search({
-      index: indexAlias,
-      filter_path: "took,hits.hits",
-      body: {
-        "query": {
-          "bool": {
-            "must": [
-              {
-                "match": {
-                  "logical-termination-point.layer-protocol.http-server-interface-1-0:http-server-interface-pac.http-server-interface-capability.application-name": applicationName
-                }
-              }
-            ]
-          }
-        }
-      }
-    })
-    if (res.body.hits.hits.length === 0) {
-      console.log(`Could not find existing control-construct with ${applicationName}`);
-      return { "took": res.body.took };
-    }
-    let controlConstruct = createResultArray(res);
-    return { "controlConstruct": controlConstruct[0], "took": res.body.took };
-  }
-
-  /**
    * @description Replaces logical-termination-point list in control construct
    * specified by controlConstructUuid.
    * @param {String} controlConstructUuid UUID of control construct that will be updated

@@ -101,14 +101,8 @@ async function PromptForBequeathingDataCausesTransferOfListOfApplications(user, 
                         traceIndicator + "." + traceIncrementer++,
                         customerJourney
                     );
-                    
-                    let errorMessage = forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + JSON.stringify(requestBody);
-                    if( result != undefined && result.data != undefined){
-                        if(!result.data["successfully-connected"]){
-                            throw errorMessage
-                        }
-                    }else{
-                        throw errorMessage
+                    if (!result) {
+                        throw forwardingKindNameOfTheBequeathOperation + "forwarding is not success for the input" + JSON.stringify(requestBody);
                     }
 
                 } catch (error) {
@@ -285,10 +279,7 @@ function forwardRequest(forwardingKindName, attributeList, user, xCorrelator, tr
                 user,
                 xCorrelator,
                 traceIndicator,
-                customerJourney,
-                undefined,
-                undefined,
-                true
+                customerJourney
             );
             resolve(result);
         } catch (error) {

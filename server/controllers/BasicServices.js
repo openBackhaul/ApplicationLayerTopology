@@ -286,8 +286,7 @@ module.exports.registerYourself = async function registerYourself(req, res, next
     traceIndicator = req.headers["trace-indicator"];
     customerJourney = req.headers["customer-journey"];
   }
-  
-  await BasicServices.registerYourself(body, user, xCorrelator, traceIndicator, customerJourney, req.url, OLD_RELEASE_FORWARDING_NAME)
+  await BasicServices.registerYourself(body, user, xCorrelator, traceIndicator, customerJourney, req.url)
     .then(async function (responseBody) {
       responseBodyToDocument = responseBody;
       let responseHeader = await RestResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
