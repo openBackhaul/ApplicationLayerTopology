@@ -413,7 +413,7 @@ class ControlConstructService {
    * @param {String} applicationName
    * @returns {Promise<Object>} { controlConstruct, took }
    **/
-  static async getControlConstructOfTheApplicationNameAsync(applicationName, releaseNumber) {
+  static async getControlConstructOfTheApplicationNameAsync(applicationName) {
     let esUuid = await ElasticsearchPreparation.getCorrectEsUuid(false);
     let client = await elasticsearchService.getClient(false, esUuid);
     let indexAlias = await getIndexAliasAsync(esUuid);
