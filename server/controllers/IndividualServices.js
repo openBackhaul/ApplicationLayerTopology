@@ -17,7 +17,7 @@ module.exports.addOperationClientToLink = async function addOperationClientToLin
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -39,7 +39,7 @@ module.exports.bequeathYourDataAndDie = async function bequeathYourDataAndDie(re
       restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -60,7 +60,7 @@ module.exports.deleteFcPort = async function deleteFcPort(req, res, next, body, 
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -81,7 +81,7 @@ module.exports.deleteLtpAndDependents = async function deleteLtpAndDependents(re
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -106,7 +106,7 @@ module.exports.disregardApplication = async function disregardApplication(req, r
       restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -128,7 +128,7 @@ module.exports.listApplications = async function listApplications(req, res, next
       restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -150,7 +150,7 @@ module.exports.listEndPointsOfLink = async function listEndPointsOfLink(req, res
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -172,7 +172,7 @@ module.exports.listLinkUuids = async function listLinkUuids(req, res, next, user
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -194,7 +194,7 @@ module.exports.listLinksToOperationClientsOfApplication = async function listLin
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -216,7 +216,7 @@ module.exports.listOperationClientsAtApplication = async function listOperationC
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -238,7 +238,7 @@ module.exports.listOperationClientsReactingOnOperationServer = async function li
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -260,7 +260,7 @@ module.exports.listOperationServersAtApplication = async function listOperationS
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -282,7 +282,7 @@ module.exports.notifyLinkUpdates = async function notifyLinkUpdates(req, res, ne
       restResponseBuilder.buildResponse(res, responseCode, responseBody, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -304,7 +304,7 @@ module.exports.regardApplication = async function regardApplication(req, res, ne
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -325,7 +325,7 @@ module.exports.removeOperationClientFromLink = async function removeOperationCli
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -349,7 +349,7 @@ module.exports.updateAllLtpsAndFcs = async function updateAllLtpsAndFcs(req, res
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -370,7 +370,7 @@ module.exports.updateFc = async function updateFc(req, res, next, body, user, or
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -391,7 +391,7 @@ module.exports.updateFcPort = async function updateFcPort(req, res, next, body, 
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
@@ -412,7 +412,7 @@ module.exports.updateLtp = async function updateLtp(req, res, next, body, user, 
       restResponseBuilder.buildResponse(res, responseCode, responseBodyToDocument, responseHeader);
     })
     .catch(async function (responseBody) {
-      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url);
+      let responseHeader = await restResponseHeader.createResponseHeader(xCorrelator, startTime, req.url, -1);
       let sentResp = restResponseBuilder.buildResponse(res, undefined, responseBody, responseHeader);
       responseCode = sentResp.code;
       responseBodyToDocument = sentResp.body;
