@@ -6,7 +6,7 @@ var http = require('http');
 var oas3Tools = require('openbackhaul-oas3-tools');
 var appCommons = require('onf-core-model-ap/applicationPattern/commons/AppCommons');
 //var PrepareApprovedLinks = require('./service/individualServices/PrepareApprovedLinks');
-var serverPort = 3029;
+var serverPort = 3036;
 
 const ElasticsearchPreparation = require('./service/individualServices/ElasticsearchPreparation');
 //const preApprovedLinks = require('./utils/preApprovedLinks.json');
