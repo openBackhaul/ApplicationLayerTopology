@@ -7,7 +7,9 @@ const ForwardingAutomationService = require('onf-core-model-ap/applicationPatter
  **/
 exports.createPreApprovedLinks = async function (preApprovedLinks) {
     let forwardings = [];
+    console.log("FindOrCreateCheck1")
     for (let preApprovedLink of preApprovedLinks.links) {
+        console.log("FindOrCreateCheck2")
         let servingOperationUuid = preApprovedLink.output;
         let consumingOperationUuidList = [];
         if (Array.isArray(preApprovedLink.input)) {
@@ -22,6 +24,7 @@ exports.createPreApprovedLinks = async function (preApprovedLinks) {
             forwardings.push(forwarding);
         }
     }
+    console.log("FindOrCreateCheck3")
     ForwardingAutomationService.automateForwardingConstructAsync(
         "/v1/add-operation-client-to-link",
         forwardings,
