@@ -636,6 +636,7 @@ class ControlConstructService {
         let operationServerCapability = operationServerInterfacePac[onfAttributes.OPERATION_SERVER.CAPABILITY];
         let operationName = operationServerCapability[onfAttributes.OPERATION_SERVER.OPERATION_NAME];
         if (operationName === operationServerName) {
+          console.log("operation name identified" + operationName);
           return logicalTerminationPoint[onfAttributes.GLOBAL_CLASS.UUID];
         }
       }

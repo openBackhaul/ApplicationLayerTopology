@@ -505,8 +505,11 @@ async function UpdateControlConstructAndLinksInDataBase(controlConstruct, applic
         'serving-application-release-number': releaseNumber,
         'operation-name': operationServerName
       }
+      console.log("For debuggin PUT/GET MWDI issue");
+      console.log(operationServerName);
       let servingOperationResponse = await LinkServices.getServingOperationUuidAsync(endPointDetails);
       let servingOperationUuid = servingOperationResponse.servingOperationUuid;
+      console.log(servingOperationUuid);
       if (!servingOperationUuid) return false;
       let forwarding = await LinkServices.prepareLinkChangeNotificationForwardingsAsync(servingOperationUuid, []);
       if (forwarding) {
