@@ -227,6 +227,7 @@ async function RequestForInquiringTopologyChangeInformation(applicationName, rel
         result["reason-of-failure"] = `ALT_UNKNOWN`;
       }
     } else {
+      console.log("proceeding toward UpdateControlConstructAndLinksInDataBase");
       let isControlConstructUpdated = await UpdateControlConstructAndLinksInDataBase(response.data, applicationName, releaseNumber, requestHeaders);
       if(!isControlConstructUpdated) {
         result["successfully-connected"] = false;
@@ -498,6 +499,7 @@ async function UpdateControlConstructAndLinksInDataBase(controlConstruct, applic
     // creates links for operation-servers of the application if not already exists into database
     let logicalTerminationPoints = controlConstruct[onfAttributes.CONTROL_CONSTRUCT.LOGICAL_TERMINATION_POINT];
     let operationServerNames = getAllOperationServerNameAsync(logicalTerminationPoints);
+    console.log(operationServerNames);
     let forwardings = [];
     for (let operationServerName of operationServerNames) {
       let endPointDetails = {
