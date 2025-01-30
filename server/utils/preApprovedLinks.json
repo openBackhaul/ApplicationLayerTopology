@@ -1,117 +1,131 @@
 {
-    "links": [  
-    {
-        "output": "ro-2-1-2-op-s-is-003",
-        "input": "tar-2-1-2-op-c-im-ro-2-1-2-002",
-        "operation-name": "/v1/regard-updated-approval-status"
-    },
-    {
-        "output": "ro-2-1-2-op-s-is-006",
-        "input": "tar-2-1-2-op-c-im-ro-2-1-2-000",
-        "operation-name": "/v1/inquire-application-type-approvals"
-    },
-    {
-        "output": "tar-2-1-2-op-s-is-001",
-        "input": "ro-2-1-2-op-c-im-tar-2-1-2-003",
-        "operation-name": "/v1/regard-application"
-    },
-    {
-        "output": "tar-2-1-2-op-s-is-002",
-        "input": "ro-2-1-2-op-c-im-tar-2-1-2-004",
-        "operation-name": "/v1/disregard-application"
-    },
-    {
-        "output": "tar-2-1-2-op-s-is-006",
-        "input": "ro-2-1-2-op-c-im-tar-2-1-2-005",
-        "operation-name": "/v1/redirect-info-about-approval-status-changes"
-    },
-    {
-        "output": "eatl-2-1-2-op-s-is-001",
-        "input": "ro-2-1-2-op-c-im-eatl-2-1-2-003",
-        "operation-name": "/v1/regard-application"
-    },
-    {
-        "output": "eatl-2-1-2-op-s-is-002",
-        "input": "ro-2-1-2-op-c-im-eatl-2-1-2-004",
-        "operation-name": "/v1/disregard-application"
-    },
-    {
-        "output": "ol-2-1-2-op-s-is-001",
-        "input": "ro-2-1-2-op-c-im-ol-2-1-2-003",
-        "operation-name": "/v1/regard-application"
-    },
-    {
-        "output": "ol-2-1-2-op-s-is-002",
-        "input": "ro-2-1-2-op-c-im-ol-2-1-2-004",
-        "operation-name": "/v1/disregard-application"
-    },
-    {
-        "output": "aa-2-1-2-op-s-is-001",
-        "input": "ro-2-1-2-op-c-im-aa-2-1-2-003",
-        "operation-name": "/v1/regard-application"
-    },
-    {
-        "output": "aa-2-1-2-op-s-is-002",
-        "input": "ro-2-1-2-op-c-im-aa-2-1-2-004",
-        "operation-name": "/v1/disregard-application"
-    },
-    {
-        "output": "okm-2-1-2-op-s-is-001",
-        "input": "ro-2-1-2-op-c-im-okm-2-1-2-003",
-        "operation-name": "/v1/regard-application"
-    },
-    {
-        "output": "okm-2-1-2-op-s-is-002",
-        "input": "ro-2-1-2-op-c-im-okm-2-1-2-004",
-        "operation-name": "/v1/disregard-application"
-    },
-    {
-        "output": "okm-2-1-2-op-s-is-004",
-        "input": "alt-2-1-2-op-c-is-okm-2-1-2-002",
-        "operation-name": "/v1/regard-updated-link"
-    },
-    {
-        "output": "alt-2-1-2-op-s-is-001",
-        "input": "ro-2-1-2-op-c-im-alt-2-1-2-003",
-        "operation-name": "/v1/regard-application"
-    },
-    {
-        "output": "alt-2-1-2-op-s-is-002",
-        "input": "ro-2-1-2-op-c-im-alt-2-1-2-004",
-        "operation-name": "/v1/disregard-application"
-    },
-    {
-        "output": "alt-2-1-2-op-s-is-017",
-        "input": "okm-2-1-2-op-c-is-alt-2-1-2-002",
-        "operation-name": "/v1/list-link-uuids"
-    },
-    {
-        "output": "alt-2-1-2-op-s-is-018",
-	"input": [
-		"alt-2-1-2-op-c-is-alt-2-1-2-000",
-		"ro-2-1-2-op-c-is-alt-2-1-2-000",
+    "links": [
+        {
+            "output": "ro-2-1-2-op-s-is-003",
+            "input": "tar-2-1-2-op-c-im-ro-2-1-2-002",
+            "operation-name": "/v1/regard-updated-approval-status"
+        },
+        {
+            "output": "ro-2-1-2-op-s-is-006",
+            "input": "tar-2-1-2-op-c-im-ro-2-1-2-000",
+            "operation-name": "/v1/inquire-application-type-approvals"
+        },
+        {
+            "output": "tar-2-1-2-op-s-is-001",
+            "input": "ro-2-1-2-op-c-im-tar-2-1-2-003",
+            "operation-name": "/v1/regard-application"
+        },
+        {
+            "output": "tar-2-1-2-op-s-is-002",
+            "input": "ro-2-1-2-op-c-im-tar-2-1-2-004",
+            "operation-name": "/v1/disregard-application"
+        },
+        {
+            "output": "tar-2-1-2-op-s-is-006",
+            "input": "ro-2-1-2-op-c-im-tar-2-1-2-005",
+            "operation-name": "/v1/redirect-info-about-approval-status-changes"
+        },
+        {
+            "output": "eatl-2-1-2-op-s-is-001",
+            "input": "ro-2-1-2-op-c-im-eatl-2-1-2-003",
+            "operation-name": "/v1/regard-application"
+        },
+        {
+            "output": "eatl-2-1-2-op-s-is-002",
+            "input": "ro-2-1-2-op-c-im-eatl-2-1-2-004",
+            "operation-name": "/v1/disregard-application"
+        },
+        {
+            "output": "ol-2-1-2-op-s-is-001",
+            "input": "ro-2-1-2-op-c-im-ol-2-1-2-003",
+            "operation-name": "/v1/regard-application"
+        },
+        {
+            "output": "ol-2-1-2-op-s-is-002",
+            "input": "ro-2-1-2-op-c-im-ol-2-1-2-004",
+            "operation-name": "/v1/disregard-application"
+        },
+        {
+            "output": "aa-2-1-2-op-s-is-001",
+            "input": "ro-2-1-2-op-c-im-aa-2-1-2-003",
+            "operation-name": "/v1/regard-application"
+        },
+        {
+            "output": "aa-2-1-2-op-s-is-002",
+            "input": "ro-2-1-2-op-c-im-aa-2-1-2-004",
+            "operation-name": "/v1/disregard-application"
+        },
+        {
+            "output": "okm-2-1-2-op-s-is-001",
+            "input": "ro-2-1-2-op-c-im-okm-2-1-2-003",
+            "operation-name": "/v1/regard-application"
+        },
+        {
+            "output": "okm-2-1-2-op-s-is-002",
+            "input": "ro-2-1-2-op-c-im-okm-2-1-2-004",
+            "operation-name": "/v1/disregard-application"
+        },
+        {
+            "output": "okm-2-1-2-op-s-is-004",
+            "input": "alt-2-1-2-op-c-is-okm-2-1-2-002",
+            "operation-name": "/v1/regard-updated-link"
+        },
+        {
+            "output": "alt-2-1-2-op-s-is-001",
+            "input": "ro-2-1-2-op-c-im-alt-2-1-2-003",
+            "operation-name": "/v1/regard-application"
+        },
+        {
+            "output": "alt-2-1-2-op-s-is-002",
+            "input": "ro-2-1-2-op-c-im-alt-2-1-2-004",
+            "operation-name": "/v1/disregard-application"
+        },
+        {
+            "output": "alt-2-1-2-op-s-is-017",
+            "input": "okm-2-1-2-op-c-is-alt-2-1-2-002",
+            "operation-name": "/v1/list-link-uuids"
+        },
+        {
+            "output": "alt-2-1-2-op-s-is-018",
+            "input": [
+                "alt-2-1-2-op-c-is-alt-2-1-2-000",
+                "ro-2-1-2-op-c-is-alt-2-1-2-000",
                 "eatl-2-1-2-op-c-is-alt-2-1-2-000",
                 "ol-2-1-2-op-c-is-alt-2-1-2-000",
                 "aa-2-1-2-op-c-is-alt-2-1-2-000",
                 "okm-2-1-2-op-c-is-alt-2-1-2-004"
-            ],	
-        "operation-name": "/v1/add-operation-client-to-link"
-    },
-    {
-        "output": "alt-2-1-2-op-s-is-019",
-        "input": "alt-2-1-2-op-c-is-alt-2-1-2-001",
-        "operation-name": "/v1/remove-operation-client-from-link"
-    },
-    {
-        "output": "alt-2-1-2-op-s-is-020",
-        "input": "okm-2-1-2-op-c-is-alt-2-1-2-003",
-        "operation-name": "/v1/list-end-points-of-link"
-    },
-    {
-        "output": "alt-2-1-2-op-s-is-022",
-        "input": "okm-2-1-2-op-c-im-alt-2-1-2-000",
-        "operation-name": "/v1/notify-link-updates"
-    }
-
+            ],
+            "operation-name": "/v1/add-operation-client-to-link"
+        },
+        {
+            "output": "alt-2-1-2-op-s-is-019",
+            "input": "alt-2-1-2-op-c-is-alt-2-1-2-001",
+            "operation-name": "/v1/remove-operation-client-from-link"
+        },
+        {
+            "output": "alt-2-1-2-op-s-is-020",
+            "input": "okm-2-1-2-op-c-is-alt-2-1-2-003",
+            "operation-name": "/v1/list-end-points-of-link"
+        },
+        {
+            "output": "alt-2-1-2-op-s-is-022",
+            "input": "okm-2-1-2-op-c-im-alt-2-1-2-000",
+            "operation-name": "/v1/notify-link-updates"
+        },
+        {
+            "output": "tar-2-1-2-op-s-is-003",
+            "input": "tar-2-1-2-op-c-is-tar-2-1-2-001",
+            "operation-name": "/v1/document-approval-status"
+        },
+        {
+            "output": "tar-2-1-2-op-s-is-004",
+            "input": "tar-2-1-2-op-c-is-tar-2-1-2-000",
+            "operation-name": "/v1/list-applications"
+        },
+        {
+            "output": "tar-2-1-2-op-s-is-007",
+            "input": "tar-2-1-2-op-c-is-tar-2-1-2-002",
+            "operation-name": "/v1/document-embedding-status"
+        }
     ]
 }
