@@ -593,3 +593,30 @@ exports.prepareLinkChangeNotificationForwardingsAsync = async function (servingO
     return undefined;
 }
 
+exports.prepareInputLinksForwardingsAsync = async function (servingOperationUuid, consumingOperationUuidList) {
+    let linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+    let existingLink = linkResponse.link;
+
+    if (!existingLink) {
+        let response = await createCompleteLinkAsync(consumingOperationUuidList, servingOperationUuid);
+        let linkUuid = response.link[onfAttributes.GLOBAL_CLASS.UUID];
+        console.log(`Adding new link: ${linkUuid}`);
+        return PrepareForwardingAutomation.createLinkChangeNotificationForwardings(
+            linkUuid
+        );
+    }else{
+        for(let index = 0; index < consumingOperationUuidList.length; index++) {
+            linkResponse = await getLinkOfTheOperationAsync(servingOperationUuid, LinkPort.portDirectionEnum.OUTPUT);
+            existingLink = linkResponse.link;
+            let consumingOperationUuid = consumingOperationUuidList[index];
+            await updateLinkAsync(existingLink, consumingOperationUuid);
+            console.log(`Updating the existing link: ${existingLink.uuid}`); 
+        }
+        return PrepareForwardingAutomation.createLinkChangeNotificationForwardings(
+            existingLink.uuid );
+    }
+    return undefined;
+}
+
+
+

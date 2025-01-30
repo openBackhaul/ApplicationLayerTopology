@@ -17,7 +17,7 @@ exports.createPreApprovedLinks = async function (preApprovedLinks) {
         } else {
             consumingOperationUuidList.push(preApprovedLink.input);
         }
-        let forwarding = await LinkServices.prepareLinkChangeNotificationForwardingsAsync(
+        let forwarding = await LinkServices.prepareInputLinksForwardingsAsync(
             servingOperationUuid, consumingOperationUuidList
         );
         if (forwarding) {
