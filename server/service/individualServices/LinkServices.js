@@ -590,7 +590,9 @@ exports.prepareLinkChangeNotificationForwardingsAsync = async function (servingO
             linkUuid
         );
     }
-    return undefined;
+    return PrepareForwardingAutomation.createLinkChangeNotificationForwardings(
+        linkResponse.link[onfAttributes.GLOBAL_CLASS.UUID]
+    );
 }
 
 exports.prepareInputLinksForwardingsAsync = async function (servingOperationUuid, consumingOperationUuidList) {
