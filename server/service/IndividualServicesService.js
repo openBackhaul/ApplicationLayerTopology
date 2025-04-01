@@ -867,6 +867,7 @@ exports.updateLtp = async function (body, user, xCorrelator, traceIndicator, cus
   
   let existingLtps = [];
   let forwardingAutomationInputList = [];
+  traceIndicator = traceIndicator.replace("undefined",1);
   // try get CC using ltp uuid - direct querying from ES
   let controlConstructResponse = await ControlConstructService.getControlConstructFromLtpUuidAsync(logicalTerminationPointUuid);
   let controlConstruct = controlConstructResponse.controlConstruct;

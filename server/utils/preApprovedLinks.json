@@ -66,9 +66,9 @@
             "operation-name": "/v1/disregard-application"
         },
         {
-            "output": "okm-2-1-2-op-s-is-004",
+            "output": "okm-2-1-2-op-s-is-005",
             "input": "alt-2-1-2-op-c-is-okm-2-1-2-002",
-            "operation-name": "/v1/regard-updated-link"
+            "operation-name": "/v2/regard-updated-link"
         },
         {
             "output": "alt-2-1-2-op-s-is-001",
@@ -125,6 +125,11 @@
         {
             "output": "tar-2-1-2-op-s-is-007",
             "input": "tar-2-1-2-op-c-is-tar-2-1-2-002",
+            "operation-name": "/v1/document-embedding-status"
+        },
+        {
+            "output": "tar-2-1-2-op-s-is-007",
+            "input": "ro-2-1-2-op-c-im-tar-2-1-2-007",
             "operation-name": "/v1/document-embedding-status"
         }
     ]
