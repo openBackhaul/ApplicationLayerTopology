@@ -590,8 +590,12 @@ exports.prepareLinkChangeNotificationForwardingsAsync = async function (servingO
             linkUuid
         );
     }
+    console.log("******************************** DEBUG ***********************************")
+    console.log("There is an existing link for the servingOperationUuid "+ servingOperationUuid);
+    console.log("The link name is " + existingLink[onfAttributes.GLOBAL_CLASS.UUID])
+    console.log("**************************************************************************")
     return PrepareForwardingAutomation.createLinkChangeNotificationForwardings(
-        linkResponse.link[onfAttributes.GLOBAL_CLASS.UUID]
+        existingLink[onfAttributes.GLOBAL_CLASS.UUID]
     );
 }
 
