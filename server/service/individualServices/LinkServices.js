@@ -589,7 +589,7 @@ exports.prepareLinkChangeNotificationForwardingsAsync = async function (servingO
         return PrepareForwardingAutomation.createLinkChangeNotificationForwardings(
             linkUuid
         );
-    }
+    }else{
     console.log("******************************** DEBUG ***********************************")
     console.log("There is an existing link for the servingOperationUuid "+ servingOperationUuid);
     console.log("The link name is " + existingLink[onfAttributes.GLOBAL_CLASS.UUID])
@@ -597,6 +597,7 @@ exports.prepareLinkChangeNotificationForwardingsAsync = async function (servingO
     return PrepareForwardingAutomation.createLinkChangeNotificationForwardings(
         existingLink[onfAttributes.GLOBAL_CLASS.UUID]
     );
+    }
 }
 
 exports.prepareInputLinksForwardingsAsync = async function (servingOperationUuid, consumingOperationUuidList) {
