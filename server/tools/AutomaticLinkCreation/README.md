@@ -1,5 +1,5 @@
 # Automatic Link Creation Tool
-This tool automates the creation of application-layer links by reading link configurations from a CSV file and calling a specified API to establish the relationships. 
+This tool automates the creation of application-layer-topology links by reading link configurations from a CSV file and calling the link creation API to establish the relationships. 
 It supports batch processing with configurable delay and outputs the results (including success/failure) into a timestamped CSV file.
 
 ## Prerequisites
