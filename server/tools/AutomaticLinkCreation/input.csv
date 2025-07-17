@@ -1,0 +1,4 @@
+servingApplicationName,servingApplicationReleaseNumber,operationName,consumingApplicationName,consumingApplicationReleaseNumber
+ExecutionAndTraceLog,2.1.2,/v1/record-service-request,RegistryOffice,2.1.2
+OamLog,2.1.2,/v1/record-oam-request,RegistryOffice,2.1.2
+OamLog,3.1.2,/v1/record-oam-request,RegistryOffice,2.1.2

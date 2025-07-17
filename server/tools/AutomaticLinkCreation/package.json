@@ -1,0 +1,23 @@
+{
+  "name": "automatic-link-creation",
+  "version": "1.0.0",
+  "description": "To automate the link creation",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "node index.js"
+  },
+  "application-layer-topology": {
+    "base-url": "http://localhost:3036",
+    "link-creation-api": "/v1/add-operation-client-to-link",
+    "operation-key": "Operation key not yet provided.",
+    "link-creation-delay-in-ms": 10000
+  },
+  "input-file": "./input.csv",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "csvtojson": "^2.0.10",
+    "json-2-csv": "^5.5.9",
+    "randexp": "^0.5.3"
+  }
+}
